@@ -1,7 +1,4 @@
-Welcome to your new dbt project!
-
-This is a test
-### Using the starter project
+# 🚧 UNDER CONSTRUCTION 🚧
 
 Try running the following commands:
 - dbt run
