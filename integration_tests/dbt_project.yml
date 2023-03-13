@@ -1,0 +1,33 @@
+name: 'zuora_integration_tests'
+version: '0.1.0'
+profile: 'integration_tests'
+config-version: 2
+
+vars:
+  zuora_schema: zuora_integration_tests
+  zuora_source:
+    zuora_account_identifier: "zuora_account_data"
+    zuora_accounting_code_identifier: "zuora_accounting_code_data"
+    zuora_amendment_identifier: "zuora_amendment_data"
+    zuora_contact_identifier: "zuora_contact_data"
+    zuora_credit_balance_adjustment_identifier: "zuora_credit_balance_adjustment_data"
+    zuora_invoice_identifier: "zuora_invoice_data"
+    zuora_invoice_item_identifier: "zuora_invoice_item_data"
+    zuora_journal_entry_identifier: "zuora_journal_entry_data"
+    zuora_journal_entry_item_identifier: "zuora_journal_entry_item_data"
+    zuora_order_identifier: "zuora_order_data"
+    zuora_order_item_identifier: "zuora_order_item_data"
+    zuora_payment_identifier: "zuora_payment_data"
+    zuora_payment_method_identifier: "zuora_payment_method_data"
+    zuora_product_identifier: "zuora_product_data"
+    zuora_product_rate_plan_identifier: "zuora_product_rate_plan_data"
+    zuora_product_rate_plan_charge_identifier: "zuora_product_rate_plan_charge_data"
+    zuora_rate_plan_identifier: "zuora_rate_plan_data"
+    zuora_rate_plan_charge_identifier: "zuora_rate_plan_charge_data"
+    zuora_refund_identifier: "zuora_refund_data"
+    zuora_subscription_identifier: "zuora_subscription_data"
+    zuora_taxation_item_identifier: "zuora_taxation_item_data"
+  
+dispatch:
+  - macro_namespace: dbt_utils
+    search_order: ['spark_utils', 'dbt_utils']

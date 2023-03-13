@@ -1,0 +1,2 @@
+packages: 
+  - local: ../dbt_zuora_source
