@@ -1,17 +1,29 @@
-with credit_balance_adjustment_transactions as (
+with invoice as (
 
     select * 
-    from {{ ref('zuora__credit_balance_adjustment_transactions') }} 
+    from {{ var('invoice') }} 
 ),
 
-invoice_item_transactions as (
+invoice_item as (
 
     select * 
-    from {{ ref('zuora__invoice_item_transactions') }} 
+    from {{ var('invoice_item') }} 
 ),
 
-payment_transactions as (
+invoice_payment as  (
 
     select * 
-    from {{ ref('zuora__payment_transactions') }} 
+    from {{ var('invoice_payment') }} 
 ),
+
+account as (
+
+    select * 
+    from {{ var('account') }} 
+),  a
+
+select 
+    invoice.invoice_id,
+    invo
+
+from invoice
