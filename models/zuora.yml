@@ -1,0 +1,57 @@
+version: 2
+
+models:
+  - name: int_zuora__billing_enriched
+
+  - name: zuora__billing_history
+    description: Each record is an invoice enhanced with values from payments, refunds, adjustments, discounts and taxes.
+    columns:
+      - name: invoice_id
+        description: "{{ doc('id') }} invoice table."
+      - name: invoice_number
+        description: The unique identification number for the invoice.
+      - name: invoice_date
+        description: Specifies the date on which to generate the invoice.
+      - name: invoice_amount
+        description: The sum of all charges and taxes associated with the invoice.
+      - name: invoice_amount_home_currency
+        description: The sum of all charges and taxes associated with the invoice in the home currency of the account.
+      - name: payment_amount
+        description: The amount of payments applied to the invoice.
+      - name: tax_amount
+        description: The total amount of the taxes applied to the invoice.
+      - name: refund_amount
+        description: The amount of refunds applied to the invoice.
+      - name: credit_balance_adjustment
+        description: The amount of the credit balance adjustment applied to the invoice.
+      - name: balance
+        description: The remaining balance of the invoice after all payments, adjustments, and refunds are applied.
+      - name: transaction_currency 
+      - name: home_currency 
+      - name: exchange_rate_date 
+      - name: due_date
+      - name: status
+        description: The status of the invoice in the system. This status is not the status of the payment of the invoice, just the status of the invoice itself.
+      - name: payment_id
+      - name: payment_number
+      - name: payment_date
+      - name: payment_status
+      - name: payment_type
+      - name: payment_amount_home_currency
+      - name: refund_id
+      - name: refund_number 
+      - name: refund_date 
+      - name: refund_status 
+      - name: refund_type
+      - name: credit_balance_adjustment_id
+      - name: credit_balance_adjustment_number
+      - name: credit_balance_adjustment_reason_code
+      - name: credit_balance_adjustment_home_currency 
+      - name: payment_method_id
+      - name: payment_method_type
+      - name: payment_method_subtype
+      - name: is_payment_method_active
+      - name: invoice_items
+      - name: products
+      - name: subscriptions
+      - name: discount_charges

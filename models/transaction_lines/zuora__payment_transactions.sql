@@ -20,7 +20,7 @@ invoice_item as (
 
     select * 
     from {{ var('invoice_item') }} 
-),
+)
 
 select 
     payment_id as transaction_id,
@@ -52,3 +52,5 @@ from payment
         on payment.invoice_id = invoice_item.invoice_id
     left join contact
         on payment.created_by_id = contact.contact_id
+
+*/

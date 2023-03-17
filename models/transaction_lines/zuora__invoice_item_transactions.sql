@@ -33,7 +33,7 @@ product as (
 
     select * 
     from {{ var('product') }}
-)
+),
 
 product_rate_plan_charge as (
 
@@ -87,7 +87,7 @@ from invoice_item
     left join contact
         on invoice_item.created_by_id = contact.contact_id
     left join payment_method
-        on invoice_item.payment_method_id = payment_method.payment_method_id
+        on invoice_payment.payment_method_id = payment_method.payment_method_id
     left join product 
         on invoice_item.product_id = product.product_id
     left join product_rate_plan_charge
