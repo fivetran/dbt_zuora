@@ -38,7 +38,8 @@ credit_balance_adjustment as (
         credit_balance_adjustment_id,
         number as credit_balance_adjustment_number,
         reason_code as credit_balance_adjustment_reason_code,
-        amount_home_currency as credit_balance_adjustment_home_currency
+        amount_home_currency as credit_balance_adjustment_home_currency,
+        adjustment_date as credit_balance_adjustment_date
     from {{ var('credit_balance_adjustment') }} 
 ),
 
@@ -49,8 +50,7 @@ refund as (
         refund_number,
         refund_date,
         status as refund_status,
-        type as refund_type,
-        payout_id as payment_id,
+        type as refund_type, 
         payment_method_id
     from {{ var('refund') }} 
 ),
@@ -77,29 +77,25 @@ final as (
         invoice.payment_amount,
         invoice.tax_amount,
         invoice.refund_amount,
-        invoice.credit_balance_adjustment,
+        invoice.credit_balance_adjustment_amount,
         invoice.balance,
         invoice.transaction_currency,
         invoice.home_currency,
         invoice.exchange_rate_date,
         invoice.due_date,
         invoice.status,
-        payment_id,
+        payment.payment_id,
         payment_number,
         payment_date,
         payment_status,
         payment_type, 
         payment_amount_home_currency, 
-        refund_id,
-        refund_number,
-        refund_date,
-        refund_status,
-        refund_type,
         credit_balance_adjustment_id,
         credit_balance_adjustment_number,
         credit_balance_adjustment_reason_code,
         credit_balance_adjustment_home_currency,
-        payment_method_id,
+        credit_balance_adjustment_date,
+        payment_method.payment_method_id,
         payment_method_type,
         payment_method_subtype,
         is_payment_method_active,
@@ -111,13 +107,11 @@ final as (
     left join invoice_payment on 
         invoice.invoice_id = invoice_payment.invoice_id
     left join payment on 
-        invoice_payment.payment_id = payment.payment_id
-    left join refund on
-        payment.payment_id = refund.payment_id
+        invoice_payment.payment_id = payment.payment_id 
     left join credit_balance_adjustment on 
         credit_balance_adjustment.invoice_id = invoice.invoice_id
     left join invoice_item_enriched on  
-        invoice.invoice_id = invoiinvoice_item_enriched.invoice_id
+        invoice.invoice_id = invoice_item_enriched.invoice_id
     left join payment_method on 
         payment.payment_method_id = payment_method.payment_method_id
 )

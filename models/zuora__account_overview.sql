@@ -10,15 +10,17 @@ contact as (
     from {{ var('contact') }} 
 ),
 
-account_cumulatives as (
+account_enriched as (
 
     select * 
-    from {{ ref('int_zuora__account_cumulatives') }} 
+    from {{ ref('int_zuora__account_enriched') }} 
 )
 
 select 
     account.account_id, 
-    account.account_created_date as account_created_at,
+    account.created_date as account_created_at,
+    case when {{ dbt.datediff("account.created_date", dbt.current_timestamp(), "day") }} <= 30
+        then true else false end as is_new_account,
     account.name as account_name,
     account.account_number,
     account.balance as account_balance,
@@ -35,10 +37,12 @@ select
     contact.last_name as account_last_name,
     contact.postal_code as account_postal_code,
     contact.state as account_state,
-    invoice_charge_count,
-    invoice_count,
-    subscriptions,
-    active_subscriptions
+    account_enriched.first_charge_date,
+    account_enriched.invoice_item_count,
+    account_enriched.invoice_count,
+    account_enriched.subscription_count,
+    account_enriched.active_subscription_count,
+    account_enriched.is_current_subscriber
     
     {{ fivetran_utils.persist_pass_through_columns('zuora_account_pass_through_columns', identifier='account') }},
 
@@ -46,5 +50,5 @@ select
 from account
     left join contact 
         on account.account_id = contact.account_id
-    left join account_cumulatives
-        on account.account_id = account_invoice_data.account_id 
+    left join account_enriched
+        on account.account_id = account_enriched.account_id 
