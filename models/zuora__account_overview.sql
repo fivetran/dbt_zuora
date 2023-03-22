@@ -6,8 +6,10 @@ with account_enriched as (
 
 contact as (
 
-    select * 
+    select *,
+        row_number() over (partition by account_id order by created_date desc) = 1 as is_most_recent_record
     from {{ var('contact') }} 
+    
 )
 
 select 
@@ -61,3 +63,4 @@ select
 from account_enriched
     left join contact 
         on account_enriched.account_id = contact.account_id
+        where contact.is_most_recent_record = true

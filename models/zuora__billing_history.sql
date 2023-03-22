@@ -84,6 +84,7 @@ final as (
         invoice.exchange_rate_date,
         invoice.due_date,
         invoice.status,
+        invoice.source_type as purchase_type,
         payment.payment_id,
         payment_number,
         payment_date,
@@ -102,7 +103,11 @@ final as (
         invoice_item_enriched.invoice_items,
         invoice_item_enriched.products,
         invoice_item_enriched.subscriptions,
-        invoice_item_enriched.discount_charges
+        invoice_item_enriched.discount_charges,
+        invoice_item_enriched.units,
+        invoice_item_enriched.first_charge_date,
+        invoice_item_enriched.most_recent_charge_date
+
     from invoice
     left join invoice_payment on 
         invoice.invoice_id = invoice_payment.invoice_id
