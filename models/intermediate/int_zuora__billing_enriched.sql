@@ -6,6 +6,7 @@ with invoice_item_enriched as (
         count(distinct product_id) as products,
         count(distinct subscription_id) as subscriptions,
         sum(case when processing_type = '1' then charge_amount else 0 end) as discount_charges,
+        sum(case when processing_type = '1' then charge_amount_home_currency else 0 end) as discount_charges_home_currency,
         sum(quantity) as units,
         min(charge_date) as first_charge_date,
         max(charge_date) as most_recent_charge_date,
