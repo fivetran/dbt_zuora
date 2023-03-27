@@ -1,6 +1,6 @@
 with invoice as (
 
-    select * 
+    select *
     from {{ var('invoice') }} 
 ),
 
@@ -65,20 +65,29 @@ payment_method as (
     from {{ var('payment_method') }} 
 ),
 
+past_due_amount as(
+
+
+)
+
 final as (
 
     select 
         invoice.invoice_id,
         invoice.account_id,
+        invoice.created_date as created_at,
         invoice.invoice_number,
         invoice.invoice_date,
         invoice.amount as invoice_amount,
         invoice.amount_home_currency as invoice_amount_home_currency,
-        invoice.payment_amount,
+        invoice.payment_amount as invoice_amount_paid,
+        invoice.balance as invoice_amount_unpaid,
+        sum(case when cast({{ dbt.date_trunc('day', dbt.current_timestamp_backcompat()) }} as date) > invoice.due_date
+                and invoice.amount != invoice.payment_amount
+                then balance else 0 end) as total_amount_past_due,
         invoice.tax_amount,
         invoice.refund_amount,
         invoice.credit_balance_adjustment_amount,
-        invoice.balance,
         invoice.transaction_currency,
         invoice.home_currency,
         invoice.exchange_rate_date,
@@ -90,7 +99,7 @@ final as (
         payment_date,
         payment_status,
         payment_type, 
-        payment_amount_home_currency, 
+        payment_amount_home_currency as invoice_amount_paid_home_currency, 
         credit_balance_adjustment_id,
         credit_balance_adjustment_number,
         credit_balance_adjustment_reason_code,
@@ -104,6 +113,7 @@ final as (
         invoice_item_enriched.products,
         invoice_item_enriched.subscriptions,
         invoice_item_enriched.discount_charges,
+        invoice_item_enriched.discount_charges_home_currency,
         invoice_item_enriched.units,
         invoice_item_enriched.first_charge_date,
         invoice_item_enriched.most_recent_charge_date
