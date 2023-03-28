@@ -51,6 +51,12 @@ with spine as (
     }}
 ),
 
+billing_history as (
+    
+    select *
+    from {{ ref('zuora__billing_history') }}
+),
+
 account_overview as (
 
     select *

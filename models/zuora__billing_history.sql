@@ -1,7 +1,29 @@
 with invoice as (
 
-    select *
+    select
+        invoice_id,
+        account_id,
+        created_date as created_at,
+        invoice_number,
+        invoice_date,
+        amount as invoice_amount,
+        amount_home_currency as invoice_amount_home_currency,
+        payment_amount as invoice_amount_paid,
+        balance as invoice_amount_unpaid,
+        tax_amount,
+        refund_amount,
+        credit_balance_adjustment_amount,
+        transaction_currency,
+        home_currency,
+        exchange_rate_date,
+        due_date,
+        status,
+        source_type as purchase_type,
+        sum(case when cast({{ dbt.date_trunc('day', dbt.current_timestamp_backcompat()) }} as date) > due_date
+                and amount != payment_amount
+                then balance else 0 end) as total_amount_past_due
     from {{ var('invoice') }} 
+    {{ dbt_utils.group_by(18) }}
 ),
 
 invoice_item_enriched as (
@@ -65,26 +87,18 @@ payment_method as (
     from {{ var('payment_method') }} 
 ),
 
-past_due_amount as(
-
-
-)
-
 final as (
 
     select 
         invoice.invoice_id,
         invoice.account_id,
-        invoice.created_date as created_at,
+        invoice.created_at,
         invoice.invoice_number,
         invoice.invoice_date,
-        invoice.amount as invoice_amount,
-        invoice.amount_home_currency as invoice_amount_home_currency,
-        invoice.payment_amount as invoice_amount_paid,
-        invoice.balance as invoice_amount_unpaid,
-        sum(case when cast({{ dbt.date_trunc('day', dbt.current_timestamp_backcompat()) }} as date) > invoice.due_date
-                and invoice.amount != invoice.payment_amount
-                then balance else 0 end) as total_amount_past_due,
+        invoice.invoice_amount,
+        invoice.invoice_amount_home_currency,
+        invoice.invoice_amount_paid,
+        invoice.invoice_amount_unpaid,
         invoice.tax_amount,
         invoice.refund_amount,
         invoice.credit_balance_adjustment_amount,
@@ -93,7 +107,7 @@ final as (
         invoice.exchange_rate_date,
         invoice.due_date,
         invoice.status,
-        invoice.source_type as purchase_type,
+        invoice.purchase_type,
         payment.payment_id,
         payment_number,
         payment_date,
@@ -116,7 +130,7 @@ final as (
         invoice_item_enriched.discount_charges_home_currency,
         invoice_item_enriched.units,
         invoice_item_enriched.first_charge_date,
-        invoice_item_enriched.most_recent_charge_date
+        invoice_item_enriched.most_recent_charge_date,
 
     from invoice
     left join invoice_payment on 

@@ -48,17 +48,16 @@ account_totals as (
         sum(tax_amount) as total_taxes,
         sum(invoice_amount) as total_invoice_amount,
         sum(invoice_amount_home_currency) as total_invoice_amount_home_currency,
-        sum(payment_amount) as total_amount_paid,
-        sum(balance) as total_amount_not_paid,
+        sum(invoice_amount_paid) as total_amount_paid,
+        sum(invoice_amount_unpaid) as total_amount_not_paid,
         sum(case when cast({{ dbt.date_trunc('day', dbt.current_timestamp_backcompat()) }} as date) > due_date
-                and invoice_amount != payment_amount 
-                then balance else 0 end) as total_amount_past_due,
+                and invoice_amount != invoice_amount_paid 
+                then invoice_amount_unpaid else 0 end) as total_amount_past_due,
         max(payment_date) as most_recent_payment_date,
         max(credit_balance_adjustment_date) as most_recent_credit_balance_adjustment_date 
     from billing_history
     {{ dbt_utils.group_by(1) }}
 ),
-
 
 account_invoice_data as (
 

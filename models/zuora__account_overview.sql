@@ -14,10 +14,10 @@ contact as (
 
 select 
     account_enriched.account_id, 
-    account_enriched.created_date as created_at,
+    account_enriched.created_date as account_created_at,
     account_enriched.name as account_name,
     account_enriched.account_number,
-    account_enriched.credit_balance,
+    account_enriched.credit_balance as account_credit_balance,
     account_enriched.mrr as account_mrr,
     account_enriched.status as account_status,
     account_enriched.auto_pay as is_auto_pay,

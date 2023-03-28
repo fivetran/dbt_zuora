@@ -18,7 +18,7 @@ transactions_grouped as (
         sum(invoice_amount_home_currency) as daily_invoice_amount_home_currency,
         sum(invoice_amount_paid) as daily_amount_paid,
         sum(invoice_amount_paid_home_currency) as daily_amount_paid_home_currency,
-        sum(balance) as daily_amount_unpaid,
+        sum(invoice_amount_unpaid) as daily_amount_unpaid,
         sum(tax_amount) as daily_taxes,
         sum(refund_amount) as daily_refunds,
         sum(credit_balance_adjustment_amount) as daily_credit_balance_adjustments,
