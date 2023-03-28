@@ -33,6 +33,8 @@ vars:
   zuora_rate_plan_charge_pass_through_columns: []
   zuora_subscription_pass_through_columns: []
 
+  using_multicurrency: false
+
 models:
   zuora:
     +schema: zuora

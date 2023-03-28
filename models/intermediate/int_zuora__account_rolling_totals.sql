@@ -1,5 +1,4 @@
-{% set fields = ['invoices', 'invoice_items', 'invoice_amount', 'invoice_amount_home_currency', 'amount_paid', 'amount_paid_home_currency', 'amount_unpaid', 'taxes', 'refunds', 'credit_balance_adjustments', 'credit_balance_adjustments_home_currency', 'discounts', 'discounts_home_currency'] %}
-
+{% set fields = ['invoices','invoice_items','invoice_amount','amount_paid','amount_unpaid','taxes','credit_balance_adjustments',  'discounts','refunds'] %}
 
 with invoice_date_spine as (
 
@@ -35,16 +34,12 @@ account_rolling_totals as (
         account_rolling.daily_invoices,
         account_rolling.daily_invoice_items,
         account_rolling.daily_invoice_amount,
-        account_rolling.daily_invoice_amount_home_currency,
         account_rolling.daily_amount_paid,
-        account_rolling.daily_amount_paid_home_currency, 
-        account_rolling.daily_amount_unpaid, 
-        account_rolling.daily_taxes, 
-        account_rolling.daily_refunds, 
-        account_rolling.daily_credit_balance_adjustments, 
-        account_rolling.daily_credit_balance_adjustments_home_currency, 
-        account_rolling.daily_discounts, 
-        account_rolling.daily_discounts_home_currency,
+        account_rolling.daily_amount_unpaid,
+        account_rolling.daily_taxes,
+        account_rolling.daily_credit_balance_adjustments,
+        account_rolling.daily_discounts,
+        account_rolling.daily_refunds,
         {% for f in fields %}
         case when account_rolling.rolling_{{ f }} is null and date_index = 1
             then 0

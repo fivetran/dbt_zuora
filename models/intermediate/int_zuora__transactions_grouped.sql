@@ -14,17 +14,25 @@ transactions_grouped as (
         cast({{ dbt.date_trunc("year", "invoice_date") }} as date) as date_year, 
         count(distinct invoice_id) as daily_invoices,
         sum(invoice_items) as daily_invoice_items,
+
+        {% if var('using_multicurrency', true) %}
+        sum(invoice_amount_home_currency) as daily_invoice_amount,
+        sum(invoice_amount_paid_home_currency) as daily_amount_paid,
+        sum(invoice_amount_unpaid_home_currency) as daily_amount_unpaid,
+        sum(tax_amount_home_currency) as daily_taxes,
+        sum(credit_balance_adjustment_home_currency) as daily_credit_balance_adjustments,
+        sum(discount_charges_home_currency) as daily_discounts,
+        {% else %} 
         sum(invoice_amount) as daily_invoice_amount, 
-        sum(invoice_amount_home_currency) as daily_invoice_amount_home_currency,
         sum(invoice_amount_paid) as daily_amount_paid,
-        sum(invoice_amount_paid_home_currency) as daily_amount_paid_home_currency,
         sum(invoice_amount_unpaid) as daily_amount_unpaid,
         sum(tax_amount) as daily_taxes,
-        sum(refund_amount) as daily_refunds,
         sum(credit_balance_adjustment_amount) as daily_credit_balance_adjustments,
-        sum(credit_balance_adjustment_home_currency) as daily_credit_balance_adjustments_home_currency,
         sum(discount_charges) as daily_discounts,
-        sum(discount_charges_home_currency) as daily_discounts_home_currency
+        {% endif %}
+        
+        sum(refund_amount) as daily_refunds 
+
     from invoice_joined
     {{ dbt_utils.group_by(5) }}
 )

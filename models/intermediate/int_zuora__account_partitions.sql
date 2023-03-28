@@ -1,4 +1,4 @@
-{% set fields = ['rolling_invoices','rolling_invoice_items','rolling_invoice_amount','rolling_invoice_amount_home_currency','rolling_amount_paid','rolling_amount_paid_home_currency','rolling_amount_unpaid','rolling_taxes','rolling_refunds','rolling_credit_balance_adjustments','rolling_credit_balance_adjustments_home_currency','rolling_discounts','rolling_discounts_home_currency'] %}
+{% set fields = ['rolling_invoices','rolling_invoice_items','rolling_invoice_amount','rolling_amount_paid','rolling_amount_unpaid','rolling_taxes','rolling_credit_balance_adjustments','rolling_discounts','rolling_refunds'] %}
 
 with account_rolling_totals as (
 
