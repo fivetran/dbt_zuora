@@ -13,6 +13,7 @@ account_overview as (
 account_daily_overview as (
 
     select 
+        account_running_totals.account_daily_id,
         account_running_totals.account_id,
         account_overview.account_created_at,
         account_overview.account_name,
@@ -28,7 +29,6 @@ account_daily_overview as (
         
         {{ fivetran_utils.persist_pass_through_columns('zuora_account_pass_through_columns', identifier='account_overview') }}  
        
-        account_running_totals.account_daily_id,
         account_running_totals.date_day,        
         account_running_totals.date_week, 
         account_running_totals.date_month, 
