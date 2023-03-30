@@ -1,9 +1,9 @@
 {% set fields = ['invoices','invoice_items','invoice_amount','amount_paid','amount_unpaid','taxes','credit_balance_adjustments',  'discounts','refunds'] %}
 
-with invoice_date_spine as (
+with transaction_date_spine as (
 
     select * 
-    from {{ ref('int_zuora__invoice_date_spine') }}
+    from {{ ref('int_zuora__transaction_date_spine') }}
 ),
 
 transactions_grouped as (
@@ -26,11 +26,11 @@ account_rolling as (
 account_rolling_totals as (
 
     select 
-        coalesce(account_rolling.account_id, invoice_date_spine.account_id) as account_id,
-        coalesce(account_rolling.date_day, invoice_date_spine.date_day) as date_day,
-        coalesce(account_rolling.date_week, invoice_date_spine.date_week) as date_week,
-        coalesce(account_rolling.date_month, invoice_date_spine.date_month) as date_month,
-        coalesce(account_rolling.date_year, invoice_date_spine.date_year) as date_year,
+        coalesce(account_rolling.account_id, transaction_date_spine.account_id) as account_id,
+        coalesce(account_rolling.date_day, transaction_date_spine.date_day) as date_day,
+        coalesce(account_rolling.date_week, transaction_date_spine.date_week) as date_week,
+        coalesce(account_rolling.date_month, transaction_date_spine.date_month) as date_month,
+        coalesce(account_rolling.date_year, transaction_date_spine.date_year) as date_year,
         account_rolling.daily_invoices,
         account_rolling.daily_invoice_items,
         account_rolling.daily_invoice_amount,
@@ -46,14 +46,14 @@ account_rolling_totals as (
             else account_rolling.rolling_{{ f }}
             end as rolling_{{ f }},
         {% endfor %}
-        invoice_date_spine.date_index
-    from invoice_date_spine 
+        transaction_date_spine.date_index
+    from transaction_date_spine 
     left join account_rolling
-        on account_rolling.account_id = invoice_date_spine.account_id 
-        and account_rolling.date_day = invoice_date_spine.date_day
-        and account_rolling.date_week = invoice_date_spine.date_week
-        and account_rolling.date_month = invoice_date_spine.date_month
-        and account_rolling.date_year = invoice_date_spine.date_year
+        on account_rolling.account_id = transaction_date_spine.account_id 
+        and account_rolling.date_day = transaction_date_spine.date_day
+        and account_rolling.date_week = transaction_date_spine.date_week
+        and account_rolling.date_month = transaction_date_spine.date_month
+        and account_rolling.date_year = transaction_date_spine.date_year
 )
 
 select * 

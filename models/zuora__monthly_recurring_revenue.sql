@@ -1,21 +1,83 @@
-with account_revenue_line_items as (
+with revenue_line_items as (
 
     select *
-    from {{ ref('int_zuora__account_revenue_line_items') }}
+    from {{ ref('int_zuora__revenue_line_items') }}
+),
+
+transaction_month_spine as (
+
+    select 
+        account_id,
+        date_month,
+        date_index as month_index
+    from {{ ref('int_zuora__transaction_date_spine') }}
+    {{ dbt_utils.group_by(3) }}
+),
+
+coalesce_date_spine as (
+
+    select 
+        coalesce(revenue_line_items.account_id, transaction_month_spine.account_id) as account_id, 
+        coalesce(revenue_line_items.charge_month, transaction_month_spine.date_month) as account_month,
+        month_index as account_month_index,
+        charge_type,
+        gross_revenue,
+        discount_revenue,
+        net_revenue
+    from revenue_line_items 
+    left join transaction_month_spine 
+        on revenue_line_items.account_id = transaction_month_spine.account_id
+        and revenue_line_items.charge_month = transaction_month_spine.date_month
 ),
 
 mrr_by_account as (
 
     select 
         account_id,
-        charge_id,
-        charge_month,
-        sum(gross_revenue) as gross_mrr,
-        sum(discount_revenue) as discount_mrr,
-        sum(net_revenue) as net_mrr
-    from account_revenue
-    {{ dbt_utils.group_by(3) }}
+        account_month,
+        account_month_index,
+        {{ dbt_utils.generate_surrogate_key(['account_id', 'account_month']) }} as account_monthly_id,
+        sum(case when charge_type = 'Recurring' then gross_revenue else 0 end) as gross_current_month_mrr,
+        sum(case when charge_type = 'Recurring' then discount_revenue else 0 end) as discount_current_month_mrr,
+        sum(case when charge_type = 'Recurring' then net_revenue else 0 end) as net_current_month_mrr,
+        sum(case when charge_type != 'Recurring' then gross_revenue else 0 end) as gross_current_month_non_mrr,
+        sum(case when charge_type != 'Recurring' then discount_revenue else 0 end) as discount_current_month_non_mrr,
+        sum(case when charge_type != 'Recurring' then net_revenue else 0 end) as net_current_month_non_mrr
+    from coalesce_date_spine
+    {{ dbt_utils.group_by(4) }}
+),
+
+current_vs_previous_mrr as (
+    
+    select 
+        *,
+        lag(gross_current_month_mrr) over (partition by account_id order by account_month) as gross_previous_month_mrr,
+        lag(discount_current_month_mrr) over (partition by account_id order by account_month) as discount_previous_month_mrr,
+        lag(net_current_month_mrr) over (partition by account_id order by account_month) as net_previous_month_mrr,
+        lag(gross_current_month_non_mrr) over (partition by account_id order by account_month) as gross_previous_month_non_mrr,
+        lag(discount_current_month_mrr) over (partition by account_id order by account_month) as discount_previous_month_non_mrr,
+        lag(net_current_month_mrr) over (partition by account_id order by account_month) as net_previous_month_non_mrr
+    from mrr_by_account
+),
+
+mrr_type as (
+
+    select 
+        *,   
+        case when net_current_month_mrr > net_previous_month_mrr then 'expansion'
+            when net_current_month_mrr < net_previous_month_mrr then 'contraction'
+            when net_current_month_mrr = net_previous_month_mrr then 'unchanged'
+            when net_previous_month_mrr is null then 'new'
+            when (net_current_month_mrr = 0.0 or net_current_month_mrr is null)
+                and (net_previous_month_mrr != 0.0)
+                then 'churned'
+            when (net_previous_month_mrr = 0.0 and net_current_month_mrr > 0.0 
+                and account_month_index >= 3) 
+                then 'reactivation'
+            else null
+            end as mrr_type
+    from current_vs_previous_mrr
 )
 
 select * 
-from mrr_by_account
+from mrr_type
