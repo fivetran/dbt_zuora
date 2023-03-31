@@ -4,28 +4,28 @@ with revenue_line_items as (
     from {{ ref('int_zuora__revenue_line_items') }}
 ),
 
-transaction_month_spine as (
+account_daily_overview as (
 
     select 
         account_id,
         date_month
-    from {{ ref('int_zuora__transaction_date_spine') }}
+    from {{ ref('zuora__account_daily_overview') }}
     {{ dbt_utils.group_by(2) }}
 ),
 
 coalesce_date_spine as (
 
     select 
-        coalesce(transaction_month_spine.account_id, revenue_line_items.account_id) as account_id, 
-        coalesce(transaction_month_spine.date_month, revenue_line_items.charge_month) as account_month,
+        coalesce(account_daily_overview.account_id, revenue_line_items.account_id) as account_id, 
+        coalesce(account_daily_overview.date_month, revenue_line_items.charge_month) as account_month,
         charge_type,
         gross_revenue,
         discount_revenue,
         net_revenue
-    from transaction_month_spine
+    from account_daily_overview
     left join revenue_line_items
-        on transaction_month_spine.account_id = revenue_line_items.account_id
-        and transaction_month_spine.date_month = revenue_line_items.charge_month 
+        on account_daily_overview.account_id = revenue_line_items.account_id
+        and account_daily_overview.date_month = revenue_line_items.charge_month 
 ),
 
 mrr_by_account as (
