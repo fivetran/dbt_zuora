@@ -1,31 +1,7 @@
 with revenue_line_items as (
 
     select *
-    from {{ ref('int_zuora__revenue_line_items') }}
-),
-
-account_daily_overview as (
-
-    select 
-        account_id,
-        date_month
-    from {{ ref('zuora__account_daily_overview') }}
-    {{ dbt_utils.group_by(2) }}
-),
-
-coalesce_date_spine as (
-
-    select 
-        coalesce(account_daily_overview.account_id, revenue_line_items.account_id) as account_id, 
-        coalesce(account_daily_overview.date_month, revenue_line_items.charge_month) as account_month,
-        charge_type,
-        gross_revenue,
-        discount_revenue,
-        net_revenue
-    from account_daily_overview
-    left join revenue_line_items
-        on account_daily_overview.account_id = revenue_line_items.account_id
-        and account_daily_overview.date_month = revenue_line_items.charge_month 
+    from {{ ref('zuora__revenue_line_item_history') }}
 ),
 
 mrr_by_account as (
@@ -41,7 +17,7 @@ mrr_by_account as (
         sum(case when charge_type != 'Recurring' then gross_revenue else 0 end) as gross_current_month_non_mrr,
         sum(case when charge_type != 'Recurring' then discount_revenue else 0 end) as discount_current_month_non_mrr,
         sum(case when charge_type != 'Recurring' then net_revenue else 0 end) as net_current_month_non_mrr
-    from coalesce_date_spine
+    from revenue_line_items
     {{ dbt_utils.group_by(3) }}
 ),
 
