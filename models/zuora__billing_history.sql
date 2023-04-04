@@ -23,6 +23,7 @@ with invoice as (
                 and amount != payment_amount
                 then balance else 0 end) as total_amount_past_due
     from {{ var('invoice') }} 
+    where is_most_recent_record    
     {{ dbt_utils.group_by(18) }}
 ),
 
@@ -43,6 +44,7 @@ refund as (
         type as refund_type, 
         payment_method_id
     from {{ var('refund') }} 
+    where is_most_recent_record
 ),
 
 billing_history as (
@@ -80,7 +82,7 @@ billing_history as (
         billing_enriched.credit_balance_adjustment_id,
         billing_enriched.credit_balance_adjustment_number,
         billing_enriched.credit_balance_adjustment_reason_code,
-        billing_enriched.credit_balance_adjustment_home_currency,
+        billing_enriched.credit_balance_adjustment_amount_home_currency,
         billing_enriched.credit_balance_adjustment_date, 
         billing_enriched.tax_amount_home_currency,
         billing_enriched.invoice_items,

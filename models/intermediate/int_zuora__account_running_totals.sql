@@ -1,4 +1,4 @@
-{% set fields = ['rolling_invoices','rolling_invoice_items','rolling_invoice_amount','rolling_amount_paid','rolling_amount_unpaid','rolling_taxes','rolling_credit_balance_adjustments','rolling_discounts','rolling_refunds'] %}
+{% set fields = ['invoices','invoice_items','invoice_amount','invoice_amount_paid','invoice_amount_unpaid','tax_amount','credit_balance_adjustment_amount','discount_charges','refunds'] %}
 
 with account_partitions as (
 
@@ -16,20 +16,18 @@ account_running_totals as (
         date_month, 
         date_year,  
         date_index, 
-        coalesce(daily_invoices,0) as daily_invoices,
-        coalesce(daily_invoice_items,0) as daily_invoice_items,
-        coalesce(daily_invoice_amount,0) as daily_invoice_amount,
-        coalesce(daily_amount_paid,0) as daily_amount_paid,
-        coalesce(daily_amount_unpaid,0) as daily_amount_unpaid,
-        coalesce(daily_taxes,0) as daily_taxes,
-        coalesce(daily_credit_balance_adjustments,0) as daily_credit_balance_adjustments,
-        coalesce(daily_discounts,0) as daily_discounts,
-        coalesce(daily_refunds,0) as daily_refunds,
+
         {% for f in fields %}
-        coalesce({{ f }},   
-            first_value({{ f }}) over (partition by {{ f }}_partition order by date_day rows unbounded preceding)) as {{ f }}
-        {%- if not loop.last -%},{%- endif -%}
+            coalesce(daily_{{ f }}, 0) as daily_{{ f }},
+        {% endfor %} 
+
+        {% for f in fields %}
+            coalesce(rolling_{{ f }},   
+                first_value(rolling_{{ f }}) over (partition by rolling_{{ f }}_partition order by date_day rows unbounded preceding)) as rolling_{{ f }}
+        {%- if not loop.last -%},
+        {%- endif -%}
         {% endfor %}
+        
     from account_partitions
 )
 

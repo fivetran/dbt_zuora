@@ -1,4 +1,4 @@
-{% set fields = ['invoices','invoice_items','invoice_amount','amount_paid','amount_unpaid','taxes','credit_balance_adjustments',  'discounts','refunds'] %}
+{% set fields = ['invoices','invoice_items','invoice_amount','invoice_amount_paid','invoice_amount_unpaid','tax_amount','credit_balance_adjustment_amount','discount_charges','refunds'] %}
 
 with transaction_date_spine as (
 
@@ -17,7 +17,7 @@ account_rolling as (
     select 
         *,
         {% for f in fields %}
-        sum(daily_{{ f }}) over (partition by account_id order by date_day, account_id rows unbounded preceding) as rolling_{{ f }}
+            sum(daily_{{ f }}) over (partition by account_id order by date_day, account_id rows unbounded preceding) as rolling_{{ f }}
         {%- if not loop.last -%},{%- endif -%}
         {% endfor %}  
     from transactions_grouped
@@ -34,11 +34,11 @@ account_rolling_totals as (
         account_rolling.daily_invoices,
         account_rolling.daily_invoice_items,
         account_rolling.daily_invoice_amount,
-        account_rolling.daily_amount_paid,
-        account_rolling.daily_amount_unpaid,
-        account_rolling.daily_taxes,
-        account_rolling.daily_credit_balance_adjustments,
-        account_rolling.daily_discounts,
+        account_rolling.daily_invoice_amount_paid,
+        account_rolling.daily_invoice_amount_unpaid,
+        account_rolling.daily_tax_amount,
+        account_rolling.daily_credit_balance_adjustment_amount,
+        account_rolling.daily_discount_charges,
         account_rolling.daily_refunds,
         {% for f in fields %}
         case when account_rolling.rolling_{{ f }} is null and date_index = 1
@@ -46,6 +46,7 @@ account_rolling_totals as (
             else account_rolling.rolling_{{ f }}
             end as rolling_{{ f }},
         {% endfor %}
+
         transaction_date_spine.date_index
     from transaction_date_spine 
     left join account_rolling

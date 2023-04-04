@@ -1,3 +1,5 @@
+{% set sum_cols = ['invoice_amount', 'invoice_amount_paid', 'invoice_amount_unpaid', 'tax_amount', 'credit_balance_adjustment_amount', 'discount_charges'] %}
+  
 with invoice_joined as (
 
     select *
@@ -15,21 +17,13 @@ transactions_grouped as (
         count(distinct invoice_id) as daily_invoices,
         sum(invoice_items) as daily_invoice_items,
 
+        {% for col in sum_cols %}
         {% if var('using_multicurrency', true) %}
-        sum(invoice_amount_home_currency) as daily_invoice_amount,
-        sum(invoice_amount_paid_home_currency) as daily_amount_paid,
-        sum(invoice_amount_unpaid_home_currency) as daily_amount_unpaid,
-        sum(tax_amount_home_currency) as daily_taxes,
-        sum(credit_balance_adjustment_home_currency) as daily_credit_balance_adjustments,
-        sum(discount_charges_home_currency) as daily_discounts,
+            sum({{ col }}_home_currency) as daily_{{ col }},
         {% else %} 
-        sum(invoice_amount) as daily_invoice_amount, 
-        sum(invoice_amount_paid) as daily_amount_paid,
-        sum(invoice_amount_unpaid) as daily_amount_unpaid,
-        sum(tax_amount) as daily_taxes,
-        sum(credit_balance_adjustment_amount) as daily_credit_balance_adjustments,
-        sum(discount_charges) as daily_discounts,
+            sum({{ col }}) as daily_{{ col }},
         {% endif %}
+        {% endfor %}
         
         sum(refund_amount) as daily_refunds 
 

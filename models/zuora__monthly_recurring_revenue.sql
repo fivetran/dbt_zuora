@@ -4,40 +4,52 @@ with revenue_line_items as (
     from {{ ref('zuora__revenue_line_item_history') }}
 ),
 
-mrr_by_account as (
+month_spine as (
 
     select 
         account_id,
-        account_month,
-        {{ dbt_utils.generate_surrogate_key(['account_id', 'account_month']) }} as account_monthly_id,
-        row_number() over (partition by account_id order by account_month) as account_month_number,
-        sum(case when charge_type = 'Recurring' then gross_revenue else 0 end) as gross_current_month_mrr,
-        sum(case when charge_type = 'Recurring' then discount_revenue else 0 end) as discount_current_month_mrr,
-        sum(case when charge_type = 'Recurring' then net_revenue else 0 end) as net_current_month_mrr,
-        sum(case when charge_type != 'Recurring' then gross_revenue else 0 end) as gross_current_month_non_mrr,
-        sum(case when charge_type != 'Recurring' then discount_revenue else 0 end) as discount_current_month_non_mrr,
-        sum(case when charge_type != 'Recurring' then net_revenue else 0 end) as net_current_month_non_mrr
-    from revenue_line_items
-    {{ dbt_utils.group_by(3) }}
+        date_month as account_month
+    from {{ ref('zuora__account_daily_overview') }}
+    {{ dbt_utils.group_by(2) }}
+),
+
+mrr_by_account as (
+
+    select 
+        coalesce(month_spine.account_id, revenue_line_items.account_id) as account_id,
+        coalesce(month_spine.account_month, revenue_line_items.charge_month) as account_month,
+        {% set sum_cols = ['gross', 'discount', 'net'] %}
+        {% for col in sum_cols %} 
+            sum(case when charge_type = 'Recurring' then {{col}}_revenue else 0 end) as {{col}}_current_month_mrr,
+            sum(case when charge_type != 'Recurring' then {{col}}_revenue else 0 end) as {{col}}_current_month_non_mrr
+            {{ ',' if not loop.last }}
+        {% endfor %}
+    from month_spine
+    left join revenue_line_items
+        on month_spine.account_month = revenue_line_items.charge_month
+        and month_spine.account_id = revenue_line_items.account_id
+    {{ dbt_utils.group_by(2) }}
 ),
 
 current_vs_previous_mrr as (
     
     select 
         *,
-        lag(gross_current_month_mrr) over (partition by account_id order by account_month) as gross_previous_month_mrr,
-        lag(discount_current_month_mrr) over (partition by account_id order by account_month) as discount_previous_month_mrr,
-        lag(net_current_month_mrr) over (partition by account_id order by account_month) as net_previous_month_mrr,
-        lag(gross_current_month_non_mrr) over (partition by account_id order by account_month) as gross_previous_month_non_mrr,
-        lag(discount_current_month_mrr) over (partition by account_id order by account_month) as discount_previous_month_non_mrr,
-        lag(net_current_month_mrr) over (partition by account_id order by account_month) as net_previous_month_non_mrr
+        {% set sum_cols = ['gross', 'discount', 'net'] %}
+        {% for col in sum_cols %} 
+            lag({{col}}_current_month_mrr) over (partition by account_id order by account_month) as {{col}}_previous_month_mrr,
+            lag({{col}}_current_month_non_mrr) over (partition by account_id order by account_month) as {{col}}_previous_month_non_mrr,
+        {% endfor %}
+        row_number() over (partition by account_id order by account_month) as account_month_number
     from mrr_by_account
+    {{ dbt_utils.group_by(8) }}
 ),
 
 mrr_type as (
 
     select 
         *,   
+        {{ dbt_utils.generate_surrogate_key(['account_id', 'account_month']) }} as account_monthly_id,
         case when net_current_month_mrr > net_previous_month_mrr then 'expansion'
             when net_current_month_mrr < net_previous_month_mrr then 'contraction'
             when net_current_month_mrr = net_previous_month_mrr then 'unchanged'

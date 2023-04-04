@@ -12,7 +12,8 @@ with invoice_item_enriched as (
         max(charge_date) as most_recent_charge_date,
         min(service_start_date) as invoice_service_start_date,
         max(service_end_date) as invoice_service_end_date
-    from {{ var('invoice_item') }} 
+    from {{ var('invoice_item') }}
+    where is_most_recent_record
     {{ dbt_utils.group_by(1) }}
 ),
 
@@ -22,6 +23,7 @@ invoice_payment as (
         invoice_id,
         payment_id
     from {{ var('invoice_payment') }} 
+    where is_most_recent_record
 ),
 
 payment as (
@@ -34,7 +36,8 @@ payment as (
         type as payment_type, 
         amount_home_currency as payment_amount_home_currency,
         payment_method_id
-    from {{ var('payment') }} 
+    from {{ var('payment') }}
+    where is_most_recent_record
 ),
 
 payment_method as (
@@ -45,6 +48,7 @@ payment_method as (
         coalesce(ach_account_type, bank_transfer_account_type, credit_card_type, paypal_type, sub_type) as payment_method_subtype,
         active as is_payment_method_active
     from {{ var('payment_method') }} 
+    where is_most_recent_record
 ),
 
 credit_balance_adjustment as (
@@ -54,9 +58,10 @@ credit_balance_adjustment as (
         credit_balance_adjustment_id,
         number as credit_balance_adjustment_number,
         reason_code as credit_balance_adjustment_reason_code,
-        amount_home_currency as credit_balance_adjustment_home_currency,
+        amount_home_currency as credit_balance_adjustment_amount_home_currency,
         adjustment_date as credit_balance_adjustment_date
-    from {{ var('credit_balance_adjustment') }} 
+    from {{ var('credit_balance_adjustment') }}
+    where is_most_recent_record
 ),
 
 taxes as (
@@ -65,6 +70,7 @@ taxes as (
         invoice_id, 
         sum(tax_amount_home_currency) as tax_amount_home_currency
     from {{ var('taxation_item') }} 
+    where is_most_recent_record
     {{ dbt_utils.group_by(1) }}
 ),
 
@@ -85,7 +91,7 @@ billing_enriched as (
         credit_balance_adjustment_id,
         credit_balance_adjustment_number,
         credit_balance_adjustment_reason_code,
-        credit_balance_adjustment_home_currency,
+        credit_balance_adjustment_amount_home_currency,
         credit_balance_adjustment_date, 
         taxes.tax_amount_home_currency,
         invoice_item_enriched.invoice_items,

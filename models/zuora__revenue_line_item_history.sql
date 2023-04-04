@@ -9,36 +9,42 @@ with invoice_item_enhanced as (
         case when processing_type = '1' 
             then charge_amount else 0 end as discount_amount  
     from {{ var('invoice_item') }}
+    where is_most_recent_record 
 ),
 
 invoice as (
 
     select * 
-    from {{ var('invoice') }} 
+    from {{ var('invoice') }}
+    where is_most_recent_record 
 ),
 
 product as (
 
     select * 
-    from {{ var('product') }} 
+    from {{ var('product') }}
+    where is_most_recent_record
 ),
 
 product_rate_plan as (
 
     select * 
     from {{ var('product_rate_plan') }} 
+    where is_most_recent_record
 ),
 
 product_rate_plan_charge as (
 
     select * 
     from {{ var('product_rate_plan_charge') }} 
+    where is_most_recent_record
 ), 
 
 rate_plan_charge as (
 
     select * 
     from {{ var('rate_plan_charge') }} 
+    where is_most_recent_record
 ), 
 
 taxation_item as (
@@ -46,20 +52,20 @@ taxation_item as (
     select 
         invoice_item_id,
         tax_amount_home_currency
-    from {{ var('taxation_item') }} 
+    from {{ var('taxation_item') }}
+    where is_most_recent_record
 ), 
 
 
-account_months as (
+account_enhanced as (
 
-    select 
+    select  
         account_id,
         cast({{ dbt.date_trunc("day", "account_created_at") }} as date) as account_creation_day, 
         cast({{ dbt.date_trunc("day", "first_charge_processed_at") }} as date) as first_charge_day,
         account_status,
-        date_month as account_month
     from {{ ref('zuora__account_daily_overview') }}
-
+    {{ dbt_utils.group_by(4) }}
 ),
 
 invoice_revenue_items as (
@@ -82,10 +88,9 @@ revenue_line_item_history as (
 
     select 
         invoice_item_enhanced.invoice_item_id, 
-        coalesce(account_months.account_id, invoice_item_enhanced.account_id) as account_id, 
-        coalesce(account_months.account_month, invoice_item_enhanced.charge_month) as account_month,
-        account_months.account_creation_day, 
-        account_months.account_status,
+        invoice_item_enhanced.account_id,  
+        account_enhanced.account_creation_day, 
+        account_enhanced.account_status,
         invoice_item_enhanced.amendment_id,
         invoice_item_enhanced.balance,
         invoice_item_enhanced.charge_amount,
@@ -97,7 +102,7 @@ revenue_line_item_history as (
         invoice_item_enhanced.charge_name,
         invoice_item_enhanced.discount_amount,
         invoice_item_enhanced.discount_amount_home_currency,
-        account_months.first_charge_day,
+        account_enhanced.first_charge_day,
         invoice_item_enhanced.home_currency,
         invoice_item_enhanced.invoice_id,
         invoice_item_enhanced.product_id,
@@ -140,14 +145,13 @@ revenue_line_item_history as (
             on invoice_item_enhanced.product_rate_plan_id = product_rate_plan.product_rate_plan_id 
         left join rate_plan_charge 
             on invoice_item_enhanced.rate_plan_charge_id = rate_plan_charge.rate_plan_charge_id
-        left join account_months 
-            on invoice_item_enhanced.account_id = account_months.account_id
-            and invoice_item_enhanced.charge_month = account_months.account_month
+        left join account_enhanced
+            on invoice_item_enhanced.account_id = account_enhanced.account_id
         left join invoice_revenue_items
             on invoice_item_enhanced.invoice_item_id = invoice_revenue_items.invoice_item_id
         left join taxation_item 
             on invoice_item_enhanced.invoice_item_id = taxation_item.invoice_item_id
-)       
+)
 
 select * 
 from revenue_line_item_history

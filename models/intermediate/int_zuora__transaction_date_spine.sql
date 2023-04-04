@@ -3,7 +3,7 @@ with spine as (
 
     {% if execute %}
     {% set first_date_query %}
-        select  min( first_charge_date ) as min_date from {{ ref('zuora__billing_history') }}
+        select  min( invoice_date ) as min_date from {{ source('zuora','invoice') }}
     {% endset %}
     {% set first_date = run_query(first_date_query).columns[0][0]|string %}
     
@@ -20,7 +20,7 @@ with spine as (
 
     {% if execute %}
     {% set last_date_query %}
-        select  max( most_recent_charge_date ) as max_date from {{ ref('zuora__billing_history') }}
+        select  max( invoice_date ) as min_date from {{ source('zuora','invoice') }}
     {% endset %}
 
     {% set current_date_query %}
