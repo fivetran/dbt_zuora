@@ -48,8 +48,8 @@ current_vs_previous_mrr as (
 mrr_type as (
 
     select 
-        *,   
         {{ dbt_utils.generate_surrogate_key(['account_id', 'account_month']) }} as account_monthly_id,
+        *,   
         case when net_current_month_mrr > net_previous_month_mrr then 'expansion'
             when net_current_month_mrr < net_previous_month_mrr then 'contraction'
             when net_current_month_mrr = net_previous_month_mrr then 'unchanged'
