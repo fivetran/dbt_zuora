@@ -1,3 +1,5 @@
+{% set round_cols = ['invoice_amount', 'invoice_amount_paid', 'invoice_amount_unpaid', 'tax_amount', 'credit_balance_adjustment_amount', 'discount_charges', 'refunds'] %}
+        
 with account_running_totals as (
 
     select *
@@ -36,22 +38,18 @@ account_daily_overview as (
 
         daily_invoices,
         daily_invoice_items,
-        daily_invoice_amount,
-        daily_invoice_amount_paid as daily_amount_paid,
-        daily_invoice_amount_unpaid as daily_amount_unpaid,
-        daily_tax_amount as daily_taxes,
-        daily_credit_balance_adjustment_amount as daily_credit_balance_adjustments,
-        daily_discount_charges as daily_discounts,
-        daily_refunds,
+
+        {% for col in round_cols %}
+            round(daily_{{ col }}, 2) as daily_{{ col }},
+        {% endfor %}
+
         rolling_invoices,
         rolling_invoice_items,
-        rolling_invoice_amount,
-        rolling_invoice_amount_paid as rolling_amount_paid,
-        rolling_invoice_amount_unpaid as rolling_amount_unpaid,
-        rolling_tax_amount as rolling_taxes,
-        rolling_credit_balance_adjustment_amount as rolling_credit_balance_adjustments,
-        rolling_discount_charges as rolling_discounts,
-        rolling_refunds
+
+        {% for col in round_cols %}
+            round(rolling_{{ col }}, 2) as rolling_{{ col }}
+            {{ ',' if not loop.last }}
+        {% endfor %}
 
     from account_running_totals
     left join account_overview

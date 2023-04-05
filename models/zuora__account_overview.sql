@@ -51,7 +51,7 @@ account_overview as (
 
         {% set agged_cols = ['subscription_count', 'invoice_amount', 'invoice_amount_home_currency', 'taxes', 'discounts', 'amount_paid', 'amount_not_paid', 'amount_past_due', 'refunds', 'average_invoice_value', 'units_per_invoice'] %}
         {% for col in agged_cols %}
-            {{- dbt_utils.safe_divide('total_' ~ col, 'account_active_months') }} as monthly_average_{{ col }} -- calculates average over no. active mos
+            round({{- dbt_utils.safe_divide('total_' ~ col, 'account_active_months') }}, 2) as monthly_average_{{ col }} -- calculates average over no. active mos
             {{ ',' if not loop.last -}}
         {% endfor %}
 

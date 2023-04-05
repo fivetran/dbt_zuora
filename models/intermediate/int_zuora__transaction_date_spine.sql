@@ -2,59 +2,34 @@
 with spine as (
 
     {% if execute %}
-    {% set first_date_query %}
-        select  min( invoice_date ) as min_date from {{ source('zuora','invoice') }}
-    {% endset %}
-    {% set first_date = run_query(first_date_query).columns[0][0]|string %}
-    
-        {% if target.type == 'postgres' %}
-            {% set first_date_adjust = "cast('" ~ first_date[0:10] ~ "' as date)" %}
+    {% if not var('zuora_first_date', None) or not var('zuora_last_date', None) %}
+        {% set date_query %}
+        select 
+            min( invoice_date ) as min_date,
+            max( invoice_date ) as max_date
+        from {{ source('zuora', 'invoice') }}
+        {% endset %}
 
-        {% else %}
-            {% set first_date_adjust = "'" ~ first_date[0:10] ~ "'" %}
-
-        {% endif %}
-
-    {% else %} {% set first_date_adjust = "'2009-01-01'" %}
+        {% set calc_first_date = run_query(date_query).columns[0][0]|string %}
+        {% set calc_last_date = run_query(date_query).columns[1][0]|string %}
     {% endif %}
 
-    {% if execute %}
-    {% set last_date_query %}
-        select  max( invoice_date ) as min_date from {{ source('zuora','invoice') }}
-    {% endset %}
-
-    {% set current_date_query %}
-        select current_date
-    {% endset %}
-
-    {% if run_query(current_date_query).columns[0][0]|string < run_query(last_date_query).columns[0][0]|string %}
-
-    {% set last_date = run_query(last_date_query).columns[0][0]|string %}
-
-    {% else %} {% set last_date = run_query(current_date_query).columns[0][0]|string %}
+    {# If only compiling, creates range going back 1 year #}
+    {% else %} 
+        {% set calc_first_date = dbt.dateadd("year", "-1", "current_date") %}
+        {% set calc_last_date = dbt.current_timestamp_backcompat() %}
     {% endif %}
-        
-    {% if target.type == 'postgres' %}
-        {% set last_date_adjust = "cast('" ~ last_date[0:10] ~ "' as date)" %}
 
-    {% else %}
-        {% set last_date_adjust = "'" ~ last_date[0:10] ~ "'" %}
-
-    {% endif %}
-    {% endif %}
+    {# Prioritizes variables over calculated dates #}
+    {% set first_date = var('zuora_first_date', calc_first_date)|string %}
+    {% set last_date = var('zuora_last_date', calc_last_date)|string %}
 
     {{ dbt_utils.date_spine(
         datepart="day",
-        start_date=first_date_adjust,
-        end_date=dbt.dateadd("day", 1, last_date_adjust)
+        start_date = "cast('" ~ first_date[0:10] ~ "'as date)",
+        end_date = "cast('" ~ last_date[0:10] ~ "'as date)"
         )
     }}
-),
-
-billing_history as (
-    
-    select *
-    from {{ ref('zuora__billing_history') }}
 ),
 
 account_overview as (

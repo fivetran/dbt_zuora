@@ -61,7 +61,7 @@ account_totals as (
         {% for col in sum_cols %}
             sum({{ col }}) as total_{{ col }},
         {% endfor %}
-        
+
         sum(case when cast({{ dbt.date_trunc('day', dbt.current_timestamp_backcompat()) }} as date) > due_date
                 and invoice_amount != invoice_amount_paid 
                 then invoice_amount_unpaid else 0 end) as total_amount_past_due,
@@ -120,8 +120,8 @@ account_cumulatives as (
         account_invoice_data.most_recent_charge_date,
         account_invoice_data.invoice_item_count,
         account_invoice_data.invoice_count,
-        {{ dbt_utils.safe_divide('account_totals.total_invoice_amount', 'account_invoice_data.invoice_count') }} as total_average_invoice_value,
-        {{ dbt_utils.safe_divide('account_invoice_data.invoice_item_count', 'account_invoice_data.invoice_count') }} as total_units_per_invoice,
+        round({{ dbt_utils.safe_divide('account_totals.total_invoice_amount', 'account_invoice_data.invoice_count') }}, 2) as total_average_invoice_value,
+        round({{ dbt_utils.safe_divide('account_invoice_data.invoice_item_count', 'account_invoice_data.invoice_count') }}, 2) as total_units_per_invoice,
         account_subscription_data.subscription_count as total_subscription_count,
         account_subscription_data.active_subscription_count,
         case when account_subscription_data.active_subscription_count = 0 then false else true end as is_currently_subscribed,
