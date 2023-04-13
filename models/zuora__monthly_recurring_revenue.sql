@@ -18,6 +18,8 @@ mrr_by_account as (
     select 
         coalesce(month_spine.account_id, line_items.account_id) as account_id,
         coalesce(month_spine.account_month, line_items.charge_month) as account_month,
+        sum(charge_mrr) as mrr_expected_current_month,
+        sum(charge_mrr_home_currency) as mrr_expected_home_currency_current_month,
         {% set sum_cols = ['gross', 'discount', 'net'] %}
         {% for col in sum_cols %} 
             sum(case when charge_type = 'Recurring' then {{col}}_revenue else 0 end) as {{col}}_current_month_mrr,
@@ -35,6 +37,8 @@ current_vs_previous_mrr as (
     
     select 
         *,
+        lag(mrr_expected_current_month)  over (partition by account_id order by account_month) as mrr_expected_previous_month,
+        lag(mrr_expected_home_currency_current_month) over (partition by account_id order by account_month) as mrr_expected_home_currency_previous_month,
         {% set sum_cols = ['gross', 'discount', 'net'] %}
         {% for col in sum_cols %} 
             lag({{col}}_current_month_mrr) over (partition by account_id order by account_month) as {{col}}_previous_month_mrr,
@@ -42,7 +46,7 @@ current_vs_previous_mrr as (
         {% endfor %}
         row_number() over (partition by account_id order by account_month) as account_month_number
     from mrr_by_account
-    {{ dbt_utils.group_by(8) }}
+    {{ dbt_utils.group_by(10) }}
 ),
 
 mrr_type as (
@@ -61,7 +65,7 @@ mrr_type as (
                 and account_month_number >= 3) 
                 then 'reactivation'
             else null
-            end as mrr_type
+            end as net_mrr_type
     from current_vs_previous_mrr
 )
 
