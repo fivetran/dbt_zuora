@@ -1,7 +1,7 @@
-with revenue_line_items as (
+with line_items as (
 
     select *
-    from {{ ref('zuora__revenue_line_item_history') }}
+    from {{ ref('zuora__line_item_history') }}
 ),
 
 month_spine as (
@@ -16,8 +16,8 @@ month_spine as (
 mrr_by_account as (
 
     select 
-        coalesce(month_spine.account_id, revenue_line_items.account_id) as account_id,
-        coalesce(month_spine.account_month, revenue_line_items.charge_month) as account_month,
+        coalesce(month_spine.account_id, line_items.account_id) as account_id,
+        coalesce(month_spine.account_month, line_items.charge_month) as account_month,
         {% set sum_cols = ['gross', 'discount', 'net'] %}
         {% for col in sum_cols %} 
             sum(case when charge_type = 'Recurring' then {{col}}_revenue else 0 end) as {{col}}_current_month_mrr,
@@ -25,9 +25,9 @@ mrr_by_account as (
             {{ ',' if not loop.last }}
         {% endfor %}
     from month_spine
-    left join revenue_line_items
-        on month_spine.account_month = revenue_line_items.charge_month
-        and month_spine.account_id = revenue_line_items.account_id
+    left join line_items
+        on month_spine.account_month = line_items.charge_month
+        and month_spine.account_id = line_items.account_id
     {{ dbt_utils.group_by(2) }}
 ),
 

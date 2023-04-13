@@ -57,6 +57,7 @@ taxation_item as (
 ), 
 
 
+
 account_enhanced as (
 
     select  
@@ -83,6 +84,7 @@ invoice_revenue_items as (
         {% endif %}
     from invoice_item_enhanced
 ),
+
 
 revenue_line_item_history as (
 
@@ -121,8 +123,8 @@ revenue_line_item_history as (
         product.name as product_name,
         product.category as product_category,
         product.description as product_description,
-        product.effective_start_date,
-        product.effective_end_date,
+        product.effective_start_date as product_start_date,
+        product.effective_end_date as product_end_date, 
         product_rate_plan.name as product_rate_plan_name,
         product_rate_plan.description as product_rate_plan_description,
         rate_plan_charge.name as rate_plan_charge_name,

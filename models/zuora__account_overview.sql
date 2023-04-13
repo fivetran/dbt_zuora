@@ -36,22 +36,18 @@ account_overview as (
         account_enriched.is_new_customer,
         account_enriched.invoice_item_count,
         account_enriched.invoice_count,
-        account_enriched.active_subscription_count as number_of_active_subscriptions,
-        account_enriched.total_subscription_count as number_of_subscriptions,
-        account_enriched.total_invoice_amount as total_amount_of_charges,
-        account_enriched.total_invoice_amount_home_currency as total_amount_of_charges_home_currency,
-        account_enriched.total_taxes as total_amount_of_taxes,
-        account_enriched.total_discounts as total_amount_of_discounts,
-        account_enriched.total_amount_paid,
-        account_enriched.total_amount_not_paid,
-        account_enriched.total_amount_past_due,
-        account_enriched.total_refunds,
+    
+        {% set round_cols = ['active_subscription_count', 'total_subscription_count', 'total_invoice_amount', 'total_invoice_amount_home_currency', 'total_taxes', 'total_discounts', 'total_amount_paid', 'total_amount_not_paid', 'total_amount_past_due', 'total_refunds'] %}
+        {% for col in round_cols %}
+            round({{ col }}, 2) as {{ col }},   
+        {% endfor %}
+
         account_enriched.total_average_invoice_value,
         account_enriched.total_units_per_invoice,
 
-        {% set agged_cols = ['subscription_count', 'invoice_amount', 'invoice_amount_home_currency', 'taxes', 'discounts', 'amount_paid', 'amount_not_paid', 'amount_past_due', 'refunds', 'average_invoice_value', 'units_per_invoice'] %}
-        {% for col in agged_cols %}
-            round({{- dbt_utils.safe_divide('total_' ~ col, 'account_active_months') }}, 2) as monthly_average_{{ col }} -- calculates average over no. active mos
+        {% set avg_cols = ['subscription_count', 'invoice_amount', 'invoice_amount_home_currency', 'taxes', 'discounts', 'amount_paid', 'amount_not_paid', 'amount_past_due', 'refunds', 'average_invoice_value', 'units_per_invoice'] %}
+        {% for col in avg_cols %}
+            round({{- dbt_utils.safe_divide('total_' ~ col, 'account_active_months') }}, 2) as monthly_average_{{ col }}
             {{ ',' if not loop.last -}}
         {% endfor %}
 
