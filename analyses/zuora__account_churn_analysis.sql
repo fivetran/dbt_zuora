@@ -1,4 +1,3 @@
---to be migrated to analysis
 with month_spine as (
 
     select 
@@ -16,8 +15,9 @@ line_items as (
 
 account_current_month as (
 
-    select coalesce(month_spine.account_id, line_items.account_id) as account_id,
-      coalesce(month_spine.account_month, line_items.charge_month) as account_month,
+    select 
+      coalesce(month_spine.account_id, line_items.account_id) as account_id,
+      coalesce(month_spine.account_month, line_items.service_start_month) as account_month,
       count(distinct rate_plan_charge_id) as rate_plan_charges,
       case when count(distinct rate_plan_charge_id) = 0 then 'inactive'
         else 'active'
@@ -25,7 +25,7 @@ account_current_month as (
     from month_spine
     left join line_items  
       on month_spine.account_id = line_items.account_id
-      and month_spine.account_month = line_items.charge_month 
+      and month_spine.account_month = line_items.service_start_month 
     {{ dbt_utils.group_by(2) }}
 ),
 

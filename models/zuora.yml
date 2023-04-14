@@ -1,7 +1,20 @@
 version: 2
 
 models:
+
+  - name: int_zuora__account_enriched
+
+  - name: int_zuora__account_partitions
+
+  - name: int_zuora__account_rolling_totals
+
+  - name: int_zuora__account_running_totals
+
   - name: int_zuora__billing_enriched
+
+  - name: int_zuora__transaction_date_spine
+
+  - name: int_zuora__transactions_grouped
 
   - name: zuora__billing_history
     description: Each record is an invoice enhanced with values from payments, refunds, adjustments, discounts and taxes.

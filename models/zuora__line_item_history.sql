@@ -7,7 +7,10 @@ with invoice_item_enhanced as (
         case when processing_type = '1' 
             then charge_amount_home_currency else 0 end as discount_amount_home_currency,
         case when processing_type = '1' 
-            then charge_amount else 0 end as discount_amount  
+            then charge_amount else 0 end as discount_amount,
+        cast({{ dbt.date_trunc("day", "service_start_date") }} as date) as service_start_day,
+        cast({{ dbt.date_trunc("week", "service_start_date") }} as date) as service_start_week,
+        cast({{ dbt.date_trunc("month", "service_start_date") }} as date) as service_start_month
     from {{ var('invoice_item') }}
     where is_most_recent_record 
 ),
@@ -123,6 +126,10 @@ line_item_history as (
         invoice_item_enhanced.product_rate_plan_id,
         invoice_item_enhanced.product_rate_plan_charge_id,
         invoice_item_enhanced.rate_plan_charge_id,
+        invoice_item_enhanced.service_start_day,
+        invoice_item_enhanced.service_start_week,
+        invoice_item_enhanced.service_start_month,
+        invoice_item_enhanced.service_end_date,
         invoice_item_enhanced.subscription_id,
         invoice_item_enhanced.sku,
         invoice_item_enhanced.tax_amount,
