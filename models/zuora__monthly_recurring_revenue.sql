@@ -20,15 +20,15 @@ mrr_by_account as (
         coalesce(month_spine.account_month, line_items.charge_month) as account_month,
 
         {% if var('using_multicurrency', true) %}
-        sum(charge_mrr_home_currency) as mrr_expected_current_month,
+        sum(charge_mrr_home_currency) as mrr_expected_current_month, 
         {% else %} 
-        sum(charge_mrr) as mrr_expected_current_month,
+        sum(charge_mrr) as mrr_expected_current_month, 
         {% endif %}
 
         {% set sum_cols = ['gross', 'discount', 'net'] %}
         {% for col in sum_cols %} 
-            sum(case when charge_type = 'Recurring' then {{col}}_revenue else 0 end) as {{col}}_current_month_mrr,
-            sum(case when charge_type != 'Recurring' then {{col}}_revenue else 0 end) as {{col}}_current_month_non_mrr
+            sum(case when charge_type = 'Recurring' then {{col}}_revenue else 0 end) as {{col}}_current_month_mrr, 
+            sum(case when charge_type != 'Recurring' then {{col}}_revenue else 0 end) as {{col}}_current_month_non_mrr 
             {{ ',' if not loop.last }}
         {% endfor %}
 

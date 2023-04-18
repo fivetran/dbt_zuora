@@ -1,4 +1,4 @@
-# 🚧 UNDER CONSTRUCTION 🚧
+# 🚧 UNDER CONSTRUCTION 🚧 
 
 <p align="center">
     <a alt="License"
@@ -12,7 +12,7 @@
         <img src="https://img.shields.io/badge/Contributions-welcome-blueviolet" /></a>
 </p>
 
-# Zuora dbt package ([Docs](https://fivetran.github.io/dbt_zuora/)) 
+# Zuora dbt package ([Docs](https://fivetran.github.io/dbt_zuora/))  
 
 # 📣 What does this dbt package do?
 - Produces modeled tables that leverage Zuora data from [Fivetran's connector](https://fivetran.com/docs/applications/zuora) in the format described by [this ERD](https://fivetran.com/docs/applications/zuora#schemainformation) and build off the output of our [Zuora source package](https://github.com/fivetran/dbt_zuora_source).
@@ -38,7 +38,7 @@ The following table provides a detailed list of all models materialized within t
 
 An example churn model is separately available in the analysis folder: 
 
-| [zuora__account_churn_analysis](https://fivetran.github.io/dbt_zuora/#!/analysis/analysis.zuora.zuora__account_churn_analysis)    | Each record represents an account and whether it has churned in that month or not.          |                                                                                     |
+| [zuora__account_churn_analysis](https://fivetran.github.io/dbt_zuora/#!/analysis/analysis.zuora.zuora__account_churn_analysis)    | Each record represents an account and whether it has churned in that month or not.          |                                                                                      |
 
 # 🎯 How do I use the dbt package?
 ## Step 1: Prerequisites
@@ -83,19 +83,19 @@ vars:
     zuora__using_taxation_item: false # Disable if you do not have the taxation item table
 ```   
 
-## Step 5: Enable the multicurrency variable for customers billing in multiple currencies.
+## Step 5: Enable the multicurrency variable for customers billing in multiple currencies. 
 Zuora allows the functionality for multicurrency to bill to customers in various currencies. If you are an account utilizing multicurrency, make sure to set the `using_multicurrency` variable to true in dbt_project.yml so the amounts in our data models accurately reflect the home currency values in your native account currency.
-
+ 
 ```yml
 vars:
-    using_multicurrency: false #Enable if you are utilizing multicurrency, true by default.
+  using_multicurrency: false #Enable if you are utilizing multicurrency, true by default. 
 ```
 
 ## (Optional) Step 6: Additional configurations
 <details><summary>Expand to view configurations</summary>
 
 ### Passing Through Additional Fields
-This package includes all source columns defined in the macros folder. You can add more columns using our pass-through column variables. These variables allow for the pass-through fields to be aliased (`alias`) and casted (`transform_sql`) if desired, but not required. Datatype casting is configured via a sql snippet within the `transform_sql` key. You may add the desired sql while omitting the `as field_name` at the end and your custom pass-though fields will be casted accordingly. Use the below format for declaring the respective pass-through variables:
+This package includes all source columns defined in the macros folder. You can add more columns using our pass-through column variables. These variables allow for the pass-through fields to be aliased (`alias`) and casted (`transform_sql`) if desired, but not required. Datatype casting is configured via a sql snippet within the `transform_sql` key. You may add the desired sql while omitting the `as field_name` at the end and your custom pass-though fields will be casted accordingly. Use the below format for declaring the respective pass-through variables: 
 
 ```yml
 vars:
@@ -115,7 +115,7 @@ vars:
         alias: "coolest_field_name"
 ```
 ### Change the build schema
-By default this package will build the Zuora staging models within a schema titled (<target_schema> + `_stg_zuora`) and the Shopify final models within a schema titled (<target_schema> + `_zuora`) in your target database. If this is not where you would like your modeled Zuora data to be written to, add the following configuration to your `dbt_project.yml` file:
+By default this package will build the Zuora staging models within a schema titled (<target_schema> + `_stg_zuora`) and the Shopify final models within a schema titled (<target_schema> + `_zuora`) in your target database. If this is not where you would like your modeled Zuora data to be written to, add the following configuration to your `dbt_project.yml` file: 
 
 ```yml
 models:
@@ -171,7 +171,7 @@ A small team of analytics engineers at Fivetran develops these dbt packages. How
 We highly encourage and welcome contributions to this package. Check out [this dbt Discourse article](https://discourse.getdbt.com/t/contributing-to-a-dbt-package/657) to learn how to contribute to a dbt package!
 
 ## Opinionated Modelling Decisions
-This dbt package takes several opinionated stances on to provide the customer several options to better understand key subscription metrics. Those include:
+This dbt package takes several opinionated stances on to provide the customer several options to better understand key subscription metrics. Those include: 
 - Evaluating a history of billing transactions, examined at either the invoice or invoice item level.
 - How to calculate monthly recurring revenue and at which grains to assess it, either looking at it granularly at the charge (invoice item) or account monthly level.
 - Developing a custom churn analysis that you can find in the analysis folder that's built on the account monthly level, but also giving the customer the ability to look at churn from a subscription or rate plan charge level.
@@ -181,4 +181,4 @@ If you would like a deeper explanation of the decisions we made to our models in
 # 🏪 Are there any resources available?
 - If you have questions or want to reach out for help, please refer to the [GitHub Issue](https://github.com/fivetran/dbt_zuora_source/issues/new/choose) section to find the right avenue of support for you.
 - If you would like to provide feedback to the dbt package team at Fivetran or would like to request a new dbt package, fill out our [Feedback Form](https://www.surveymonkey.com/r/DQ7K7WW).
-- Have questions or want to just say hi? Book a time during our office hours [on Calendly](https://calendly.com/fivetran-solutions-team/fivetran-solutions-team-office-hours) or email us at solutions@fivetran.com.
+- Have questions or want to just say hi? Book a time during our office hours [on Calendly](https://calendly.com/fivetran-solutions-team/fivetran-solutions-team-office-hours) or email us at solutions@fivetran.com. 

@@ -27,11 +27,12 @@ invoice_item as (
 
 account_payment_data as (
 
-    select account_id,
+    select 
+        account_id,
         sum(amount) as account_amount_paid
     from {{ var('payment') }} 
     where is_most_recent_record
-    and account_id is not null
+    and account_id is not null 
     {{ dbt_utils.group_by(1) }}
 ),
 
@@ -88,7 +89,7 @@ account_subscription_data as (
     select 
         account_id,
         count(distinct subscription_id) as subscription_count,
-        sum(case when status = 'Active' then 1 else 0 end) as active_subscription_count
+        sum(case when status = 'Active' then 1 else 0 end) as active_subscription_count 
     from subscription
     {{ dbt_utils.group_by(1) }}
 ),

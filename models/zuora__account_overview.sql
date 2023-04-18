@@ -9,7 +9,7 @@ contact as (
     select *
     from {{ var('contact') }} 
     where is_most_recent_record
-    and is_most_recent_account_contact 
+    and is_most_recent_account_contact  
 ),
 
 account_overview as (
