@@ -7,16 +7,12 @@ vars:
   zuora_schema: zuora_integration_tests
   zuora_source:
     zuora_account_identifier: "zuora_account_data"
-    zuora_accounting_code_identifier: "zuora_accounting_code_data"
     zuora_amendment_identifier: "zuora_amendment_data"
     zuora_contact_identifier: "zuora_contact_data"
     zuora_credit_balance_adjustment_identifier: "zuora_credit_balance_adjustment_data"
     zuora_invoice_identifier: "zuora_invoice_data"
-    zuora_invoice_item_identifier: "zuora_invoice_item_data"
-    zuora_journal_entry_identifier: "zuora_journal_entry_data"
-    zuora_journal_entry_item_identifier: "zuora_journal_entry_item_data"
+    zuora_invoice_item_identifier: "zuora_invoice_item_data" 
     zuora_order_identifier: "zuora_order_data"
-    zuora_order_item_identifier: "zuora_order_item_data"
     zuora_payment_identifier: "zuora_payment_data"
     zuora_payment_method_identifier: "zuora_payment_method_data"
     zuora_product_identifier: "zuora_product_data"

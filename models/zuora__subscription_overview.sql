@@ -19,12 +19,22 @@ amendment as (
     where is_most_recent_record
 ),
 
+
+account_overview as (
+
+    select 
+        account_id,
+        account_name
+    from {{ ref('zuora__account_overview') }} 
+),
+
 subscription_overview as (
 
     select  
         {{ dbt_utils.generate_surrogate_key(['subscription.subscription_id', 'rate_plan_charge.rate_plan_charge_id']) }} as subscription_key,
         subscription.subscription_id,
         subscription.account_id,
+        account_overview.account_name,
         subscription.auto_renew,
         subscription.cancel_reason,
         subscription.cancelled_date,
@@ -48,8 +58,8 @@ subscription_overview as (
         rate_plan_charge.name as rate_plan_charge_name,
         rate_plan_charge.billing_period as charge_billing_period,
         rate_plan_charge.billing_timing as charge_billing_timing,
-        rate_plan_charge.charge_model as charge_model,
-        rate_plan_charge.charge_type as charge_type,
+        rate_plan_charge.charge_model,
+        rate_plan_charge.charge_type,
         rate_plan_charge.charged_through_date,
         rate_plan_charge.effective_start_date as charge_effective_start_date,
         rate_plan_charge.effective_end_date as charge_effective_end_date,
@@ -61,6 +71,8 @@ subscription_overview as (
         amendment.created_date as amendment_creation_date,
         amendment.type as amendment_type,
         amendment.status as amendment_status,
+        amendment.contract_effective_date as amendment_contract_date,
+        amendment.service_activation_date as amendment_activation_date,
 
         {% set interval_cols = ['current_term', 'initial_term', 'renewal_term'] %}
         {% for interval_col in interval_cols %}
@@ -84,11 +96,15 @@ subscription_overview as (
 
         {{ fivetran_utils.persist_pass_through_columns('zuora_subscription_pass_through_columns', identifier='subscription') }}
 
+        {{ fivetran_utils.persist_pass_through_columns('zuora_rate_plan_charge_pass_through_columns', identifier='rate_plan_charge') }}
+
     from subscription
     left join rate_plan_charge
         on subscription.subscription_id = rate_plan_charge.subscription_id
     left join amendment
         on subscription.subscription_id = amendment.subscription_id
+    left join account_overview 
+        on subscription.account_id = account_overview.account_id
 )
 
 select * 

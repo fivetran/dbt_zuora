@@ -40,14 +40,14 @@ account_daily_overview as (
         daily_invoice_items,
 
         {% for col in round_cols %}
-            round(daily_{{ col }}, 2) as daily_{{ col }},
+            round(cast(daily_{{ col }} as {{ dbt.type_numeric() }}), 2) as daily_{{ col }},
         {% endfor %}
 
         rolling_invoices,
         rolling_invoice_items,
 
         {% for col in round_cols %}
-            round(rolling_{{ col }}, 2) as rolling_{{ col }}
+            round(cast(rolling_{{ col }} as {{ dbt.type_numeric() }}), 2) as rolling_{{ col }}
             {{ ',' if not loop.last }}
         {% endfor %}
 

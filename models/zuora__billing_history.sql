@@ -73,7 +73,7 @@ billing_history as (
         billing_enriched.payment_date,
         billing_enriched.payment_status,
         billing_enriched.payment_type, 
-        billing_enriched.invoice_amount_paid_home_currency,
+        billing_enriched.invoice_amount_paid_home_currency as payment_amount_home_currency,
         invoice.invoice_amount_home_currency - billing_enriched.invoice_amount_paid_home_currency as invoice_amount_unpaid_home_currency,
         billing_enriched.payment_method_id,
         billing_enriched.payment_method_type,

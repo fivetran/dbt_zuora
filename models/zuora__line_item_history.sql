@@ -174,6 +174,11 @@ line_item_history as (
         invoice_revenue_items.gross_revenue,
         invoice_revenue_items.discount_revenue,
         invoice_revenue_items.gross_revenue - invoice_revenue_items.discount_revenue as net_revenue
+
+        {{ fivetran_utils.persist_pass_through_columns('zuora_subscription_pass_through_columns', identifier='subscription') }}
+
+        {{ fivetran_utils.persist_pass_through_columns('zuora_rate_plan_charge_pass_through_columns', identifier='rate_plan_charge') }}
+
     from invoice_item_enhanced
         left join invoice
             on invoice_item_enhanced.invoice_id = invoice.invoice_id

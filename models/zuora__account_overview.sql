@@ -39,15 +39,15 @@ account_overview as (
     
         {% set round_cols = ['active_subscription_count', 'total_subscription_count', 'total_invoice_amount', 'total_invoice_amount_home_currency', 'total_taxes', 'total_discounts', 'total_amount_paid', 'total_amount_not_paid', 'total_amount_past_due', 'total_refunds'] %}
         {% for col in round_cols %}
-            round({{ col }}, 2) as {{ col }},   
+            round(cast({{ col }} as {{ dbt.type_numeric() }}), 2) as {{ col }},   
         {% endfor %}
 
         account_enriched.total_average_invoice_value,
         account_enriched.total_units_per_invoice,
 
-        {% set avg_cols = ['subscription_count', 'invoice_amount', 'invoice_amount_home_currency', 'taxes', 'discounts', 'amount_paid', 'amount_not_paid', 'amount_past_due', 'refunds', 'average_invoice_value', 'units_per_invoice'] %}
+        {% set avg_cols = ['subscription_count', 'invoice_amount', 'invoice_amount_home_currency', 'taxes', 'discounts', 'amount_paid', 'amount_not_paid', 'amount_past_due', 'refunds'] %}
         {% for col in avg_cols %}
-            round({{- dbt_utils.safe_divide('total_' ~ col, 'account_active_months') }}, 2) as monthly_average_{{ col }}
+            round(cast({{- dbt_utils.safe_divide('total_' ~ col, 'account_active_months') }} as {{ dbt.type_numeric() }} ), 2) as monthly_average_{{ col }}
             {{ ',' if not loop.last -}}
         {% endfor %}
 

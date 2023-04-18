@@ -5,17 +5,14 @@ require-dbt-version: [">=1.3.0", "<2.0.0"]
 
 vars:
   zuora: 
-    account: "{{ ref('stg_zuora__account') }}"
-    accounting_code: "{{ ref('stg_zuora__accounting_code') }}"
+    account: "{{ ref('stg_zuora__account') }}" 
     amendment: "{{ ref('stg_zuora__amendment') }}"
     contact: "{{ ref('stg_zuora__contact') }}"
     credit_balance_adjustment: "{{ ref('stg_zuora__credit_balance_adjustment') }}"
     invoice: "{{ ref('stg_zuora__invoice') }}"
     invoice_item: "{{ ref('stg_zuora__invoice_item') }}"
-    invoice_payment: "{{ ref('stg_zuora__invoice_payment') }}"
-    journal_entry_item: "{{ ref('stg_zuora__journal_entry_item') }}"
-    order: "{{ ref('stg_zuora__order') }}"
-    order_item: "{{ ref('stg_zuora__order_item') }}"
+    invoice_payment: "{{ ref('stg_zuora__invoice_payment') }}" 
+    order: "{{ ref('stg_zuora__order') }}" 
     payment: "{{ ref('stg_zuora__payment') }}"
     payment_method: "{{ ref('stg_zuora__payment_method') }}"
     product_rate_plan_charge: "{{ ref('stg_zuora__product_rate_plan_charge') }}"
