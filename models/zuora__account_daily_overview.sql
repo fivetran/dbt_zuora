@@ -17,7 +17,7 @@ account_daily_overview as (
     select 
         account_running_totals.account_daily_id,
         account_running_totals.account_id,
-        account_running_totals.date_day,        
+        account_running_totals.date_day,         
         account_running_totals.date_week, 
         account_running_totals.date_month, 
         account_running_totals.date_year,  
