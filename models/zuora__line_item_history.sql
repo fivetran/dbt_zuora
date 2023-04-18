@@ -4,9 +4,9 @@ with invoice_item_enhanced as (
         cast({{ dbt.date_trunc("day", "charge_date") }} as date) as charge_day,
         cast({{ dbt.date_trunc("week", "charge_date") }} as date) as charge_week,
         cast({{ dbt.date_trunc("month", "charge_date") }} as date) as charge_month,
-        case when processing_type = '1' 
+        case when cast(processing_type as {{ dbt.type_string() }}) = '1' 
             then charge_amount_home_currency else 0 end as discount_amount_home_currency,
-        case when processing_type = '1' 
+        case when cast(processing_type as {{ dbt.type_string() }}) = '1' 
             then charge_amount else 0 end as discount_amount,
         cast({{ dbt.date_trunc("day", "service_start_date") }} as date) as service_start_day,
         cast({{ dbt.date_trunc("week", "service_start_date") }} as date) as service_start_week,
@@ -90,11 +90,11 @@ invoice_revenue_items as (
         invoice_item_id, 
         {% if var('using_multicurrency', true) %}
         charge_amount_home_currency as gross_revenue,
-        case when processing_type = '1' 
+        case when cast(processing_type as {{ dbt.type_string() }})= '1' 
             then charge_amount_home_currency else 0 end as discount_revenue
         {% else %} 
         charge_amount as gross_revenue,
-        case when processing_type = '1' 
+        case when cast(processing_type as {{ dbt.type_string() }})= '1' 
             then charge_amount else 0 end as discount_revenue
         {% endif %}
     from invoice_item_enhanced
