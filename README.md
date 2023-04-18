@@ -99,20 +99,20 @@ This package includes all source columns defined in the macros folder. You can a
 
 ```yml
 vars:
-    zuora_account_pass_through_columns: 
-      - name: "new_custom_field"
-        alias: "custom_field"
-        transform_sql: "cast(custom_field as string)"
-      - name: "another_one"
-    zuora_subscription_pass_through_columns:
-      - name: "this_field"
-        alias: "cool_field_name"
-    zuora_rate_plan_pass_through_columns:
-      - name: "another_field"
-        alias: "cooler_field_name"
-    zuora_rate_plan_charge_pass_through_columns:
-      - name: "yet_another_field"
-        alias: "coolest_field_name"
+  zuora_account_pass_through_columns: 
+    - name: "new_custom_field"
+      alias: "custom_field"
+      transform_sql: "cast(custom_field as string)"
+    - name: "another_one"
+  zuora_subscription_pass_through_columns:
+    - name: "this_field"
+      alias: "cool_field_name"
+  zuora_rate_plan_pass_through_columns:
+    - name: "another_field"
+      alias: "cooler_field_name"
+  zuora_rate_plan_charge_pass_through_columns:
+    - name: "yet_another_field"
+      alias: "coolest_field_name"
 ```
 ### Change the build schema
 By default this package will build the Zuora staging models within a schema titled (<target_schema> + `_stg_zuora`) and the Shopify final models within a schema titled (<target_schema> + `_zuora`) in your target database. If this is not where you would like your modeled Zuora data to be written to, add the following configuration to your `dbt_project.yml` file: 
