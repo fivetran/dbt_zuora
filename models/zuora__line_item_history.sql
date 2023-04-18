@@ -79,7 +79,7 @@ account_enhanced as (
         account_id,
         cast({{ dbt.date_trunc("day", "account_created_at") }} as date) as account_creation_day, 
         cast({{ dbt.date_trunc("day", "first_charge_processed_at") }} as date) as first_charge_day,
-        account_status,
+        account_status
     from {{ ref('zuora__account_daily_overview') }}
     {{ dbt_utils.group_by(4) }}
 ),

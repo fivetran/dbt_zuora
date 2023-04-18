@@ -6,7 +6,7 @@ with account_enriched as (
 
 contact as (
 
-    select *,
+    select *
     from {{ var('contact') }} 
     where is_most_recent_record
     and is_most_recent_account_contact 

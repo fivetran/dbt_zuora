@@ -76,9 +76,9 @@ subscription_overview as (
 
         {% set interval_cols = ['current_term', 'initial_term', 'renewal_term'] %}
         {% for interval_col in interval_cols %}
-        case when subscription.{{ interval_col }}_period_type = "Week" then 7 * subscription.{{ interval_col }}
-            when subscription.{{ interval_col }}_period_type = "Month" then 30 * subscription.{{ interval_col }}
-            when subscription.{{ interval_col }}_period_type = "Year" then 365 * subscription.{{ interval_col }}
+        case when subscription.{{ interval_col }}_period_type = 'Week' then 7 * subscription.{{ interval_col }}
+            when subscription.{{ interval_col }}_period_type = 'Month' then 30 * subscription.{{ interval_col }}
+            when subscription.{{ interval_col }}_period_type = 'Year' then 365 * subscription.{{ interval_col }}
             else subscription.{{ interval_col }} 
             end as {{ interval_col }}_days,
         {% endfor %}
