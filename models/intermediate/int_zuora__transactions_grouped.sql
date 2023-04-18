@@ -18,7 +18,7 @@ transactions_grouped as (
         sum(invoice_items) as daily_invoice_items,
 
         {% for col in sum_cols %}
-        {% if var('using_multicurrency', true) %}
+        {% if var('using_multicurrency', true) %} 
             sum({{ col }}_home_currency) as daily_{{ col }}, 
         {% else %} 
             sum({{ col }}) as daily_{{ col }},
