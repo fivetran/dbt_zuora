@@ -27,3 +27,104 @@ vars:
 dispatch:
   - macro_namespace: dbt_utils
     search_order: ['spark_utils', 'dbt_utils']
+
+seeds:
+  zuora_integration_tests:
+    +column_types:
+      _fivetran_synced: "timestamp"
+      amount: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+      amount_home_currency: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+      balance: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+      bill_cycle_day: "{{ 'INT64' if target.type == 'bigquery' else 'bigint' }}"
+      cancelled_date: "timestamp"
+      cancelled_on: "timestamp"
+      created_date: "timestamp"
+      current_term: "{{ 'INT64' if target.type == 'bigquery' else 'bigint' }}"
+      exchange_rate: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+      mrr: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+      quantity: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+      renewal_term: "{{ 'INT64' if target.type == 'bigquery' else 'bigint' }}"
+      submitted_on: "timestamp"
+      tax_amount: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+      updated_date: "timestamp"
+    zuora_account_data:
+      +column_types:
+        credit_balance: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        last_invoice_date: "timestamp"
+        tax_exempt_effective_date: "timestamp"
+        tax_exempt_expiration_date: "timestamp"
+        total_debit_memo_balance: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        total_invoice_balance: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        unapplied_balance: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        unapplied_credit_memo_amount: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+    zuora_invoice_data:
+      +column_types:
+        adjustment_amount: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        amount_without_tax: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        amount_without_tax_home_currency: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}" 
+        credit_balance_adjustment_amount: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        credit_memo_amount: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        last_email_sent_date: "timestamp"
+        payment_amount: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        posted_date: "timestamp"
+    zuora_invoice_item_data:
+      +column_types: 
+        charge_amount: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        charge_amount_home_currency: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        charge_date: "timestamp"
+        unit_price: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+    zuora_invoice_payment_data:
+      +column_types:
+        amount_currency_rounding: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}" 
+    zuora_payment_data:
+      +column_types:  
+        applied_amount: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        applied_credit_balance_amount: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"  
+        settled_on: "timestamp"
+        unapplied_amount: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+    zuora_payment_method_data:
+      +column_types:
+        last_failed_sale_transaction_date: "timestamp"
+        last_transaction_date_time: "timestamp"
+        max_consecutive_payment_failures: "{{ 'INT64' if target.type == 'bigquery' else 'bigint' }}"
+        num_consecutive_failures: "{{ 'INT64' if target.type == 'bigquery' else 'bigint' }}"
+        total_number_of_error_payments: "{{ 'INT64' if target.type == 'bigquery' else 'bigint' }}"
+        total_number_of_processed_payments: "{{ 'INT64' if target.type == 'bigquery' else 'bigint' }}"
+    zuora_product_rate_plan_charge_data:
+      +column_types:
+        default_quantity: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        included_units: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        max_quantity: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        min_quantity: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}" 
+        specific_billing_period:  "{{ 'INT64' if target.type == 'bigquery' else 'bigint' }}"
+        up_to_periods: "{{ 'INT64' if target.type == 'bigquery' else 'bigint' }}"
+    zuora_rate_plan_charge_data:
+      +column_types:
+        booking_exchange_rate: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        dmrc: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        dmrchome_currency: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        dtcv: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        dtcvhome_currency: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}" 
+        mrrhome_currency: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        price_increase_percentage: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        tcv: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+        tcvhome_currency: "{{ 'FLOAT64' if target.type == 'bigquery' else 'float' }}"
+    zuora_refund_data:
+      +column_types: 
+        refund_transaction_time: "timestamp"
+    zuora_subscription_data:
+      +column_types: 
+        contract_acceptance_date: "timestamp"
+        contract_effective_date: "timestamp"
+        created_date: "timestamp"
+        initial_term: "{{ 'INT64' if target.type == 'bigquery' else 'bigint' }}" 
+        original_created_date: "timestamp"
+        service_activation_date: "timestamp"
+        subscription_end_date: "timestamp"
+        subscription_start_date: "timestamp"
+        term_end_date: "timestamp"
+        term_start_date: "timestamp"
+        version: "{{ 'INT64' if target.type == 'bigquery' else 'bigint' }}" 
+    zuora_taxation_item_data:
+      +column_types:  
+        tax_date: "timestamp"

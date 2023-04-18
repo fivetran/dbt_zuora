@@ -115,11 +115,13 @@ vars:
         alias: "coolest_field_name"
 ```
 ### Change the build schema
-By default, this package builds the zuora staging models within a schema titled (`<target_schema>` + `_zuora`) in your destination. If this is not where you would like your zuora staging data to be written to, add the following configuration to your root `dbt_project.yml` file:
+By default this package will build the Zuora staging models within a schema titled (<target_schema> + `_stg_zuora`) and the Shopify final models within a schema titled (<target_schema> + `_zuora`) in your target database. If this is not where you would like your modeled Zuora data to be written to, add the following configuration to your `dbt_project.yml` file:
 
 ```yml
 models:
     zuora:
+      +schema: my_new_schema_name # leave blank for just the target_schema
+    zuora_source:
       +schema: my_new_schema_name # leave blank for just the target_schema
 ```
 
@@ -129,9 +131,8 @@ If an individual source table has a different name than the package expects, add
 
 ```yml
 vars:
-    <default_source_table_name>_identifier: your_table_name 
+    zuora_<default_source_table_name>_identifier: your_table_name 
 ```
-
   
 </details>
 
@@ -168,6 +169,14 @@ The Fivetran team maintaining this package _only_ maintains the latest version o
 A small team of analytics engineers at Fivetran develops these dbt packages. However, the packages are made better by community contributions! 
 
 We highly encourage and welcome contributions to this package. Check out [this dbt Discourse article](https://discourse.getdbt.com/t/contributing-to-a-dbt-package/657) to learn how to contribute to a dbt package!
+
+## Opinionated Modelling Decisions
+This dbt package takes several opinionated stances on to provide the customer several options to better understand key subscription metrics. Those include:
+- Evaluating a history of billing transactions, examined at either the invoice or invoice item level.
+- How to calculate monthly recurring revenue and at which grains to assess it, either looking at it granularly at the charge (invoice item) or account monthly level.
+- Developing a custom churn analysis based off of charges that you can find in the analysis folder that's built on the account monthly level, but also giving the customer the ability to look at churn from a subscription or rate plan charge level.
+
+If you would like a deeper explanation of the decisions we made to our models in this dbt package, you may reference the [DECISIONLOG](https://github.com/fivetran/dbt_zuora/blob/main/DECISIONLOG.md).
 
 # 🏪 Are there any resources available?
 - If you have questions or want to reach out for help, please refer to the [GitHub Issue](https://github.com/fivetran/dbt_zuora_source/issues/new/choose) section to find the right avenue of support for you.
