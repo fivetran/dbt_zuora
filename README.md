@@ -174,7 +174,7 @@ We highly encourage and welcome contributions to this package. Check out [this d
 This dbt package takes several opinionated stances on to provide the customer several options to better understand key subscription metrics. Those include:
 - Evaluating a history of billing transactions, examined at either the invoice or invoice item level.
 - How to calculate monthly recurring revenue and at which grains to assess it, either looking at it granularly at the charge (invoice item) or account monthly level.
-- Developing a custom churn analysis based off of charges that you can find in the analysis folder that's built on the account monthly level, but also giving the customer the ability to look at churn from a subscription or rate plan charge level.
+- Developing a custom churn analysis that you can find in the analysis folder that's built on the account monthly level, but also giving the customer the ability to look at churn from a subscription or rate plan charge level.
 
 If you would like a deeper explanation of the decisions we made to our models in this dbt package, you may reference the [DECISIONLOG](https://github.com/fivetran/dbt_zuora/blob/main/DECISIONLOG.md).
 
