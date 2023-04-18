@@ -88,7 +88,7 @@ Zuora allows the functionality for multicurrency to bill to customers in various
  
 ```yml
 vars:
-  using_multicurrency: false #Enable if you are utilizing multicurrency, true by default. 
+  using_multicurrency: false #Enable if you are utilizing multicurrency, true by default.  
 ```
 
 ## (Optional) Step 6: Additional configurations
