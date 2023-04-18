@@ -77,10 +77,10 @@ Your Zuora connector may not be syncing all tabes that this package references. 
 
 ```yml 
 vars: 
-    zuora__using_credit_balance_adjustment: false # Disable if you do not have the credit balance adjustment table
-    zuora__using_refund: false # Disable if you do not have the refund table
-    zuora__using_refund_invoice_payment: false # Disable if you do not have the refund invoice payment table
-    zuora__using_taxation_item: false # Disable if you do not have the taxation item table
+  zuora__using_credit_balance_adjustment: false # Disable if you do not have the credit balance adjustment table
+  zuora__using_refund: false # Disable if you do not have the refund table
+  zuora__using_refund_invoice_payment: false # Disable if you do not have the refund invoice payment table
+  zuora__using_taxation_item: false # Disable if you do not have the taxation item table
 ```   
 
 ## Step 5: Enable the multicurrency variable for customers billing in multiple currencies. 
