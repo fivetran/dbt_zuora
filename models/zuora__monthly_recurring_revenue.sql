@@ -17,24 +17,24 @@ mrr_by_account as (
 
     select 
         coalesce(month_spine.account_id, line_items.account_id) as account_id,
-        coalesce(month_spine.account_month, line_items.charge_month) as account_month,
+        coalesce(month_spine.account_month, line_items.service_start_month) as account_month,
 
-        {% if var('using_multicurrency', true) %}
-        sum(charge_mrr_home_currency) as mrr_expected_current_month,
-        {% else %} 
+        {% if var('zuora__using_multicurrency', false) %}
         sum(charge_mrr) as mrr_expected_current_month,
+        {% else %} 
+        sum(charge_mrr_home_currency) as mrr_expected_current_month,
         {% endif %}
 
         {% set sum_cols = ['gross', 'discount', 'net'] %}
         {% for col in sum_cols %} 
-            sum(case when charge_type = 'Recurring' then {{col}}_revenue else 0 end) as {{col}}_current_month_mrr,
-            sum(case when charge_type != 'Recurring' then {{col}}_revenue else 0 end) as {{col}}_current_month_non_mrr
+            sum(case when lower(charge_type) = 'recurring' then {{col}}_revenue else 0 end) as {{col}}_current_month_mrr,
+            sum(case when lower(charge_type) != 'recurring' then {{col}}_revenue else 0 end) as {{col}}_current_month_non_mrr
             {{ ',' if not loop.last }}
         {% endfor %}
 
     from month_spine
     left join line_items
-        on month_spine.account_month = line_items.charge_month
+        on month_spine.account_month = line_items.service_start_month
         and month_spine.account_id = line_items.account_id
     {{ dbt_utils.group_by(2) }}
 ),

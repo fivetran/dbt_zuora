@@ -34,7 +34,9 @@ with spine as (
 
 account_overview as (
 
-    select *
+    select 
+        account_id,
+        account_created_at
     from {{ ref('zuora__account_overview') }}
 ),
 
@@ -51,15 +53,16 @@ date_spine as (
 
 final as (
 
-    select distinct
-        account_overview.account_id,
+    select 
+        distinct account_overview.account_id,
         date_spine.date_day,
         date_spine.date_week,
         date_spine.date_month,
         date_spine.date_year,
         date_spine.date_index
-    from account_overview 
+    from account_overview
     cross join date_spine
+    where cast({{ dbt.date_trunc('day', 'account_overview.account_created_at') }} as date) <= date_spine.date_day
 )
 
 select * 

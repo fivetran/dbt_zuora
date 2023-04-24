@@ -3,8 +3,8 @@ packages:
   # - package: fivetran/dbt_zuora_source
   #   version: [">=0.1.0", "<0.2.0"]
 
-- git: https://github.com/fivetran/dbt_zuora_source.git
-  revision: main
-  warn-unpinned: false
+# - git: https://github.com/fivetran/dbt_zuora_source.git
+#   revision: main
+#   warn-unpinned: false
   
-# - local: ../dbt_zuora_source
+- local: ../dbt_zuora_source

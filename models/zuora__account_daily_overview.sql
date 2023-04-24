@@ -21,7 +21,7 @@ account_daily_overview as (
         account_running_totals.date_week, 
         account_running_totals.date_month, 
         account_running_totals.date_year,  
-        account_running_totals.date_index,
+        account_running_totals.date_index,  
         account_overview.account_created_at,
         account_overview.account_name,
         account_overview.account_number,
@@ -36,15 +36,15 @@ account_daily_overview as (
         
         {{ fivetran_utils.persist_pass_through_columns('zuora_account_pass_through_columns', identifier='account_overview') }}  
 
-        daily_invoices,
-        daily_invoice_items,
+        account_running_totals.daily_invoices,
+        account_running_totals.daily_invoice_items,
 
         {% for col in round_cols %}
             round(cast(daily_{{ col }} as {{ dbt.type_numeric() }}), 2) as daily_{{ col }},
         {% endfor %}
 
-        rolling_invoices,
-        rolling_invoice_items,
+        account_running_totals.rolling_invoices,
+        account_running_totals.rolling_invoice_items,
 
         {% for col in round_cols %}
             round(cast(rolling_{{ col }} as {{ dbt.type_numeric() }}), 2) as rolling_{{ col }}

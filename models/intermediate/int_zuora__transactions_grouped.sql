@@ -18,13 +18,13 @@ transactions_grouped as (
         sum(invoice_items) as daily_invoice_items,
 
         {% for col in sum_cols %}
-        {% if var('using_multicurrency', true) %}
-            sum({{ col }}_home_currency) as daily_{{ col }},
-        {% else %} 
+        {% if var('zuora__using_multicurrency', false) %}
             sum({{ col }}) as daily_{{ col }},
+        {% else %} 
+            sum({{ col }}_home_currency) as daily_{{ col }},
         {% endif %}
         {% endfor %}
-        
+
         sum(refund_amount) as daily_refunds 
 
     from invoice_joined

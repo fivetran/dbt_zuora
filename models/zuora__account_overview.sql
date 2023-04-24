@@ -51,7 +51,7 @@ account_overview as (
             {{ ',' if not loop.last -}}
         {% endfor %}
 
-        {{ fivetran_utils.persist_pass_through_columns('zuora_account_pass_through_columns', identifier='account') }}
+        {{ fivetran_utils.persist_pass_through_columns('zuora_account_pass_through_columns', identifier='account_enriched') }}
 
     from account_enriched
     left join contact 

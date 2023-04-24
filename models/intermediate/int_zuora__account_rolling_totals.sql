@@ -46,8 +46,8 @@ account_rolling_totals as (
             else account_rolling.rolling_{{ f }}
             end as rolling_{{ f }},
         {% endfor %}
-
         transaction_date_spine.date_index
+
     from transaction_date_spine 
     left join account_rolling
         on account_rolling.account_id = transaction_date_spine.account_id 
