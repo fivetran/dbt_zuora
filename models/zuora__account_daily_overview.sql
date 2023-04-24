@@ -32,9 +32,9 @@ account_daily_overview as (
         account_overview.account_last_name,
         account_overview.account_postal_code,
         account_overview.account_state, 
-        account_overview.first_charge_processed_at,
+        account_overview.first_charge_processed_at
         
-        {{ fivetran_utils.persist_pass_through_columns('zuora_account_pass_through_columns', identifier='account_overview') }}  
+        {{ fivetran_utils.persist_pass_through_columns('zuora_account_pass_through_columns', identifier='account_overview') }},
 
         account_running_totals.daily_invoices,
         account_running_totals.daily_invoice_items,

@@ -50,7 +50,11 @@ account_details as (
         {{ dbt_utils.safe_divide( dbt.datediff("account.created_date", dbt.current_timestamp_backcompat(), "day"), 30) }} as account_active_months,
         case when {{ dbt.datediff("account.created_date", dbt.current_timestamp_backcompat(), "day") }} <= 30
             then true else false end as is_new_customer
+    
+        {{ fivetran_utils.persist_pass_through_columns('zuora_account_pass_through_columns') }}
+
     from account
+
 ),
 
 account_totals as (
@@ -106,7 +110,10 @@ account_cumulatives as (
         account_details.status,
         account_details.auto_pay,
         account_details.account_active_months,
-        account_details.is_new_customer,
+        account_details.is_new_customer
+
+        {{ fivetran_utils.persist_pass_through_columns('zuora_account_pass_through_columns', identifier = 'account_details') }},
+
         account_totals.total_tax_amount as total_taxes,
         account_totals.total_refund_amount as total_refunds,
         account_totals.total_discount_charges as total_discounts,
