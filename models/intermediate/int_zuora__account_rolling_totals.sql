@@ -52,9 +52,6 @@ account_rolling_totals as (
     left join account_rolling
         on account_rolling.account_id = transaction_date_spine.account_id 
         and account_rolling.date_day = transaction_date_spine.date_day
-        and account_rolling.date_week = transaction_date_spine.date_week
-        and account_rolling.date_month = transaction_date_spine.date_month
-        and account_rolling.date_year = transaction_date_spine.date_year
 )
 
 select * 

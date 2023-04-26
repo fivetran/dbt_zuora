@@ -95,8 +95,8 @@ models:
         description: Unique account number assigned to the account. 
       - name: account_credit_balance
         description: Total credit balance for the account.
-      - name: account_mrr
-        description: The amount of predictable revenue expected to be received on a monthly basis.
+      - name: account_zuora_calculated_mrr
+        description: The amount of tabulated MRR as calculated by Zuora internally. 
       - name: account_status
         description: Status of the account in the system.
       - name: is_auto_pay

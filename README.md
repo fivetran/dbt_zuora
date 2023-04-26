@@ -89,9 +89,25 @@ Zuora allows the functionality for multicurrency to bill to customers in various
 vars:
   zuora__using_multicurrency: false #Enable if you are utilizing multicurrency, false by default.
 ```
+### Multicurrency Support Disclaimer (and how you can help)
+We were not able to develop the package using the multicurrency variable, so we had to execute best judgement when building these models. If you encounter any issues with enabling the variable, [please file a bug report with us](https://github.com/fivetran/dbt_zuora/issues/new?assignees=&labels=type%3Abug&template=bug-report.yml&title=%5BBug%5D+%3Ctitle%3E) and we can work together to fix any issues you encounter!
 
 ## (Optional) Step 6: Additional configurations
 <details><summary>Expand to view configurations</summary>
+
+### Setting the date range for the account daily overview and monthly recurring revenue models
+By default, the `zuora__account_daily_overview` will aggregate data for the entire date range of your data set based on the minimum and maximum `invoice_date` values from the `invoice` source table, and `zuora__monthly_recurring_revenue` based on the `service_start_date` from the `invoice_item` source table. 
+
+However, you may limit this date range if desired by defining the following variables for each respective model (the `zuora_overview_` variables refer to the `zuora__account_daily_overview`, the `zuora_mrr_` variables apply to `zuora__monthly_recurring_revenue`). 
+
+```yml
+vars:
+    zuora_daily_overview_first_date: "yyyy-mm-dd"
+    zuora_daily_overview_last_date: "yyyy-mm-dd"
+
+    zuora_mrr_first_date: "yyyy-mm-dd"
+    zuora_mrr_last_date: "yyyy-mm-dd"
+```
 
 ### Passing Through Additional Fields
 This package includes all source columns defined in the [macros folder of the dbt_zuora_source package](https://github.com/fivetran/dbt_zuora_source/tree/main/macros). You can add more columns using our pass-through column variables. These variables allow for the pass-through fields to be aliased (`alias`) and casted (`transform_sql`) if desired, but not required. Datatype casting is configured via a sql snippet within the `transform_sql` key. You may add the desired sql while omitting the `as field_name` at the end and your custom pass-though fields will be casted accordingly. Use the below format for declaring the respective pass-through variables:
