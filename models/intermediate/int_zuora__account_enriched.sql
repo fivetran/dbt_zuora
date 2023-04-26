@@ -27,11 +27,12 @@ invoice_item as (
 
 account_payment_data as (
 
-    select account_id,
+    select 
+        account_id,
         sum(amount) as account_amount_paid
     from {{ var('payment') }} 
     where is_most_recent_record
-    and account_id is not null
+        and account_id is not null
     {{ dbt_utils.group_by(1) }}
 ),
 
@@ -49,7 +50,11 @@ account_details as (
         {{ dbt_utils.safe_divide( dbt.datediff("account.created_date", dbt.current_timestamp_backcompat(), "day"), 30) }} as account_active_months,
         case when {{ dbt.datediff("account.created_date", dbt.current_timestamp_backcompat(), "day") }} <= 30
             then true else false end as is_new_customer
+    
+        {{ fivetran_utils.persist_pass_through_columns('zuora_account_pass_through_columns') }}
+
     from account
+
 ),
 
 account_totals as (
@@ -65,8 +70,12 @@ account_totals as (
         sum(case when cast({{ dbt.date_trunc('day', dbt.current_timestamp_backcompat()) }} as date) > due_date
                 and invoice_amount != invoice_amount_paid 
                 then invoice_amount_unpaid else 0 end) as total_amount_past_due,
-        max(payment_date) as most_recent_payment_date,
-        max(credit_balance_adjustment_date) as most_recent_credit_balance_adjustment_date 
+        max(payment_date) as most_recent_payment_date
+
+        {% if var('zuora__using_credit_balance_adjustment', true) %}
+        , max(credit_balance_adjustment_date) as most_recent_credit_balance_adjustment_date 
+        {% endif %}
+
     from billing_history
     {{ dbt_utils.group_by(1) }}
 ),
@@ -88,7 +97,7 @@ account_subscription_data as (
     select 
         account_id,
         count(distinct subscription_id) as subscription_count,
-        sum(case when status = 'Active' then 1 else 0 end) as active_subscription_count
+        sum(case when lower(status) = 'active' then 1 else 0 end) as active_subscription_count
     from subscription
     {{ dbt_utils.group_by(1) }}
 ),
@@ -105,7 +114,10 @@ account_cumulatives as (
         account_details.status,
         account_details.auto_pay,
         account_details.account_active_months,
-        account_details.is_new_customer,
+        account_details.is_new_customer
+
+        {{ fivetran_utils.persist_pass_through_columns('zuora_account_pass_through_columns', identifier = 'account_details') }},
+
         account_totals.total_tax_amount as total_taxes,
         account_totals.total_refund_amount as total_refunds,
         account_totals.total_discount_charges as total_discounts,
@@ -115,7 +127,11 @@ account_cumulatives as (
         account_totals.total_invoice_amount_unpaid as total_amount_not_paid,
         account_totals.total_amount_past_due,
         account_totals.most_recent_payment_date,
+
+        {% if var('zuora__using_credit_balance_adjustment', true) %}
         account_totals.most_recent_credit_balance_adjustment_date, 
+        {% endif %}
+        
         account_invoice_data.first_charge_date,
         account_invoice_data.most_recent_charge_date,
         account_invoice_data.invoice_item_count,

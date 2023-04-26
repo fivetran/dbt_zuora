@@ -1,5 +1,8 @@
-{% set sum_cols = ['invoice_amount', 'invoice_amount_paid', 'invoice_amount_unpaid', 'tax_amount', 'credit_balance_adjustment_amount', 'discount_charges'] %}
-  
+{% set sum_cols = ['invoice_amount', 'invoice_amount_paid', 'invoice_amount_unpaid', 'discount_charges'] %}
+{% do sum_cols.append('tax_amount') if var('zuora__using_taxation_item', true) %}
+{% do sum_cols.append('credit_balance_adjustment_amount') if var('zuora__using_credit_balance_adjustment', true) %}
+
+
 with invoice_joined as (
 
     select *
@@ -18,13 +21,13 @@ transactions_grouped as (
         sum(invoice_items) as daily_invoice_items,
 
         {% for col in sum_cols %}
-        {% if var('using_multicurrency', true) %}
-            sum({{ col }}_home_currency) as daily_{{ col }},
-        {% else %} 
+        {% if var('zuora__using_multicurrency', false) %}
             sum({{ col }}) as daily_{{ col }},
+        {% else %} 
+            sum({{ col }}_home_currency) as daily_{{ col }},
         {% endif %}
         {% endfor %}
-        
+
         sum(refund_amount) as daily_refunds 
 
     from invoice_joined

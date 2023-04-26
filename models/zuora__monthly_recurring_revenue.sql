@@ -9,7 +9,7 @@ month_spine as (
     select 
         account_id,
         date_month as account_month
-    from {{ ref('zuora__account_daily_overview') }}
+    from {{ ref('int_zuora__mrr_date_spine') }}
     {{ dbt_utils.group_by(2) }}
 ),
 
@@ -17,24 +17,24 @@ mrr_by_account as (
 
     select 
         coalesce(month_spine.account_id, line_items.account_id) as account_id,
-        coalesce(month_spine.account_month, line_items.charge_month) as account_month,
+        coalesce(month_spine.account_month, line_items.service_start_month) as account_month,
 
-        {% if var('using_multicurrency', true) %}
-        sum(charge_mrr_home_currency) as mrr_expected_current_month,
+        {% if var('zuora__using_multicurrency', false) %}
+        sum(case when charge_mrr is null then 0 else charge_mrr end) as mrr_expected_current_month,
         {% else %} 
-        sum(charge_mrr) as mrr_expected_current_month,
+        sum(case when charge_mrr_home_currency is null then 0 else charge_mrr_home_currency end) as mrr_expected_current_month,
         {% endif %}
 
         {% set sum_cols = ['gross', 'discount', 'net'] %}
         {% for col in sum_cols %} 
-            sum(case when charge_type = 'Recurring' then {{col}}_revenue else 0 end) as {{col}}_current_month_mrr,
-            sum(case when charge_type != 'Recurring' then {{col}}_revenue else 0 end) as {{col}}_current_month_non_mrr
+            sum(case when lower(charge_type) = 'recurring' and {{col}}_revenue is not null then {{col}}_revenue else 0 end) as {{col}}_current_month_mrr,
+            sum(case when lower(charge_type) != 'recurring' and {{col}}_revenue is not null then {{col}}_revenue else 0 end) as {{col}}_current_month_non_mrr
             {{ ',' if not loop.last }}
         {% endfor %}
 
     from month_spine
     left join line_items
-        on month_spine.account_month = line_items.charge_month
+        on month_spine.account_month = line_items.service_start_month
         and month_spine.account_id = line_items.account_id
     {{ dbt_utils.group_by(2) }}
 ),
@@ -42,8 +42,16 @@ mrr_by_account as (
 current_vs_previous_mrr as (
     
     select 
-        *,
-        lag(mrr_expected_current_month)  over (partition by account_id order by account_month) as mrr_expected_previous_month,
+        account_id,
+        account_month,
+        gross_current_month_mrr,
+        discount_current_month_mrr,
+        net_current_month_mrr,
+        gross_current_month_non_mrr,
+        discount_current_month_non_mrr,
+        net_current_month_non_mrr,
+        mrr_expected_current_month,
+        lag(mrr_expected_current_month) over (partition by account_id order by account_month) as mrr_expected_previous_month,
 
         {% set sum_cols = ['gross', 'discount', 'net'] %}
         {% for col in sum_cols %} 

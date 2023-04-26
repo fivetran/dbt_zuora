@@ -1,4 +1,6 @@
-{% set fields = ['invoices','invoice_items','invoice_amount','invoice_amount_paid','invoice_amount_unpaid','tax_amount','credit_balance_adjustment_amount','discount_charges','refunds'] %}
+{% set fields = ['invoices','invoice_items','invoice_amount','invoice_amount_paid','invoice_amount_unpaid','discount_charges','refunds'] %}
+{% do fields.append('tax_amount') if var('zuora__using_taxation_item', true) %}
+{% do fields.append('credit_balance_adjustment_amount') if var('zuora__using_credit_balance_adjustment', true) %}
 
 with account_partitions as (
 

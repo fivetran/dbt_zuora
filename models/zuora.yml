@@ -95,8 +95,8 @@ models:
         description: Unique account number assigned to the account. 
       - name: account_credit_balance
         description: Total credit balance for the account.
-      - name: account_mrr
-        description: The amount of predictable revenue expected to be received on a monthly basis.
+      - name: account_zuora_calculated_mrr
+        description: The amount of tabulated MRR as calculated by Zuora internally. 
       - name: account_status
         description: Status of the account in the system.
       - name: is_auto_pay
@@ -188,6 +188,8 @@ models:
         description: Specifies the date on which to generate the invoice.
       - name: invoice_amount
         description: The sum of all charges and taxes associated with the invoice.
+      - name: invoice_amount_home_currency
+        description: The sum of all charges and taxes associated with the invoice in its home currency.
       - name: invoice_amount_paid
         description: The amount of the invoice currently paid for.  
       - name: invoice_amount_unpaid
@@ -212,6 +214,8 @@ models:
         description: The due date of the invoice.
       - name: status
         description: The status of the invoice in the system. This status is not the status of the payment of the invoice just the status of the invoice itself.
+      - name: purchase_type
+        description: The type of the invoice source.
       - name: payment_id
         description: The identifier of the payment associated with the invoice payment.
       - name: payment_number
@@ -224,6 +228,8 @@ models:
         description: The type of the payment.
       - name: invoice_amount_paid_home_currency
         description: The amount of the invoice amount paid in the home currency on the invoice.
+      - name: invoice_amount_unpaid_home_currency
+        description: The amount of the invoice amount unpaid in the home currency on the invoice.
       - name: credit_balance_adjustment_id
         description: The identifier of the credit balance adjustment on the invoice.
       - name: credit_balance_adjustment_number
@@ -232,6 +238,8 @@ models:
         description: The reason code for the credit balance adjustment on the invoice. 
       - name: credit_balance_adjustment_amount_home_currency
         description: The amount for the credit balance adjustment in home currency on the invoice.
+      - name: credit_balance_adjustment_date
+        description: The date when the credit balance adjustment is applied.
       - name: payment_method_id
         description: The unique identifier of the payment method associated with the invoice.
       - name: payment_method_type
@@ -255,7 +263,13 @@ models:
       - name: units
         description: The units in the invoice.
       - name: first_charge_date
-        description: The first charge date for the invoice. 
+        description: The first charge date for the invoice.
+      - name: most_recent_charge_date
+        description: The most recent charge date for the invoice.
+      - name: invoice_service_start_date
+        description: Earliest invoice item service start date for the invoice.
+      - name: invoice_service_end_date
+        description: Earliest invoice item service end date for the invoice.
 
   - name: zuora__line_item_history
     description: Each record is an invoice item meant to provide all details on all transactions at the most granular level, with details being brought in from subscriptions, amendments, rate plan charges, products, subscriptions, amendments and more.
@@ -421,11 +435,11 @@ models:
       - name: gross_current_month_mrr
         description: Total recurring charges in the current month for the account, resulting in gross monthly recurring revenue.    
       - name: discount_current_month_mrr
-        description: Total recurring discounts in the current month for the account, resulting in discount monthly recurring revenue.     
+        description: Total recurring discounts in the current month for the account, resulting in discount monthly recurring revenue.
       - name: net_current_month_mrr
         description: The difference between gross monthly recurring revenue and net monthly recurring revenue in the current month.
       - name: gross_current_month_non_mrr
-        description: Total non-recurring charges in the current month for the account, resulting in gross monthly non-recurring revenue.    
+        description: Total non-recurring charges in the current month for the account, resulting in gross monthly non-recurring revenue.
       - name: discount_current_month_non_mrr
         description: Total non-recurring discounts in the current month for the account, resulting in discount monthly non-recurring revenue.
       - name: net_current_month_non_mrr
@@ -439,11 +453,13 @@ models:
       - name: net_previous_month_mrr
         description: The difference between gross monthly recurring revenue and net monthly recurring revenue in the previous month.     
       - name: gross_previous_month_non_mrr
-        description: Total non-recurring charges in the previous month for the account, resulting in gross monthly non-recurring revenue.         
+        description: Total non-recurring charges in the previous month for the account, resulting in gross monthly non-recurring revenue.
       - name: discount_previous_month_non_mrr
-        description: Total non-recurring discounts in the previous month for the account, resulting in discount monthly non-recurring revenue. 
+        description: Total non-recurring discounts in the previous month for the account, resulting in discount monthly non-recurring revenue.
       - name: net_previous_month_non_mrr
-        description: The difference between gross monthly non-recurring revenue and net monthly non-recurring revenue in the previous month.    
+        description: The difference between gross monthly non-recurring revenue and net monthly non-recurring revenue in the previous month.
+      - name: account_month_number
+        description: The number of the month of the account, 1 being the first month the account receives revenue and the number increases with each subsequent month.
       - name: net_mrr_type
         description: The net monthly recurring revenue type, defined by best-known MRR type terminology. 
 

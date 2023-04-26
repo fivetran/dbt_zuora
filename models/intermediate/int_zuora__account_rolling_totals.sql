@@ -1,4 +1,6 @@
-{% set fields = ['invoices','invoice_items','invoice_amount','invoice_amount_paid','invoice_amount_unpaid','tax_amount','credit_balance_adjustment_amount','discount_charges','refunds'] %}
+{% set fields = ['invoices','invoice_items','invoice_amount','invoice_amount_paid','invoice_amount_unpaid','discount_charges','refunds'] %}
+{% do fields.append('tax_amount') if var('zuora__using_taxation_item', true) %}
+{% do fields.append('credit_balance_adjustment_amount') if var('zuora__using_credit_balance_adjustment', true) %}
 
 with transaction_date_spine as (
 
@@ -36,8 +38,15 @@ account_rolling_totals as (
         account_rolling.daily_invoice_amount,
         account_rolling.daily_invoice_amount_paid,
         account_rolling.daily_invoice_amount_unpaid,
+
+        {% if var('zuora__using_taxation_item', true) %}
         account_rolling.daily_tax_amount,
+        {% endif %}
+
+        {% if var('zuora__using_credit_balance_adjustment', true) %}
         account_rolling.daily_credit_balance_adjustment_amount,
+        {% endif %}
+
         account_rolling.daily_discount_charges,
         account_rolling.daily_refunds,
         {% for f in fields %}
@@ -46,15 +55,12 @@ account_rolling_totals as (
             else account_rolling.rolling_{{ f }}
             end as rolling_{{ f }},
         {% endfor %}
-
         transaction_date_spine.date_index
+
     from transaction_date_spine 
     left join account_rolling
         on account_rolling.account_id = transaction_date_spine.account_id 
         and account_rolling.date_day = transaction_date_spine.date_day
-        and account_rolling.date_week = transaction_date_spine.date_week
-        and account_rolling.date_month = transaction_date_spine.date_month
-        and account_rolling.date_year = transaction_date_spine.date_year
 )
 
 select * 

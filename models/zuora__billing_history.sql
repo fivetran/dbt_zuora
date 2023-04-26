@@ -9,10 +9,14 @@ with invoice as (
         amount as invoice_amount,
         amount_home_currency as invoice_amount_home_currency,
         payment_amount as invoice_amount_paid,
-        amount - payment_amount as invoice_amount_unpaid,
+        amount - payment_amount as invoice_amount_unpaid, 
         tax_amount,
         refund_amount,
+
+        {% if var('zuora__using_credit_balance_adjustment', true) %}
         credit_balance_adjustment_amount,
+        {% endif %}
+
         transaction_currency,
         home_currency,
         exchange_rate_date,
@@ -24,7 +28,7 @@ with invoice as (
                 then balance else 0 end) as total_amount_past_due
     from {{ var('invoice') }} 
     where is_most_recent_record    
-    {{ dbt_utils.group_by(18) }}
+    {{ dbt_utils.group_by(18) if var('zuora__using_credit_balance_adjustment', true) else dbt_utils.group_by(17) }}
 ),
 
 billing_enriched as (
@@ -32,20 +36,6 @@ billing_enriched as (
     select * 
     from {{ ref('int_zuora__billing_enriched') }} 
 ), 
-
-refund as (
-
-    select 
-        amount as refund_amount,
-        refund_id,
-        refund_number,
-        refund_date,
-        status as refund_status,
-        type as refund_type, 
-        payment_method_id
-    from {{ var('refund') }} 
-    where is_most_recent_record
-),
 
 billing_history as (
 
@@ -61,7 +51,11 @@ billing_history as (
         invoice.invoice_amount_unpaid,
         invoice.tax_amount,
         invoice.refund_amount,
+
+        {% if var('zuora__using_credit_balance_adjustment', true) %}
         invoice.credit_balance_adjustment_amount,
+        {% endif %}
+
         invoice.transaction_currency,
         invoice.home_currency,
         invoice.exchange_rate_date,
@@ -73,18 +67,25 @@ billing_history as (
         billing_enriched.payment_date,
         billing_enriched.payment_status,
         billing_enriched.payment_type, 
-        billing_enriched.invoice_amount_paid_home_currency as payment_amount_home_currency,
+        billing_enriched.invoice_amount_paid_home_currency,
         invoice.invoice_amount_home_currency - billing_enriched.invoice_amount_paid_home_currency as invoice_amount_unpaid_home_currency,
         billing_enriched.payment_method_id,
         billing_enriched.payment_method_type,
         billing_enriched.payment_method_subtype,
         billing_enriched.is_payment_method_active, 
+
+        {% if var('zuora__using_credit_balance_adjustment', true) %}
         billing_enriched.credit_balance_adjustment_id,
         billing_enriched.credit_balance_adjustment_number,
         billing_enriched.credit_balance_adjustment_reason_code,
         billing_enriched.credit_balance_adjustment_amount_home_currency,
         billing_enriched.credit_balance_adjustment_date, 
+        {% endif %}
+
+        {% if var('zuora__using_taxation_item', true) %}
         billing_enriched.tax_amount_home_currency,
+        {% endif %}
+        
         billing_enriched.invoice_items,
         billing_enriched.products,
         billing_enriched.subscriptions,

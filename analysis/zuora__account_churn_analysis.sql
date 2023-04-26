@@ -19,9 +19,9 @@ account_current_month as (
       coalesce(month_spine.account_id, line_items.account_id) as account_id,
       coalesce(month_spine.account_month, line_items.service_start_month) as account_month,
       count(distinct rate_plan_charge_id) as rate_plan_charges,
-      case when count(distinct rate_plan_charge_id) = 0 then 'inactive'
-        else 'active'
-        end as current_month_account_state
+      case when count(distinct rate_plan_charge_id) != 0 then true
+        else false
+        end as is_current_month_active
     from month_spine
     left join line_items  
       on month_spine.account_id = line_items.account_id
@@ -33,9 +33,19 @@ account_previous_month as (
 
     select *, 
       lag(rate_plan_charges) over (partition by account_id order by account_month) as rate_plan_charges_last_month,
-      lag(current_month_account_state) over (partition by account_id order by account_month) as previous_month_account_state
+      lag(current_month_account_state) over (partition by account_id order by account_month) as is_previous_month_active
     from account_current_month
+),
+
+churn_month as (
+
+    select *,
+        case when is_current_month_active = false and is_previous_month_active = true
+          then true 
+          else false
+        end as is_churned_month
+    from account_previous_month
 )
 
 select * 
-from account_previous_month
+from churn_month

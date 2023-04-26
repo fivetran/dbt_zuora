@@ -1,5 +1,3 @@
-# 🚧 UNDER CONSTRUCTION 🚧
-
 <p align="center">
     <a alt="License"
         href="https://github.com/fivetran/dbt_zuora/blob/main/LICENSE">
@@ -37,8 +35,9 @@ The following table provides a detailed list of all models materialized within t
 | [zuora__subscription_overview](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__subscription_overview)       | Each record represents a subscription, enriched with metrics about time, revenue, state, and period.    
 
 An example churn model is separately available in the analysis folder: 
-
-| [zuora__account_churn_analysis](https://fivetran.github.io/dbt_zuora/#!/analysis/analysis.zuora.zuora__account_churn_analysis)    | Each record represents an account and whether it has churned in that month or not.          |                                                                                     |
+| **analysis model**   | **description**   |
+|---------------------|------------------|
+| [zuora__account_churn_analysis](https://fivetran.github.io/dbt_zuora/#!/analysis/analysis.zuora.zuora__account_churn_analysis) | Each record represents an account and whether it has churned in that month or not. | 
 
 # 🎯 How do I use the dbt package?
 ## Step 1: Prerequisites
@@ -77,52 +76,70 @@ Your Zuora connector may not be syncing all tabes that this package references. 
 
 ```yml 
 vars: 
-    zuora__using_credit_balance_adjustment: false # Disable if you do not have the credit balance adjustment table
-    zuora__using_refund: false # Disable if you do not have the refund table
-    zuora__using_refund_invoice_payment: false # Disable if you do not have the refund invoice payment table
-    zuora__using_taxation_item: false # Disable if you do not have the taxation item table
-```   
+  zuora__using_credit_balance_adjustment: false # Disable if you do not have the credit balance adjustment table
+  zuora__using_refund: false # Disable if you do not have the refund table
+  zuora__using_refund_invoice_payment: false # Disable if you do not have the refund invoice payment table
+  zuora__using_taxation_item: false # Disable if you do not have the taxation item table
+```     
 
-## Step 5: Enable the multicurrency variable for customers billing in multiple currencies.
-Zuora allows the functionality for multicurrency to bill to customers in various currencies. If you are an account utilizing multicurrency, make sure to set the `using_multicurrency` variable to true in dbt_project.yml so the amounts in our data models accurately reflect the home currency values in your native account currency.
+## Step 5: Configure the multicurrency variable for customers billing in multiple currencies.
+Zuora allows the functionality for multicurrency to bill to customers in various currencies. If you are an account utilizing multicurrency, make sure to set the `zuora__using_multicurrency` variable to true in dbt_project.yml so the amounts in our data models accurately reflect the home currency values in your native account currency.
 
 ```yml
 vars:
-    using_multicurrency: false #Enable if you are utilizing multicurrency, true by default.
+  zuora__using_multicurrency: false #Enable if you are utilizing multicurrency, false by default.
 ```
+### Multicurrency Support Disclaimer (and how you can help)
+We were not able to develop the package using the multicurrency variable, so we had to execute best judgement when building these models. If you encounter any issues with enabling the variable, [please file a bug report with us](https://github.com/fivetran/dbt_zuora/issues/new?assignees=&labels=type%3Abug&template=bug-report.yml&title=%5BBug%5D+%3Ctitle%3E) and we can work together to fix any issues you encounter!
 
 ## (Optional) Step 6: Additional configurations
 <details><summary>Expand to view configurations</summary>
 
-### Passing Through Additional Fields
-This package includes all source columns defined in the macros folder. You can add more columns using our pass-through column variables. These variables allow for the pass-through fields to be aliased (`alias`) and casted (`transform_sql`) if desired, but not required. Datatype casting is configured via a sql snippet within the `transform_sql` key. You may add the desired sql while omitting the `as field_name` at the end and your custom pass-though fields will be casted accordingly. Use the below format for declaring the respective pass-through variables:
+### Setting the date range for the account daily overview and monthly recurring revenue models
+By default, the `zuora__account_daily_overview` will aggregate data for the entire date range of your data set based on the minimum and maximum `invoice_date` values from the `invoice` source table, and `zuora__monthly_recurring_revenue` based on the `service_start_date` from the `invoice_item` source table. 
+
+However, you may limit this date range if desired by defining the following variables for each respective model (the `zuora_overview_` variables refer to the `zuora__account_daily_overview`, the `zuora_mrr_` variables apply to `zuora__monthly_recurring_revenue`). 
 
 ```yml
 vars:
-    zuora_account_pass_through_columns: 
-      - name: "new_custom_field"
-        alias: "custom_field"
-        transform_sql: "cast(custom_field as string)"
-      - name: "another_one"
-    zuora_subscription_pass_through_columns:
-      - name: "this_field"
-        alias: "cool_field_name"
-    zuora_rate_plan_pass_through_columns:
-      - name: "another_field"
-        alias: "cooler_field_name"
-    zuora_rate_plan_charge_pass_through_columns:
-      - name: "yet_another_field"
-        alias: "coolest_field_name"
+    zuora_daily_overview_first_date: "yyyy-mm-dd"
+    zuora_daily_overview_last_date: "yyyy-mm-dd"
+
+    zuora_mrr_first_date: "yyyy-mm-dd"
+    zuora_mrr_last_date: "yyyy-mm-dd"
+```
+
+### Passing Through Additional Fields
+This package includes all source columns defined in the [macros folder of the dbt_zuora_source package](https://github.com/fivetran/dbt_zuora_source/tree/main/macros). You can add more columns using our pass-through column variables. These variables allow for the pass-through fields to be aliased (`alias`) and casted (`transform_sql`) if desired, but not required. Datatype casting is configured via a sql snippet within the `transform_sql` key. You may add the desired sql while omitting the `as field_name` at the end and your custom pass-though fields will be casted accordingly. Use the below format for declaring the respective pass-through variables:
+
+```yml
+vars:
+  zuora_account_pass_through_columns: 
+    - name: "new_custom_field"
+      alias: "custom_field"
+      transform_sql: "cast(custom_field as string)"
+    - name: "another_one"
+  zuora_subscription_pass_through_columns:
+    - name: "this_field"
+      alias: "cool_field_name"
+  zuora_rate_plan_pass_through_columns:
+    - name: "another_field"
+      alias: "cooler_field_name"
+  zuora_rate_plan_charge_pass_through_columns:
+    - name: "yet_another_field"
+      alias: "coolest_field_name"
 ```
 ### Change the build schema
-By default this package will build the Zuora staging models within a schema titled (<target_schema> + `_stg_zuora`) and the Shopify final models within a schema titled (<target_schema> + `_zuora`) in your target database. If this is not where you would like your modeled Zuora data to be written to, add the following configuration to your `dbt_project.yml` file:
+By default this package will build the Zuora staging models within a schema titled (<target_schema> + `_stg_zuora`), the Zuora intermediate models within a schema titled (<target_schema> + `_zuora_int`) and the Zuora final models within a schema titled (<target_schema> + `_zuora`) in your target database. If this is not where you would like your modeled Zuora data to be written to, add the following configuration to your `dbt_project.yml` file:
 
 ```yml
 models:
-    zuora:
+  zuora:
+    +schema: my_new_schema_name # leave blank for just the target_schema
+    intermediate:
       +schema: my_new_schema_name # leave blank for just the target_schema
-    zuora_source:
-      +schema: my_new_schema_name # leave blank for just the target_schema
+  zuora_source:
+    +schema: my_new_schema_name # leave blank for just the target_schema
 ```
 
 ### Change the source table references
@@ -171,7 +188,7 @@ A small team of analytics engineers at Fivetran develops these dbt packages. How
 We highly encourage and welcome contributions to this package. Check out [this dbt Discourse article](https://discourse.getdbt.com/t/contributing-to-a-dbt-package/657) to learn how to contribute to a dbt package!
 
 ## Opinionated Modelling Decisions
-This dbt package takes several opinionated stances on to provide the customer several options to better understand key subscription metrics. Those include:
+This dbt package takes several opinionated stances in order to provide the customer several options to better understand key subscription metrics. Those include:
 - Evaluating a history of billing transactions, examined at either the invoice or invoice item level.
 - How to calculate monthly recurring revenue and at which grains to assess it, either looking at it granularly at the charge (invoice item) or account monthly level.
 - Developing a custom churn analysis that you can find in the analysis folder that's built on the account monthly level, but also giving the customer the ability to look at churn from a subscription or rate plan charge level.
@@ -181,4 +198,4 @@ If you would like a deeper explanation of the decisions we made to our models in
 # 🏪 Are there any resources available?
 - If you have questions or want to reach out for help, please refer to the [GitHub Issue](https://github.com/fivetran/dbt_zuora_source/issues/new/choose) section to find the right avenue of support for you.
 - If you would like to provide feedback to the dbt package team at Fivetran or would like to request a new dbt package, fill out our [Feedback Form](https://www.surveymonkey.com/r/DQ7K7WW).
-- Have questions or want to just say hi? Book a time during our office hours [on Calendly](https://calendly.com/fivetran-solutions-team/fivetran-solutions-team-office-hours) or email us at solutions@fivetran.com.
+- Submit any questions you have about our packages [in our Fivetran dbt community](https://community.fivetran.com/t5/user-group-for-dbt/gh-p/dbt-user-group) so our Engineering team can provide guidance as quickly as possible!
