@@ -70,8 +70,12 @@ account_totals as (
         sum(case when cast({{ dbt.date_trunc('day', dbt.current_timestamp_backcompat()) }} as date) > due_date
                 and invoice_amount != invoice_amount_paid 
                 then invoice_amount_unpaid else 0 end) as total_amount_past_due,
-        max(payment_date) as most_recent_payment_date,
-        max(credit_balance_adjustment_date) as most_recent_credit_balance_adjustment_date 
+        max(payment_date) as most_recent_payment_date
+
+        {% if var('zuora__using_credit_balance_adjustment', true) %}
+        , max(credit_balance_adjustment_date) as most_recent_credit_balance_adjustment_date 
+        {% endif %}
+
     from billing_history
     {{ dbt_utils.group_by(1) }}
 ),
@@ -123,7 +127,11 @@ account_cumulatives as (
         account_totals.total_invoice_amount_unpaid as total_amount_not_paid,
         account_totals.total_amount_past_due,
         account_totals.most_recent_payment_date,
+
+        {% if var('zuora__using_credit_balance_adjustment', true) %}
         account_totals.most_recent_credit_balance_adjustment_date, 
+        {% endif %}
+        
         account_invoice_data.first_charge_date,
         account_invoice_data.most_recent_charge_date,
         account_invoice_data.invoice_item_count,
