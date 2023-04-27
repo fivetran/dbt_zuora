@@ -1,5 +1,7 @@
-{% set round_cols = ['invoice_amount', 'invoice_amount_paid', 'invoice_amount_unpaid', 'tax_amount', 'credit_balance_adjustment_amount', 'discount_charges', 'refunds'] %}
-        
+{% set round_cols = ['invoice_amount', 'invoice_amount_paid', 'invoice_amount_unpaid', 'discount_charges', 'refunds'] %}
+{% do round_cols.append('tax_amount') if var('zuora__using_taxation_item', true) %}
+{% do round_cols.append('credit_balance_adjustment_amount') if var('zuora__using_credit_balance_adjustment', true) %}
+
 with account_running_totals as (
 
     select *

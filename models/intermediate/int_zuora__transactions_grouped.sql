@@ -1,5 +1,8 @@
-{% set sum_cols = ['invoice_amount', 'invoice_amount_paid', 'invoice_amount_unpaid', 'tax_amount', 'credit_balance_adjustment_amount', 'discount_charges'] %}
-  
+{% set sum_cols = ['invoice_amount', 'invoice_amount_paid', 'invoice_amount_unpaid', 'discount_charges'] %}
+{% do sum_cols.append('tax_amount') if var('zuora__using_taxation_item', true) %}
+{% do sum_cols.append('credit_balance_adjustment_amount') if var('zuora__using_credit_balance_adjustment', true) %}
+
+
 with invoice_joined as (
 
     select *

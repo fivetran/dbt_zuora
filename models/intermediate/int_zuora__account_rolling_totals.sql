@@ -1,4 +1,6 @@
-{% set fields = ['invoices','invoice_items','invoice_amount','invoice_amount_paid','invoice_amount_unpaid','tax_amount','credit_balance_adjustment_amount','discount_charges','refunds'] %}
+{% set fields = ['invoices','invoice_items','invoice_amount','invoice_amount_paid','invoice_amount_unpaid','discount_charges','refunds'] %}
+{% do fields.append('tax_amount') if var('zuora__using_taxation_item', true) %}
+{% do fields.append('credit_balance_adjustment_amount') if var('zuora__using_credit_balance_adjustment', true) %}
 
 with transaction_date_spine as (
 
@@ -36,8 +38,15 @@ account_rolling_totals as (
         account_rolling.daily_invoice_amount,
         account_rolling.daily_invoice_amount_paid,
         account_rolling.daily_invoice_amount_unpaid,
+
+        {% if var('zuora__using_taxation_item', true) %}
         account_rolling.daily_tax_amount,
+        {% endif %}
+
+        {% if var('zuora__using_credit_balance_adjustment', true) %}
         account_rolling.daily_credit_balance_adjustment_amount,
+        {% endif %}
+
         account_rolling.daily_discount_charges,
         account_rolling.daily_refunds,
         {% for f in fields %}

@@ -51,6 +51,7 @@ payment_method as (
     where is_most_recent_record
 ),
 
+{% if var('zuora__using_credit_balance_adjustment', true) %}
 credit_balance_adjustment as (
 
     select 
@@ -63,7 +64,9 @@ credit_balance_adjustment as (
     from {{ var('credit_balance_adjustment') }}
     where is_most_recent_record
 ),
+{% endif %}
 
+{% if var('zuora__using_taxation_item', true) %}
 taxes as (
 
     select
@@ -73,6 +76,7 @@ taxes as (
     where is_most_recent_record
     {{ dbt_utils.group_by(1) }}
 ),
+{% endif %}
 
 billing_enriched as (
 
@@ -88,12 +92,19 @@ billing_enriched as (
         payment_method_type,
         payment_method_subtype,
         is_payment_method_active, 
+
+        {% if var('zuora__using_credit_balance_adjustment', true) %}
         credit_balance_adjustment_id,
         credit_balance_adjustment_number,
         credit_balance_adjustment_reason_code,
         credit_balance_adjustment_amount_home_currency,
         credit_balance_adjustment_date, 
+        {% endif %}
+
+        {% if var('zuora__using_taxation_item', true) %}
         taxes.tax_amount_home_currency,
+        {% endif %}
+
         invoice_item_enriched.invoice_items,
         invoice_item_enriched.products,
         invoice_item_enriched.subscriptions,
@@ -111,10 +122,16 @@ billing_enriched as (
         on invoice_payment.payment_id = payment.payment_id
     left join payment_method
         on payment.payment_method_id = payment_method.payment_method_id
+    
+    {% if var('zuora__using_credit_balance_adjustment', true) %}
     left join credit_balance_adjustment
         on invoice_item_enriched.invoice_id = credit_balance_adjustment.invoice_id 
+    {% endif %}
+
+    {% if var('zuora__using_taxation_item', true) %}
     left join taxes
         on invoice_item_enriched.invoice_id = taxes.invoice_id
+    {% endif %}
 )
 
 select * 
