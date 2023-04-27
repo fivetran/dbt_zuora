@@ -4,7 +4,7 @@ packages:
   #   version: [">=0.1.0", "<0.2.0"]
 
 - git: https://github.com/fivetran/dbt_zuora_source.git
-  revision: main
+  revision: release/final-edits
   warn-unpinned: false
   
 # - local: ../dbt_zuora_source
