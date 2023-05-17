@@ -60,8 +60,11 @@ Include the following zuora_source package version in your `packages.yml` file.
 ```yaml
 packages:
   - package: fivetran/zuora
-    version: [">=0.1.0", "<0.2.0"]
+    version: [">=0.1.0", "<0.2.0"] # we recommend using ranges to capture non-breaking changes automatically
 ```
+Do NOT include the `zuora_source` package in this file. The transformation package itself has a dependency on it and will install the source package as well.
+
+
 ## Step 3: Define database and schema variables
 By default, this package runs using your destination and the `zuora` schema. If this is not where your zuora data is (for example, if your zuora schema is named `zuora_fivetran`), add the following configuration to your root `dbt_project.yml` file:
 
