@@ -82,29 +82,6 @@ billing_enriched as (
 
     select 
         invoice_item_enriched.invoice_id,
-        payment.payment_id,
-        payment_number,
-        payment_date,
-        payment_status,
-        payment_type, 
-        payment_amount_home_currency as invoice_amount_paid_home_currency,
-        payment_method.payment_method_id,
-        payment_method_type,
-        payment_method_subtype,
-        is_payment_method_active, 
-
-        {% if var('zuora__using_credit_balance_adjustment', true) %}
-        credit_balance_adjustment_id,
-        credit_balance_adjustment_number,
-        credit_balance_adjustment_reason_code,
-        credit_balance_adjustment_amount_home_currency,
-        credit_balance_adjustment_date, 
-        {% endif %}
-
-        {% if var('zuora__using_taxation_item', true) %}
-        taxes.tax_amount_home_currency,
-        {% endif %}
-
         invoice_item_enriched.invoice_items,
         invoice_item_enriched.products,
         invoice_item_enriched.subscriptions,
@@ -114,7 +91,25 @@ billing_enriched as (
         invoice_item_enriched.first_charge_date,
         invoice_item_enriched.most_recent_charge_date,
         invoice_item_enriched.invoice_service_start_date,
-        invoice_item_enriched.invoice_service_end_date
+        invoice_item_enriched.invoice_service_end_date,
+
+        {% if var('zuora__using_taxation_item', true) %}
+        taxes.tax_amount_home_currency,
+        {% endif %}
+
+        count(distinct payment.payment_id) as payments, 
+        sum(payment_amount_home_currency) as invoice_amount_paid_home_currency,
+        min(payment_date) as first_payment_date,
+        max(payment_date) as most_recent_payment_date, 
+        count(distinct payment_method.payment_method_id) as payment_methods
+
+        {% if var('zuora__using_credit_balance_adjustment', true) %}
+        , count(distinct credit_balance_adjustment_id) as credit_balance_adjustments
+        , sum(credit_balance_adjustment_amount_home_currency) as credit_balance_adjustment_amount_home_currency
+        , min(credit_balance_adjustment_date) as first_credit_balance_adjustment_date
+        , max(credit_balance_adjustment_date) as most_recent_credit_balance_adjustment_date
+        {% endif %}
+
     from invoice_item_enriched
     left join invoice_payment 
         on invoice_item_enriched.invoice_id = invoice_payment.invoice_id
@@ -132,6 +127,8 @@ billing_enriched as (
     left join taxes
         on invoice_item_enriched.invoice_id = taxes.invoice_id
     {% endif %}
+
+    {{ dbt_utils.group_by(12) if var('zuora__using_taxation_item', true) else dbt_utils.group_by(11) }} 
 )
 
 select * 
