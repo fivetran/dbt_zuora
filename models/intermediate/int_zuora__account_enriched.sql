@@ -61,10 +61,10 @@ account_totals as (
 
     select 
         account_id,
-        min(most_recent_payment_date) as most_recent_payment_date,
+        max(most_recent_payment_date) as most_recent_payment_date,
 
         {% if var('zuora__using_credit_balance_adjustment', true) %}
-        min(most_recent_credit_balance_adjustment_date) as most_recent_credit_balance_adjustment_date,
+        max(most_recent_credit_balance_adjustment_date) as most_recent_credit_balance_adjustment_date,
         {% endif %}
 
         sum(case when cast({{ dbt.date_trunc('day', dbt.current_timestamp_backcompat()) }} as date) > due_date
