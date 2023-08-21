@@ -200,14 +200,12 @@ models:
         description: The amount of refunds applied to the invoice.
       - name: credit_balance_adjustment_amount
         description: The amount of the credit balance adjustment applied to the invoice.
+      - name: tax_amount_home_currency
+        description: The amount of tax in home currency for the invoice.
       - name: transaction_currency 
         description: "{{ doc('transaction_currency') }}"
       - name: home_currency 
         description: "{{ doc('home_currency') }}"
-      - name: payment_amount
-        description: The amount of payments applied to the invoice.
-      - name: balance
-        description: The remaining balance of the invoice after all payments adjustments and refunds are applied.
       - name: exchange_rate_date 
         description: The date of the exchange rate used for the invoice.
       - name: due_date
@@ -215,41 +213,7 @@ models:
       - name: status
         description: The status of the invoice in the system. This status is not the status of the payment of the invoice just the status of the invoice itself.
       - name: purchase_type
-        description: The type of the invoice source.
-      - name: payment_id
-        description: The identifier of the payment associated with the invoice payment.
-      - name: payment_number
-        description: The payment number assigned by Zuora.
-      - name: payment_date
-        description: The date the payment will be effectively processed.
-      - name: payment_status
-        description: The status of the payment.
-      - name: payment_type
-        description: The type of the payment.
-      - name: invoice_amount_paid_home_currency
-        description: The amount of the invoice amount paid in the home currency on the invoice.
-      - name: invoice_amount_unpaid_home_currency
-        description: The amount of the invoice amount unpaid in the home currency on the invoice.
-      - name: credit_balance_adjustment_id
-        description: The identifier of the credit balance adjustment on the invoice.
-      - name: credit_balance_adjustment_number
-        description: The unique number assigned for the credit balance adjustment on the invoice.
-      - name: credit_balance_adjustment_reason_code
-        description: The reason code for the credit balance adjustment on the invoice. 
-      - name: credit_balance_adjustment_amount_home_currency
-        description: The amount for the credit balance adjustment in home currency on the invoice.
-      - name: credit_balance_adjustment_date
-        description: The date when the credit balance adjustment is applied.
-      - name: payment_method_id
-        description: The unique identifier of the payment method associated with the invoice.
-      - name: payment_method_type
-        description: The type of the payment for the invoice.
-      - name: payment_method_subtype
-        description: The sub-type of the payment method for the invoice. 
-      - name: is_payment_method_active
-        description: Is the payment method currently active?
-      - name: tax_amount_home_currency
-        description: The amount of tax in home currency for the invoice.
+        description: The type of the invoice source. 
       - name: invoice_items
         description: The amount of invoice items in the invoice.
       - name: products
@@ -270,6 +234,26 @@ models:
         description: Earliest invoice item service start date for the invoice.
       - name: invoice_service_end_date
         description: Earliest invoice item service end date for the invoice.
+      - name: payments
+        description: The number of payments applied to the invoice.
+      - name: invoice_amount_paid_home_currency
+        description: The amount of the invoice amount paid in the home currency on the invoice.
+      - name: invoice_amount_unpaid_home_currency
+        description: The amount of the invoice amount unpaid in the home currency on the invoice.
+      - name: first_payment_date
+        description: The first date when a payment is applied to the invoice.
+      - name: most_recent_payment_date
+        description: The most recent date when a payment is applied to the invoice. 
+      - name: payment_methods
+        description: The number of payment methods associated with the invoice.
+      - name: credit_balance_adjustments
+        description: The number of the credit balance adjustments applied on the invoice.
+      - name: credit_balance_adjustment_amount_home_currency
+        description: The amount for the credit balance adjustment in home currency on the invoice.
+      - name: first_credit_balance_adjustment_date
+        description: The first date when a credit balance adjustment is applied to the invoice. 
+      - name: most_recent_credit_balance_adjustment_date
+        description: The most recent date when a credit balance adjustment is applied to the invoice. 
 
   - name: zuora__line_item_history
     description: Each record is an invoice item meant to provide all details on all transactions at the most granular level, with details being brought in from subscriptions, amendments, rate plan charges, products, subscriptions, amendments and more.

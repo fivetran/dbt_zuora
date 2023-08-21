@@ -61,20 +61,20 @@ account_totals as (
 
     select 
         account_id,
+        max(most_recent_payment_date) as most_recent_payment_date,
 
-        {% set sum_cols = ['refund_amount', 'discount_charges', 'tax_amount', 'invoice_amount', 'invoice_amount_home_currency', 'invoice_amount_paid', 'invoice_amount_unpaid'] %}
-        {% for col in sum_cols %}
-            sum({{ col }}) as total_{{ col }},
-        {% endfor %}
+        {% if var('zuora__using_credit_balance_adjustment', true) %}
+        max(most_recent_credit_balance_adjustment_date) as most_recent_credit_balance_adjustment_date,
+        {% endif %}
 
         sum(case when cast({{ dbt.date_trunc('day', dbt.current_timestamp_backcompat()) }} as date) > due_date
                 and invoice_amount != invoice_amount_paid 
-                then invoice_amount_unpaid else 0 end) as total_amount_past_due,
-        max(payment_date) as most_recent_payment_date
-
-        {% if var('zuora__using_credit_balance_adjustment', true) %}
-        , max(credit_balance_adjustment_date) as most_recent_credit_balance_adjustment_date 
-        {% endif %}
+                then invoice_amount_unpaid else 0 end) as total_amount_past_due
+        
+        {% set sum_cols = ['refund_amount', 'discount_charges', 'tax_amount', 'invoice_amount', 'invoice_amount_home_currency', 'invoice_amount_paid', 'invoice_amount_unpaid'] %}
+        {% for col in sum_cols %}
+        , sum({{ col }}) as total_{{ col }} 
+        {% endfor %}
 
     from billing_history
     {{ dbt_utils.group_by(1) }}
