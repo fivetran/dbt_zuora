@@ -6,6 +6,19 @@
     - All metrics associated with `credit_balance_adjustment_id` in `int_zuora__billing_enriched` were aggregated on the invoice level (number of credit balance adjustments,total credit balance amount in home currency, first and last dates of credit balance adjustments on the invoice). Fields associated with an individual `credit_balance_adjustment_id` were removed.
     - All metrics associated with `payment_id` in `int_zuora__billing_enriched` were aggregated on the invoice level (number of payments, total payment amount in home currency, first and last dates of payments on the invoice). Fields associated with an individual `payment_id` were removed.
     - Aggregated count of `payment_method_id` to gather a count of payment methods on each invoice.
+    - A full list of field changes in `zuora__billing_history` is provided below: 
+
+| **[Zuora__billing_history](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__billing_history)** updates | **Field changes** |
+| ---------- | -------------------- |
+| Added payment fields | `payments`, `first_payment_date`, `most_recent_payment_date`, `payment_methods` |
+| Modified payment fields  (aggregated line items) | `invoice_amount_unpaid_home_currency` |
+| Removed payment fields |  `payment_id`, `payment_number`, `payment_date`, `payment_status`, `payment_type` |
+| Added credit balance adjustment fields | `credit_balance_adjustments`, `first_credit_balance_adjustment_date`, `most_recent_credit_balance_adjustment_date` |
+| Modified credit balance adjustment fields (aggregated line items) | `credit_balance_adjustment_amount_home_currency` |
+| Removed credit balance adjustment fields | `credit_balance_adjustment_id`, `credit_balance_adjustment_number`, `credit_balance_adjustment_reason_code`, `credit_balance_adjustment_date` |
+| Added payment method fields | `payment_methods` |
+| Removed payment method fields | `payment_method_id`, `payment_method_type`, `payment_method_subtype`, `is_payment_method_active` | 
+
 - Updated yml of `zuora__billing_history` with aggregated fields, and removed non-aggregated fields associated with credit balance adjustments, payments, and payment methods.
 - Modified `int_zuora__account_enriched` to account for new aggregated metric fields being pulled from `zuora__billing_history`. 
 
