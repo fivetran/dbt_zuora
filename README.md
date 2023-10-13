@@ -75,7 +75,7 @@ vars:
 ```
 
 ## Step 4: Disable models for non-existent sources
-Your Zuora connector may not be syncing all tabes that this package references. This might be because you are excluding those tables. If you are not using those tables, you can disable the corresponding functionality in the package by specifying the variable in your dbt_project.yml. By default, all packages are assumed to be true. You only have to add variables for tables you want to disable in the following way:
+Your Zuora connector may not be syncing all tables that this package references. This might be because you are excluding those tables. If you are not using those tables, you can disable the corresponding functionality in the package by specifying the variable in your dbt_project.yml. By default, all packages are assumed to be true. You only have to add variables for tables you want to disable in the following way:
 
 ```yml 
 vars: 
@@ -90,7 +90,7 @@ Zuora allows the functionality for multicurrency to bill customers in various cu
 
 ```yml
 vars:
-  zuora__using_multicurrency: false #Enable if you are utilizing multicurrency, false by default.
+  zuora__using_multicurrency: true #Enable if you are utilizing multicurrency, false by default.
 ```
 ### Multicurrency Support Disclaimer (and how you can help)
 We were not able to develop the package using the multicurrency variable, so we had to execute our best judgement when building these models. If you encounter any issues with enabling the variable, [please file a bug report with us](https://github.com/fivetran/dbt_zuora/issues/new?assignees=&labels=type%3Abug&template=bug-report.yml&title=%5BBug%5D+%3Ctitle%3E) and we can work together to fix any issues you encounter!
