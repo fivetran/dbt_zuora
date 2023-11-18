@@ -1,3 +1,8 @@
+# dbt_zuora v0.2.1
+[PR #10](https://github.com/fivetran/dbt_zuora/pull/10) includes the following breaking changes:
+- Updated `zuora__line_item_history` so that all `tax_amount_home_currency` values associated with a given `invoice_item_id` are summed rather than simply joined. This ensures the grain for this model is kept at the `invoice_item_id` level.
+- Updated surrogate key `subscription_key` in `zuora__subscription_overview` to include `amendment_id`. This accounts for multiple amendments associated with the same record.
+
 # dbt_zuora v0.2.0
 [PR #8](https://github.com/fivetran/dbt_zuora/pull/8) includes the following breaking changes:
 

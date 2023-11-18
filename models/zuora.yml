@@ -451,7 +451,7 @@ models:
     description: Each record is a subscription, enhanced with additional details from rate plan charges and amendments.
     columns: 
       - name: subscription_key 
-        description: The unique subscription key, defined by subscription id and rate plan charge id.
+        description: The unique subscription key, defined by subscription id, rate plan charge id, and amendment id.
         tests:
           - unique
           - not_null

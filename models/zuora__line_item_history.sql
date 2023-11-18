@@ -12,7 +12,7 @@ with invoice_item_enhanced as (
         cast({{ dbt.date_trunc("week", "service_start_date") }} as date) as service_start_week,
         cast({{ dbt.date_trunc("month", "service_start_date") }} as date) as service_start_month
     from {{ var('invoice_item') }}
-    where is_most_recent_record 
+    {# where is_most_recent_record  #}
 ),
 
 invoice as (
@@ -69,9 +69,9 @@ taxation_item as (
 
     select 
         invoice_item_id,
-        tax_amount_home_currency
+        sum(tax_amount_home_currency)
     from {{ var('taxation_item') }}
-    where is_most_recent_record
+    group by 1
 ), 
 {% endif %}
 
