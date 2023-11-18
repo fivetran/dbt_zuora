@@ -1,3 +1,6 @@
 packages:
-  - package: fivetran/zuora_source
-    version: [">=0.2.0", "<0.3.0"]
+  # - package: fivetran/zuora_source
+  #   version: [">=0.2.0", "<0.3.0"]
+  - git: https://github.com/fivetran/dbt_zuora_source.git
+    revision: bug/default-cols
+    warn-unpinned: false

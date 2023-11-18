@@ -69,7 +69,7 @@ taxation_item as (
 
     select 
         invoice_item_id,
-        sum(tax_amount_home_currency)
+        sum(tax_amount_home_currency) as tax_amount_home_currency
     from {{ var('taxation_item') }}
     group by 1
 ), 
