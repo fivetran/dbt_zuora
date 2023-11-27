@@ -31,7 +31,7 @@ account_overview as (
 subscription_overview as (
 
     select  
-        {{ dbt_utils.generate_surrogate_key(['subscription.subscription_id', 'rate_plan_charge.rate_plan_charge_id']) }} as subscription_key,
+        {{ dbt_utils.generate_surrogate_key(['subscription.subscription_id', 'rate_plan_charge.rate_plan_charge_id', 'amendment.amendment_id']) }} as subscription_key,
         subscription.subscription_id,
         subscription.account_id,
         account_overview.account_name,

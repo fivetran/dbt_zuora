@@ -69,9 +69,10 @@ taxation_item as (
 
     select 
         invoice_item_id,
-        tax_amount_home_currency
+        sum(tax_amount_home_currency) as tax_amount_home_currency
     from {{ var('taxation_item') }}
     where is_most_recent_record
+    group by 1
 ), 
 {% endif %}
 
