@@ -1,0 +1,20 @@
+database_key: zuora_database
+schema_key: zuora_schema
+
+dbt_versions: ">=1.3.0 <2.0.0"
+
+table_variables:
+  zuora__using_credit_balance_adjustment:
+    - credit_balance_adjustment
+  zuora__using_refund:
+    - refund
+  zuora__using_refund_invoice_payment:
+    - refund_invoice_payment
+  zuora__using_taxation_item:
+    - taxation_item
+
+destination_configurations:
+  databricks:
+    dispatch:
+      - macro_namespace: dbt_utils
+        search_order: [ 'spark_utils', 'dbt_utils' ]
