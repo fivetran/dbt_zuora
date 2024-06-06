@@ -85,8 +85,8 @@ select
     refunds.refund_id,
     refunds.refund_date as refunded_at,
     {% else %}
-    {{ cast(null as dbt.type_string()) }} as refund_id,
-    {{ cast(null as dbt.type_timestamp()) }} as refunded_at,
+    cast(null as {{ dbt.type_string() }}) as refund_id,
+    cast(null as {{ dbt.type_timestamp() }}) as refunded_at,
     {% endif %}
 
     line_items.subscription_id,
