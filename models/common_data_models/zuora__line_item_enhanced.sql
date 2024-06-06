@@ -87,7 +87,7 @@ select
     line_items.accounts_id as customer_id,
 {# customer_level #}
     accounts.name as customer_company,
-    contacts.first_name ~ contacts.last_name as customer_name,
+    concat(contacts.first_name, ' ', contacts.last_name) as customer_name,
     contacts.work_email as customer_email,
     contacts.city as customer_city,
     contacts.country as customer_country
