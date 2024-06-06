@@ -40,11 +40,13 @@ with line_items as (
     from {{ var('product') }}
     where is_most_recent_record
 
+{% if var('zuora__using_refund', true) %}
 ), refunds as (
 
     select *
     from {{ var('refund') }} 
     where is_most_recent_record
+{% endif %}
 
 ), subscriptions as (
 
@@ -78,8 +80,15 @@ select
     payments.effective_date as payment_at,
 -- fee_amount
     invoices.refund_amount,
+
+    {% if var('zuora__using_refund', true) %}
     refunds.refund_id,
     refunds.refund_date as refunded_at,
+    {% else %}
+    {{ cast(null as dbt.type_string()) }} as refund_id,
+    {{ cast(null as dbt.type_timestamp()) }} as refunded_at,
+    {% endif %}
+
     line_items.subscription_id,
     subscriptions.subscription_start_date as subscriptions_period_started_at,
     subscriptions.subscription_end_date as subscriptions_period_ended_at,
@@ -103,8 +112,10 @@ left join invoice_payments
 left join payments
     on payments.payment_id = invoice_payments.payment_id
 
+{% if var('zuora__using_refund', true) %}
 left join refunds
     on refunds.payment_method_id = payments.payment_method_id
+{% endif %}
 
 left join accounts
     on accounts.account_id = line_items.account_id
