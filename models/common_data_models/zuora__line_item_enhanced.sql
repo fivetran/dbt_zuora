@@ -54,15 +54,15 @@ with line_items as (
 
 ), enhanced as (
 select
-    line_items.invoices_id as header_id,
-    line_items.invoices_item_id as line_item_id,
-    row_number() over (partition by line_items.invoices_id, invoices_item_id.invoices_item_id 
+    line_items.invoice_id as header_id,
+    line_items.invoice_item_id as line_item_id,
+    row_number() over (partition by line_items.invoice_id, line_items.invoice_item_id 
         order by line_items.created_date) as line_item_index,
     line_items.created_date as created_at,
     line_items.transaction_currency as currency,
     -- need to add line_item_status
     invoices.status as header_status,
-    line_items.products_id,
+    line_items.product_id,
     products.name as products_name,
     -- need to create products_type,
     products.category as products_category,
@@ -72,7 +72,7 @@ select
         then line_items.charge_amount else 0 end as discount_amount,
     coalesce(line_items.tax_amount, 0) as tax_amount,
     line_items.charge_amount as total_amount,
-    {{ dbt_utils.safe_divide('line_item.tax_amount', 'line_item.total_amount') }} as tax_rate,
+    {{ dbt_utils.safe_divide('line_items.tax_amount', 'line_items.charge_amount') }} as tax_rate,
     invoice_payments.payment_id as payment_id,
     invoice_payments.payment_method_id as payment_method,
     payments.effective_date as payment_at,
@@ -80,12 +80,12 @@ select
     invoices.refund_amount,
     refunds.refund_id,
     refunds.refund_date as refunded_at,
-    line_items.subscriptions_id,
-    subscriptions.subscriptions_start_date as subscriptions_period_started_at,
-    subscriptions.subscriptions_end_date as subscriptions_period_ended_at,
+    line_items.subscription_id,
+    subscriptions.subscription_start_date as subscriptions_period_started_at,
+    subscriptions.subscription_end_date as subscriptions_period_ended_at,
     subscriptions.status as subscriptions_status,
-    line_items.accounts_id as customer_id,
-{# customer_level #}
+    line_items.account_id as customer_id,
+-- customer_level
     accounts.name as customer_company,
     concat(contacts.first_name, ' ', contacts.last_name) as customer_name,
     contacts.work_email as customer_email,
@@ -95,7 +95,7 @@ select
 from line_items
 
 left join invoices
-    on invoices.invoices_id = line_items.invoices_id
+    on invoices.invoice_id = line_items.invoice_id
 
 left join invoice_payments
     on invoice_payments.invoice_id = invoices.invoice_id
