@@ -4,7 +4,7 @@ profile: 'integration_tests'
 config-version: 2
 
 vars:
-  zuora_schema: zz_dbt_catherine_zuora #zuora_integration_tests_1
+  zuora_schema: zuora_integration_tests_1
   zuora_source:
     zuora_account_identifier: "zuora_account_data"
     zuora_amendment_identifier: "zuora_amendment_data"
