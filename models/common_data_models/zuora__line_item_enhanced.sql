@@ -180,7 +180,7 @@ left join subscriptions
     select
         header_id,
         cast(null as {{ dbt.type_string() }}) as line_item_id,
-        '0' as line_item_index,
+        0 as line_item_index,
         'header' as record_type,
         invoice_created_at as created_at,
         currency,
