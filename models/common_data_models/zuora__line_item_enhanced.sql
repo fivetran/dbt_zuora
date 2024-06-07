@@ -80,7 +80,6 @@ select
         then line_items.charge_amount else 0 end as discount_amount,
     line_items.tax_amount,
     line_items.charge_amount as total_amount,
-    {# {{ dbt_utils.safe_divide('line_items.tax_amount', 'line_items.charge_amount') }} as tax_rate, #}
     invoice_payments.payment_id as payment_id,
     invoice_payments.payment_method_id as payment_method,
     payments.effective_date as payment_at,
@@ -104,8 +103,7 @@ select
     {{ dbt.concat(["contacts.first_name", "' '", "contacts.last_name"]) }} as customer_name,
     contacts.work_email as customer_email,
     contacts.city as customer_city,
-    contacts.country as customer_country,
-    invoices.refund_amount is not null and invoices.refund_amount > 0 as is_refunded
+    contacts.country as customer_country
 
 from line_items
 
