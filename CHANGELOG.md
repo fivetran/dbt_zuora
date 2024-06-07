@@ -1,3 +1,13 @@
+# dbt_zuora v0.3.0
+[PR #12](https://github.com/fivetran/dbt_zuora/pull/12) includes the following breaking changes:
+
+## Feature Updates
+- Introduced the new `zuora__line_item_enhanced` model. This model includes a line item enriched with invoice, subscription, payment, and refund information. This model has been built with the intention of retaining a common line item schema across all other Fivetran billing data models.
+
+## Under the Hood:
+- Updated the pull request templates.
+- Included auto-releaser GitHub Actions workflow to automate future releases.
+
 # dbt_zuora v0.2.1
 [PR #10](https://github.com/fivetran/dbt_zuora/pull/10) includes the following breaking changes:
 ## 🔧 Fixes

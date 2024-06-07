@@ -58,48 +58,54 @@ with line_items as (
 select
     line_items.invoice_id as header_id,
     line_items.invoice_item_id as line_item_id,
-    row_number() over (partition by line_items.invoice_id, line_items.invoice_item_id 
+    row_number() over (partition by line_items.invoice_id
         order by line_items.created_date) as line_item_index,
-    line_items.created_date as created_at,
+    line_items.created_date as line_item_created_at,
     line_items.transaction_currency as currency,
-    -- need to add line_item_status
+    invoices.status as line_item_status,
     invoices.status as header_status,
+    invoices.created_date as invoice_created_at,
     line_items.product_id,
-    products.name as products_name,
-    -- need to create products_type,
-    products.category as products_category,
+    products.name as product_name,
+    products.category as product_category,
+    case 
+        when cast(line_items.processing_type as {{ dbt.type_string() }}) = '0' then 'charge'
+        when cast(line_items.processing_type as {{ dbt.type_string() }}) = '1' then 'discount'
+        when cast(line_items.processing_type as {{ dbt.type_string() }}) = '2' then 'prepayment'
+        when cast(line_items.processing_type as {{ dbt.type_string() }}) = '3' then 'tax'
+        end as product_type,
     line_items.quantity,
     line_items.unit_price as unit_amount,
     case when cast(line_items.processing_type as {{ dbt.type_string() }}) = '1' 
         then line_items.charge_amount else 0 end as discount_amount,
-    coalesce(line_items.tax_amount, 0) as tax_amount,
+    line_items.tax_amount,
     line_items.charge_amount as total_amount,
-    {{ dbt_utils.safe_divide('line_items.tax_amount', 'line_items.charge_amount') }} as tax_rate,
+    {# {{ dbt_utils.safe_divide('line_items.tax_amount', 'line_items.charge_amount') }} as tax_rate, #}
     invoice_payments.payment_id as payment_id,
     invoice_payments.payment_method_id as payment_method,
     payments.effective_date as payment_at,
--- fee_amount
     invoices.refund_amount,
 
     {% if var('zuora__using_refund', true) %}
-    refunds.refund_id,
-    refunds.refund_date as refunded_at,
+    cast(refunds.refund_id as {{ dbt.type_string() }}) as refund_id,
+    cast(refunds.refund_date as {{ dbt.type_timestamp() }}) as refunded_at,
     {% else %}
     cast(null as {{ dbt.type_string() }}) as refund_id,
     cast(null as {{ dbt.type_timestamp() }}) as refunded_at,
     {% endif %}
 
     line_items.subscription_id,
-    subscriptions.subscription_start_date as subscriptions_period_started_at,
-    subscriptions.subscription_end_date as subscriptions_period_ended_at,
-    subscriptions.status as subscriptions_status,
+    subscriptions.subscription_start_date as subscription_period_started_at,
+    subscriptions.subscription_end_date as subscription_period_ended_at,
+    subscriptions.status as subscription_status,
     line_items.account_id as customer_id,
--- customer_level
+    'contact' as customer_level,
     accounts.name as customer_company,
-    concat(contacts.first_name, ' ', contacts.last_name) as customer_name,
+    {{ dbt.concat(["contacts.first_name", "' '", "contacts.last_name"]) }} as customer_name,
     contacts.work_email as customer_email,
     contacts.city as customer_city,
-    contacts.country as customer_country
+    contacts.country as customer_country,
+    invoices.refund_amount is not null and invoices.refund_amount > 0 as is_refunded
 
 from line_items
 
@@ -130,19 +136,84 @@ left join subscriptions
     on subscriptions.subscription_id = line_items.subscription_id
 
 ), final as (
-    {# select
+
+    select 
+        header_id,
+        line_item_id,
+        line_item_index,
         'line_item' as record_type,
+        line_item_created_at as created_at,
+        currency,
+        line_item_status as status,
+        header_status,
+        product_id,
+        product_name,
+        product_type,
+        product_category,
+        quantity,
+        unit_amount,
+        discount_amount,
+        tax_amount,
+        total_amount,
+        payment_id,
+        payment_method,
+        payment_at,
+        cast(null as {{ dbt.type_string() }}) as refund_id,
+        cast(null as {{ dbt.type_float() }}) as refund_amount,
+        cast(null as {{ dbt.type_timestamp() }}) as refunded_at,
+        subscription_id,
+        subscription_period_started_at,
+        subscription_period_ended_at,
+        subscription_status,
+        customer_id,
+        customer_level,
+        customer_name,
+        customer_company,
+        customer_email,
+        customer_city,
+        customer_country
     from enhanced
 
     union all
 
+    -- Refund information is only reliable at the invoice header. Therefore the below operation creates a new line to track the refund values.
     select
-        'header' as record_type
+        header_id,
+        cast(null as {{ dbt.type_string() }}) as line_item_id,
+        '0' as line_item_index,
+        'header' as record_type,
+        invoice_created_at as created_at,
+        currency,
+        cast(null as {{ dbt.type_string() }}) as line_item_status,
+        header_status as status,
+        cast(null as {{ dbt.type_string() }}) as product_id,
+        cast(null as {{ dbt.type_string() }}) as product_name,
+        cast(null as {{ dbt.type_string() }}) as product_type,
+        cast(null as {{ dbt.type_string() }}) as product_category,
+        cast(null as {{ dbt.type_float() }}) as quantity,
+        cast(null as {{ dbt.type_float() }}) as unit_amount,
+        cast(null as {{ dbt.type_float() }}) as discount_amount,
+        cast(null as {{ dbt.type_float() }}) as tax_amount,
+        cast(null as {{ dbt.type_float() }}) as total_amount,
+        payment_id,
+        payment_method,
+        payment_at,
+        refund_id,
+        refund_amount,
+        refunded_at,
+        cast(null as {{ dbt.type_string() }}) as subscription_id,
+        cast(null as {{ dbt.type_timestamp() }}) as subscription_period_started_at,
+        cast(null as {{ dbt.type_timestamp() }}) as subscription_period_ended_at,
+        cast(null as {{ dbt.type_string() }}) as subscription_status,
+        customer_id,
+        customer_level,
+        customer_name,
+        customer_company,
+        customer_email,
+        customer_city,
+        customer_country
     from enhanced
-    where line_item_index = 1 #}
-    select *
-    from enhanced
-
+    where line_item_index = 1
 )
 
 select *
