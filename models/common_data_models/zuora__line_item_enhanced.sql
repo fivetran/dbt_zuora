@@ -107,7 +107,7 @@ left join payments
     on payments.payment_id = invoice_payments.payment_id
 
 left join payment_methods
-    on payments.payment_method_id = invoice_payments.payment_method_id
+    on payment_methods.payment_method_id = payments.payment_method_id
 
 left join accounts
     on accounts.account_id = line_items.account_id
