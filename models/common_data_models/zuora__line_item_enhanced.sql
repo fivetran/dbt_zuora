@@ -34,19 +34,17 @@ with line_items as (
     from {{ var('payment') }}
     where is_most_recent_record
 
+), payment_methods as (
+
+    select * 
+    from {{ var('payment_method') }}
+    where is_most_recent_record
+
 ), products as (
 
     select * 
     from {{ var('product') }}
     where is_most_recent_record
-
-{% if var('zuora__using_refund', true) %}
-), refunds as (
-
-    select *
-    from {{ var('refund') }} 
-    where is_most_recent_record
-{% endif %}
 
 ), subscriptions as (
 
@@ -61,19 +59,19 @@ select
     row_number() over (partition by line_items.invoice_id
         order by line_items.created_date) as line_item_index,
     line_items.created_date as line_item_created_at,
-    line_items.transaction_currency as currency,
-    invoices.status as line_item_status,
-    invoices.status as header_status,
     invoices.created_date as invoice_created_at,
+    invoices.status as header_status,
+    invoices.source_type as billing_type,
+    line_items.transaction_currency as currency,
     line_items.product_id,
     products.name as product_name,
-    products.category as product_category,
+    products.category as product_type,
     case 
         when cast(line_items.processing_type as {{ dbt.type_string() }}) = '0' then 'charge'
         when cast(line_items.processing_type as {{ dbt.type_string() }}) = '1' then 'discount'
         when cast(line_items.processing_type as {{ dbt.type_string() }}) = '2' then 'prepayment'
         when cast(line_items.processing_type as {{ dbt.type_string() }}) = '3' then 'tax'
-        end as product_type,
+        end as transaction_type,
     line_items.quantity,
     line_items.unit_price as unit_amount,
     case when cast(line_items.processing_type as {{ dbt.type_string() }}) = '1' 
@@ -81,24 +79,16 @@ select
     line_items.tax_amount,
     line_items.charge_amount as total_amount,
     invoice_payments.payment_id as payment_id,
-    invoice_payments.payment_method_id as payment_method,
+    invoice_payments.payment_method_id,
+    payment_methods.name as payment_method,
     payments.effective_date as payment_at,
     invoices.refund_amount,
-
-    {% if var('zuora__using_refund', true) %}
-    cast(refunds.refund_id as {{ dbt.type_string() }}) as refund_id,
-    cast(refunds.refund_date as {{ dbt.type_timestamp() }}) as refunded_at,
-    {% else %}
-    cast(null as {{ dbt.type_string() }}) as refund_id,
-    cast(null as {{ dbt.type_timestamp() }}) as refunded_at,
-    {% endif %}
-
     line_items.subscription_id,
     subscriptions.subscription_start_date as subscription_period_started_at,
     subscriptions.subscription_end_date as subscription_period_ended_at,
     subscriptions.status as subscription_status,
     line_items.account_id as customer_id,
-    'contact' as customer_level,
+    'customer' as customer_level,
     accounts.name as customer_company,
     {{ dbt.concat(["contacts.first_name", "' '", "contacts.last_name"]) }} as customer_name,
     contacts.work_email as customer_email,
@@ -116,10 +106,8 @@ left join invoice_payments
 left join payments
     on payments.payment_id = invoice_payments.payment_id
 
-{% if var('zuora__using_refund', true) %}
-left join refunds
-    on refunds.payment_method_id = payments.payment_method_id
-{% endif %}
+left join payment_methods
+    on payments.payment_method_id = invoice_payments.payment_method_id
 
 left join accounts
     on accounts.account_id = line_items.account_id
@@ -141,24 +129,23 @@ left join subscriptions
         line_item_index,
         'line_item' as record_type,
         line_item_created_at as created_at,
-        currency,
-        line_item_status as status,
         header_status,
+        billing_type,
+        currency,
         product_id,
         product_name,
         product_type,
-        product_category,
+        transaction_type,
         quantity,
         unit_amount,
         discount_amount,
         tax_amount,
         total_amount,
         payment_id,
+        payment_method_id,
         payment_method,
         payment_at,
-        cast(null as {{ dbt.type_string() }}) as refund_id,
         cast(null as {{ dbt.type_float() }}) as refund_amount,
-        cast(null as {{ dbt.type_timestamp() }}) as refunded_at,
         subscription_id,
         subscription_period_started_at,
         subscription_period_ended_at,
@@ -178,27 +165,26 @@ left join subscriptions
     select
         header_id,
         cast(null as {{ dbt.type_string() }}) as line_item_id,
-        0 as line_item_index,
+        cast(0 as {{ dbt.type_int() }}) as line_item_index,
         'header' as record_type,
         invoice_created_at as created_at,
+        header_status,
+        billing_type,
         currency,
-        cast(null as {{ dbt.type_string() }}) as line_item_status,
-        header_status as status,
         cast(null as {{ dbt.type_string() }}) as product_id,
         cast(null as {{ dbt.type_string() }}) as product_name,
         cast(null as {{ dbt.type_string() }}) as product_type,
-        cast(null as {{ dbt.type_string() }}) as product_category,
+        cast(null as {{ dbt.type_string() }}) as transaction_type,
         cast(null as {{ dbt.type_float() }}) as quantity,
         cast(null as {{ dbt.type_float() }}) as unit_amount,
         cast(null as {{ dbt.type_float() }}) as discount_amount,
         cast(null as {{ dbt.type_float() }}) as tax_amount,
         cast(null as {{ dbt.type_float() }}) as total_amount,
         payment_id,
+        payment_method_id,
         payment_method,
         payment_at,
-        refund_id,
         refund_amount,
-        refunded_at,
         cast(null as {{ dbt.type_string() }}) as subscription_id,
         cast(null as {{ dbt.type_timestamp() }}) as subscription_period_started_at,
         cast(null as {{ dbt.type_timestamp() }}) as subscription_period_ended_at,
