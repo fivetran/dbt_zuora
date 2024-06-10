@@ -19,16 +19,20 @@ models:
         description: "{{ doc('record_type') }}"
       - name: created_at
         description: "{{ doc('created_at') }}"
+      - name: header_status
+        description: "{{ doc('header_status') }}"
+      - name: billing_type
+        description: "{{ doc('billing_type') }}"
       - name: currency
         description: "{{ doc('currency') }}"
-      - name: status
-        description: "{{ doc('status') }}"
       - name: product_id
         description: "{{ doc('product_id') }}"
       - name: product_name
         description: "{{ doc('product_name') }}"
       - name: product_type
         description: "{{ doc('product_type') }}"
+      - name: transaction_type
+        description: "{{ doc('transaction_type') }}"
       - name: product_category
         description: "{{ doc('product_category') }}"
       - name: quantity
@@ -45,14 +49,12 @@ models:
         description: "{{ doc('payment_id') }}"
       - name: payment_method
         description: "{{ doc('payment_method') }}"
+      - name: payment_method_id
+        description: "{{ doc('payment_method_id') }}"
       - name: payment_at
         description: "{{ doc('payment_at') }}"
-      - name: refund_id
-        description: "{{ doc('refund_id') }}"
       - name: refund_amount
         description: "{{ doc('refund_amount') }}"
-      - name: refunded_at
-        description: "{{ doc('refunded_at') }}"
       - name: subscription_id
         description: "{{ doc('subscription_id') }}"
       - name: subscription_period_started_at
