@@ -3,6 +3,10 @@ version: '0.3.0'
 profile: 'integration_tests'
 config-version: 2
 
+# For use with validations
+models:
+  +schema: "zuora_{{ var('directed_schema','dev') }}"
+
 vars:
   zuora_schema: zuora_integration_tests_1
   zuora_source:
