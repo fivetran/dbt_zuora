@@ -2,7 +2,7 @@
 [PR #12](https://github.com/fivetran/dbt_zuora/pull/12) includes the following breaking changes:
 
 ## Feature Updates
-- Introduced the new `zuora__line_item_enhanced` model. This model builds a standard denormalized analytical table which can be used to report on your revenue, subscription, customer, and product metrics from your billing platform. This model has been designed to match the schema of the similarly named `*__line_item_enhanced` model within the Shopify, Recharge, Recurly, and Zuora platforms in an effort to standardize reporting when using data from a billing platform.
+- Introduced the new `zuora__line_item_enhanced` model. This model builds a standard denormalized analytical table which can be used to report on your revenue, subscription, customer, and product metrics from your billing platform. This model has been designed to match the schema of the similarly named `*__line_item_enhanced` model within the Shopify, Recharge, Recurly, and Stripe platforms in an effort to standardize reporting when using data from a billing platform.
 
 ## Under the Hood:
 - Updated the pull request templates.
