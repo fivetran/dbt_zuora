@@ -42,6 +42,10 @@ description
 description
 {% enddocs %}
 
+{% docs fee_amount %}
+description
+{% enddocs %}
+
 {% docs header_id %}
 description
 {% enddocs %}

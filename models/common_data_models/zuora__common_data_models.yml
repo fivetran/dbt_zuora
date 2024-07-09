@@ -77,3 +77,5 @@ models:
         description: "{{ doc('customer_city') }}"
       - name: customer_country
         description: "{{ doc('customer_country') }}"
+      - name: fee_amount
+        description: "{{ doc('fee_amount') }}"
