@@ -60,7 +60,7 @@ Include the following zuora_source package version in your `packages.yml` file.
 ```yaml
 packages:
   - package: fivetran/zuora
-    version: [">=0.2.0", "<0.3.0"] # we recommend using ranges to capture non-breaking changes automatically
+    version: [">=0.3.0", "<0.4.0"] # we recommend using ranges to capture non-breaking changes automatically
 ```
 Do NOT include the `zuora_source` package in this file. The transformation package itself has a dependency on it and will install the source package as well.
 
