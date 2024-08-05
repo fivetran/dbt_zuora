@@ -27,17 +27,21 @@ The following table provides a detailed list of all models materialized within t
  
 | **model**                         | **description** |                                                                                                                               
 |--------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [zuora_account_daily_overview](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__account_daily_overview)    |  Each record is a day in an account and its accumulated balance totals based on all line item transactions up to that day.                            |
-| [zuora_account_overview](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__account_overview)    |  Each record represents an account, enriched with metrics about their associated transactions.                                                                                                     |
-| [zuora_billing_history](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__billing_history)    | Each record represents an invoice and its various transaction details. |
-| [zuora_line_item_history](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__line_item_history)      | Each record represents a specific invoice item and its various transaction details.                                                                     |                                                              
+| [zuora__account_daily_overview](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__account_daily_overview)    |  Each record is a day in an account and its accumulated balance totals based on all line item transactions up to that day.                            |
+| [zuora__account_overview](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__account_overview)    |  Each record represents an account, enriched with metrics about their associated transactions.                                                                                                     |
+| [zuora__billing_history](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__billing_history)    | Each record represents an invoice and its various transaction details. |
+| [zuora__line_item_history](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__line_item_history)      | Each record represents a specific invoice item and its various transaction details.                                                                     |                                                              
 | [zuora__monthly_recurring_revenue](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__monthly_recurring_revenue) | Each record represents an account and MRR generated on a monthly basis. |
-| [zuora__subscription_overview](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__subscription_overview)       | Each record represents a subscription, enriched with metrics about time, revenue, state, and period.    
+| [zuora__subscription_overview](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__subscription_overview)       | Each record represents a subscription, enriched with metrics about time, revenue, state, and period.    |
+| [zuora__line_item_enhanced](https://fivetran.github.io/dbt_recurly/#!/model/model.zuora.zuora__line_item_enhanced)       | This model constructs a comprehensive, denormalized analytical table that enables reporting on key revenue, subscription, customer, and product metrics from your billing platform. It’s designed to align with the schema of the `*__line_item_enhanced` model found in Zuora, Recharge, Stripe, Shopify, and Recurly, offering standardized reporting across various billing platforms. To see the kinds of insights this model can generate, explore example visualizations in the [Fivetran Billing Model Streamlit App](https://fivetran-billing-model.streamlit.app/). Visit the app for more details.  |
 
 An example churn model is separately available in the analysis folder: 
 | **analysis model**   | **description**   |
 |---------------------|------------------|
 | [zuora__account_churn_analysis](https://fivetran.github.io/dbt_zuora/#!/analysis/analysis.zuora.zuora__account_churn_analysis) | Each record represents an account and whether it has churned in that month or not. | 
+
+## Example Visualizations
+Explore example visualizations produced by the [zuora__line_item_enhanced](https://fivetran.github.io/dbt_recurly/#!/model/model.zuora.zuora__line_item_enhanced) model in the [Fivetran Billing Model Streamlit App](https://fivetran-billing-model.streamlit.app/). For further details and to see how these insights can be applied, visit the app.
 
 # 🎯 How do I use the dbt package?
 ## Step 1: Prerequisites
@@ -55,13 +59,12 @@ dispatch:
 ```
 
 ## Step 2: Install the package
-Include the following zuora_source package version in your `packages.yml` file.
+Include the following zuora package version in your `packages.yml` file.
 > TIP: Check [dbt Hub](https://hub.getdbt.com/) for the latest installation instructions or [read the dbt docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
 ```yaml
 packages:
-  - git: https://github.com/fivetran/dbt_zuora.git
-    revision: feature/standardized-billing-line-item-model
-    warn-unpinned: false
+  - package: fivetran/zuora
+    version: [">=0.3.0", "<0.4.0"]
 ```
 Do NOT include the `zuora_source` package in this file. The transformation package itself has a dependency on it and will install the source package as well.
 

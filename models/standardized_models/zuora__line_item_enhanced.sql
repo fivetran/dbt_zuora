@@ -52,6 +52,12 @@ with line_items as (
     from {{ var('subscription') }} 
     where is_most_recent_record
 
+), rate_plan as (
+
+    select * 
+    from {{ var('rate_plan') }}
+    where is_most_recent_record 
+
 ), enhanced as (
 select
     line_items.invoice_id as header_id,
@@ -84,11 +90,13 @@ select
     payments.effective_date as payment_at,
     invoices.refund_amount,
     line_items.subscription_id,
+    rate_plan.name as subscription_plan,
     subscriptions.subscription_start_date as subscription_period_started_at,
     subscriptions.subscription_end_date as subscription_period_ended_at,
     subscriptions.status as subscription_status,
     line_items.account_id as customer_id,
     'customer' as customer_level,
+    accounts.created_date as customer_created_at,
     accounts.name as customer_company,
     {{ dbt.concat(["contacts.first_name", "' '", "contacts.last_name"]) }} as customer_name,
     contacts.work_email as customer_email,
@@ -121,6 +129,10 @@ left join products
 left join subscriptions
     on subscriptions.subscription_id = line_items.subscription_id
 
+left join rate_plan
+    on rate_plan.subscription_id = subscriptions.subscription_id
+
+
 ), final as (
 
     select 
@@ -129,13 +141,13 @@ left join subscriptions
         line_item_index,
         'line_item' as record_type,
         line_item_created_at as created_at,
-        header_status,
-        billing_type,
         currency,
+        header_status,
         product_id,
         product_name,
-        product_type,
         transaction_type,
+        billing_type,
+        product_type,
         quantity,
         unit_amount,
         discount_amount,
@@ -145,12 +157,15 @@ left join subscriptions
         payment_method_id,
         payment_method,
         payment_at,
+        cast(null as {{ dbt.type_float() }}) as fee_amount,
         cast(null as {{ dbt.type_float() }}) as refund_amount,
         subscription_id,
+        subscription_plan,
         subscription_period_started_at,
         subscription_period_ended_at,
         subscription_status,
         customer_id,
+        customer_created_at,
         customer_level,
         customer_name,
         customer_company,
@@ -168,13 +183,13 @@ left join subscriptions
         cast(0 as {{ dbt.type_int() }}) as line_item_index,
         'header' as record_type,
         invoice_created_at as created_at,
-        header_status,
-        billing_type,
         currency,
+        header_status,
         cast(null as {{ dbt.type_string() }}) as product_id,
         cast(null as {{ dbt.type_string() }}) as product_name,
-        cast(null as {{ dbt.type_string() }}) as product_type,
         cast(null as {{ dbt.type_string() }}) as transaction_type,
+        billing_type,
+        cast(null as {{ dbt.type_string() }}) as product_type,
         cast(null as {{ dbt.type_float() }}) as quantity,
         cast(null as {{ dbt.type_float() }}) as unit_amount,
         cast(null as {{ dbt.type_float() }}) as discount_amount,
@@ -184,12 +199,15 @@ left join subscriptions
         payment_method_id,
         payment_method,
         payment_at,
+        cast(null as {{ dbt.type_float() }}) as fee_amount,
         refund_amount,
         cast(null as {{ dbt.type_string() }}) as subscription_id,
+        cast(null as {{ dbt.type_string() }}) as subscription_plan,
         cast(null as {{ dbt.type_timestamp() }}) as subscription_period_started_at,
         cast(null as {{ dbt.type_timestamp() }}) as subscription_period_ended_at,
         cast(null as {{ dbt.type_string() }}) as subscription_status,
         customer_id,
+        customer_created_at,
         customer_level,
         customer_name,
         customer_company,
