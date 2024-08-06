@@ -41,7 +41,7 @@ An example churn model is separately available in the analysis folder:
 | [zuora__account_churn_analysis](https://fivetran.github.io/dbt_zuora/#!/analysis/analysis.zuora.zuora__account_churn_analysis) | Each record represents an account and whether it has churned in that month or not. | 
 
 ## Example Visualizations
-Explore example visualizations produced by the [zuora__line_item_enhanced](https://fivetran.github.io/dbt_recurly/#!/model/model.zuora.zuora__line_item_enhanced) model in the [Fivetran Billing Model Streamlit App](https://fivetran-billing-model.streamlit.app/). For further details and to see how these insights can be applied, visit the app.
+Explore example visualizations produced by the [zuora__line_item_enhanced](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__line_item_enhanced) model in the [Fivetran Billing Model Streamlit App](https://fivetran-billing-model.streamlit.app/). For further details and to see how these insights can be applied, visit the app.
 
 # 🎯 How do I use the dbt package?
 ## Step 1: Prerequisites
