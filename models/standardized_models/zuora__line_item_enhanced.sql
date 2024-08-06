@@ -1,3 +1,5 @@
+{{ config(enabled= var('zuora__standardized_billing_model_enabled', True)) }}
+
 with line_items as (
 
     select * 
