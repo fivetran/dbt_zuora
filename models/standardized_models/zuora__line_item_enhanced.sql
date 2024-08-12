@@ -1,4 +1,4 @@
-{{ config(enabled= var('zuora__standardized_billing_model_enabled', True)) }}
+{{ config(enabled= var('zuora__standardized_billing_model_enabled', False)) }}
 
 with line_items as (
 

@@ -22,6 +22,7 @@
     - Generating metrics tables that allow you to better understand your account activity over time or at a customer level. These time-based metrics are available on a daily level.
 - Generates a comprehensive data dictionary of your source and modeled Zuora data through the [dbt docs site](https://fivetran.github.io/dbt_zuora/).
 
+<!--section="zuora_transformation_model"-->
 The following table provides a detailed list of all models materialized within this package by default. 
 > TIP: See more details about these models in the package's [dbt docs site](https://fivetran.github.io/dbt_zuora/#!/overview?g_v=1).
  
@@ -41,7 +42,15 @@ An example churn model is separately available in the analysis folder:
 | [zuora__account_churn_analysis](https://fivetran.github.io/dbt_zuora/#!/analysis/analysis.zuora.zuora__account_churn_analysis) | Each record represents an account and whether it has churned in that month or not. | 
 
 ## Example Visualizations
-Explore example visualizations produced by the [zuora__line_item_enhanced](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__line_item_enhanced) model in the [Fivetran Billing Model Streamlit App](https://fivetran-billing-model.streamlit.app/). For further details and to see how these insights can be applied, visit the app.
+Curious what these models can do? Check out example visualizations from the [zuora__line_item_enhanced](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__line_item_enhanced) model in the [Fivetran Billing Model Streamlit App](https://fivetran-billing-model.streamlit.app/), and see how you can use these models in your own reporting. Below is a screenshot of an example report—-explore the app for more.
+
+<p align="center">
+  <a href="https://fivetran-billing-model.streamlit.app/">
+    <img src="https://raw.githubusercontent.com/fivetran/dbt_zuora/main/images/streamlit_example.png" alt="Streamlit Billing Model App" width="75%">
+  </a>
+</p>
+
+<!--section-end-->
 
 # 🎯 How do I use the dbt package?
 ## Step 1: Prerequisites
@@ -100,7 +109,15 @@ vars:
 We were not able to develop the package using the multicurrency variable, so we had to execute our best judgement when building these models. If you encounter any issues with enabling the variable, [please file a bug report with us](https://github.com/fivetran/dbt_zuora/issues/new?assignees=&labels=type%3Abug&template=bug-report.yml&title=%5BBug%5D+%3Ctitle%3E) and we can work together to fix any issues you encounter!
 
 ## (Optional) Step 6: Additional configurations
-<details><summary>Expand to view configurations</summary>
+<details open><summary>Expand to view configurations</summary>
+
+### Enabling Standardized Billing Model
+This package contains the `zuora__line_item_enhanced` model which constructs a comprehensive, denormalized analytical table that enables reporting on key revenue, subscription, customer, and product metrics from your billing platform. It’s designed to align with the schema of the `*__line_item_enhanced` model found in Recurly, Recharge, Stripe, Shopify, and Zuora, offering standardized reporting across various billing platforms. To see the kinds of insights this model can generate, explore example visualizations in the [Fivetran Billing Model Streamlit App](https://fivetran-billing-model.streamlit.app/). For the time being, this model is disabled by default. If you would like to enable this model you will need to adjust the `zuora__standardized_billing_model_enabled` variable to be `true` within your `dbt_project.yml`:
+
+```yml
+vars:
+  zuora__standardized_billing_model_enabled: true # false by default.
+```
 
 ### Setting the date range for the account daily overview and monthly recurring revenue models
 By default, the `zuora__account_daily_overview` will aggregate data for the entire date range of your data set based on the minimum and maximum `invoice_date` values from the `invoice` source table, and `zuora__monthly_recurring_revenue` based on the `service_start_date` from the `invoice_item` source table. 
