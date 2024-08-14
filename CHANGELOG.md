@@ -1,3 +1,14 @@
+# dbt_zuora v0.3.0
+[PR #13](https://github.com/fivetran/dbt_zuora/pull/13) includes the following breaking changes:
+
+## Feature Updates
+- Addition of the `zuora__line_item_enhanced` model. This model constructs a comprehensive, denormalized analytical table that enables reporting on key revenue, subscription, customer, and product metrics from your billing platform. It’s designed to align with the schema of the `*__line_item_enhanced` model found in Zuora, Recharge, Stripe, Shopify, and Recurly, offering standardized reporting across various billing platforms. To see the kinds of insights this model can generate, explore example visualizations in the [Fivetran Billing Model Streamlit App](https://fivetran-billing-model.streamlit.app/). Visit the app for more details.
+  - This model is currently disabled by default. You may enable it by setting the `zuora__standardized_billing_model_enabled` as `true` in your `dbt_project.yml`.
+
+## Under the Hood:
+- Updated the pull request templates.
+- Included auto-releaser GitHub Actions workflow to automate future releases.
+
 # dbt_zuora v0.2.1
 [PR #10](https://github.com/fivetran/dbt_zuora/pull/10) includes the following breaking changes:
 ## 🔧 Fixes
