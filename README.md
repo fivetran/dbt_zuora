@@ -34,15 +34,15 @@ The following table provides a detailed list of all tables materialized within t
 | [zuora__line_item_history](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__line_item_history)      | Each record represents a specific invoice item and its various transaction details.                                                                     |
 | [zuora__monthly_recurring_revenue](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__monthly_recurring_revenue) | Each record represents an account and MRR generated on a monthly basis. |
 | [zuora__subscription_overview](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__subscription_overview)       | Each record represents a subscription, enriched with metrics about time, revenue, state, and period.    |
-| [zuora__line_item_enhanced](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__line_item_enhanced)       | This model constructs a comprehensive, denormalized analytical table that enables reporting on key revenue, subscription, customer, and product metrics from your billing platform. It’s designed to align with the schema of the `*__line_item_enhanced` model found in Zuora, Recharge, Stripe, Shopify, and Recurly, offering standardized reporting across various billing platforms. To see the kinds of insights this model can generate, explore example visualizations in the [Fivetran Billing Model Streamlit App](https://fivetran-billing-model.streamlit.app/). Visit the app for more details.  |
+| [zuora__line_item_enhanced](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__line_item_enhanced)       | This table is a comprehensive, denormalized analytical table that enables reporting on key revenue, subscription, customer, and product metrics from your billing platform. It’s designed to align with the schema of the `*__line_item_enhanced` model found in Zuora, Recharge, Stripe, Shopify, and Recurly, offering standardized reporting across various billing platforms. To see the kinds of insights this model can generate, explore example visualizations in the [Fivetran Billing Model Streamlit App](https://fivetran-billing-model.streamlit.app/). Visit the app for more details and refer to these [docs](https://github.com/fivetran/dbt_zuora/tree/main?tab=readme-ov-file#enabling-standardized-billing-model) for how to enable the table, which is disabled by default.  |
 
-An example churn model is separately available in the analysis folder:
+An example churn report is separately available in the analysis folder:
 | **analysis model**   | **description**   |
 |---------------------|------------------|
 | [zuora__account_churn_analysis](https://fivetran.github.io/dbt_zuora/#!/analysis/analysis.zuora.zuora__account_churn_analysis) | Each record represents an account and whether it has churned in that month or not. |
 
 ### Example Visualizations
-Curious what these models can do? Check out example visualizations from the [zuora__line_item_enhanced](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__line_item_enhanced) model in the [Fivetran Billing Model Streamlit App](https://fivetran-billing-model.streamlit.app/), and see how you can use these models in your own reporting. Below is a screenshot of an example report—-explore the app for more.
+Curious what these tables can do? Check out example visualizations from the [zuora__line_item_enhanced](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__line_item_enhanced) table in the [Fivetran Billing Model Streamlit App](https://fivetran-billing-model.streamlit.app/), and see how you can use these tables in your own reporting. Below is a screenshot of an example report—-explore the app for more.
 
 <p align="center">
 <a href="https://fivetran-billing-model.streamlit.app/">
@@ -182,7 +182,7 @@ In this package, this would apply to the `ORDER` source. If you are receiving er
 
 ```yml
 vars:
-    zuora_order_identifier: "ORDER" # as an example, must include the double-quotes and correct case!
+    zuora_order_identifier: "ORDER" # as an example, must include the double-quotes and correct case
 ```  
 
 </details>
@@ -232,4 +232,3 @@ If you would like a deeper explanation of the decisions we made to our models in
 ## Are there any resources available?
 - If you have questions or want to reach out for help, see the [GitHub Issue](https://github.com/fivetran/dbt_zuora_source/issues/new/choose) section to find the right avenue of support for you.
 - If you would like to provide feedback to the dbt package team at Fivetran or would like to request a new dbt package, fill out our [Feedback Form](https://www.surveymonkey.com/r/DQ7K7WW).
-- Submit any questions you have about our packages [in our Fivetran dbt community](https://community.fivetran.com/t5/user-group-for-dbt/gh-p/dbt-user-group) so our Engineering team can provide guidance as quickly as possible.
