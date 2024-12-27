@@ -1,4 +1,6 @@
-<p align="center">
+# Zuora dbt package ([Docs](https://fivetran.github.io/dbt_zuora/))
+
+<p align="left">
     <a alt="License"
         href="https://github.com/fivetran/dbt_zuora/blob/main/LICENSE">
         <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" /></a>
@@ -9,8 +11,6 @@
     <a alt="PRs">
         <img src="https://img.shields.io/badge/Contributions-welcome-blueviolet" /></a>
 </p>
-
-# Zuora dbt package ([Docs](https://fivetran.github.io/dbt_zuora/))
 
 ## What does this dbt package do?
 - Produces modeled tables that leverage Zuora data from [Fivetran's connector](https://fivetran.com/docs/applications/zuora) in the format described by [this ERD](https://fivetran.com/docs/applications/zuora#schemainformation) and builds off the output of our [Zuora source package](https://github.com/fivetran/dbt_zuora_source).

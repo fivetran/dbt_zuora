@@ -25,6 +25,5 @@ public_models: [
   "zuora__line_item_history",
   "zuora__subscription_overview",
   "zuora__monthly_recurring_revenue",
-  "zuora__account_overview",
-  "zuora__line_item_enhanced"
+  "zuora__account_overview"
 ]
