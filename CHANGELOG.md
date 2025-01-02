@@ -1,3 +1,12 @@
+# dbt_zuora v0.3.1
+[PR #18](https://github.com/fivetran/dbt_zuora/pull/18) includes the following updates:
+
+## Fixes
+- Removed `zuora__line_item_enhanced` from the public `quickstart.yml` models, as it's disabled by default.
+
+## Documentation Update
+- Moved badges at top of the README below the H1 header to be consistent with popular README formats.
+
 # dbt_zuora v0.3.0
 [PR #13](https://github.com/fivetran/dbt_zuora/pull/13) includes the following breaking changes:
 
