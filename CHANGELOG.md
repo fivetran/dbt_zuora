@@ -1,3 +1,9 @@
+# dbt_zuora version.version
+
+## Documentation
+- Added Quickstart model counts to README. ([#19](https://github.com/fivetran/dbt_zuora/pull/19))
+- Corrected references to connectors and connections in the README. ([#19](https://github.com/fivetran/dbt_zuora/pull/19))
+
 # dbt_zuora v0.3.1
 [PR #18](https://github.com/fivetran/dbt_zuora/pull/18) includes the following updates:
 
