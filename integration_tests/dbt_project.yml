@@ -7,6 +7,9 @@ models:
   +schema: "zuora_{{ var('directed_schema','dev') }}"
 
 vars:
+  # Uncomment when regenerating docs
+  # zuora__standardized_billing_model_enabled: true
+
   zuora_schema: zuora_integration_tests_2
   zuora_source:
     zuora_account_identifier: "zuora_account_data"
@@ -28,7 +31,6 @@ vars:
     zuora_refund_invoice_payment_identifier: "zuora_refund_invoice_payment_data"
     zuora_subscription_identifier: "zuora_subscription_data"
     zuora_taxation_item_identifier: "zuora_taxation_item_data"
-  # zuora__standardized_billing_model_enabled: true 
 
 
 dispatch:
