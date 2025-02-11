@@ -1,4 +1,4 @@
-# dbt_zuora v0.3.2
+# dbt_zuora v0.3.2-a1
 This release introduces the following updates.
  
 ## Bug Fixes (originating within the upstream `zuora_source` package):
