@@ -1,4 +1,12 @@
-# dbt_zuora version.version
+# dbt_zuora v0.3.2
+This release introduces the following updates.
+ 
+## Bug Fixes (originating within the upstream `zuora_source` package):
+- Leveraged the `{{ dbt.type_timestamp() }}` macro within staging models for all timestamp fields. Certain Redshift warehouses sync these fields as `timestamp with time zone` fields by default, causing errors in the `zuora` package. This macro safely removes timezone values from the UTC timestamps and ensures successful compilations of these models. 
+- For more details, please refer to the relevant [dbt_zuora_source v0.2.2 release](https://github.com/fivetran/dbt_zuora_source/releases/tag/v0.2.2).
+
+## Under the Hood
+- Replaced the deprecated `dbt.current_timestamp_backcompat()` function with `dbt.current_timestamp()` to ensure all timestamps are captured in UTC.  ([#20](https://github.com/fivetran/dbt_zuora/pull/20))
 
 ## Documentation
 - Added Quickstart model counts to README. ([#19](https://github.com/fivetran/dbt_zuora/pull/19))

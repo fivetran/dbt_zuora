@@ -1,17 +1,26 @@
-with invoice_item_enhanced as (
+with invoice_item as (
 
     select *,
-        cast({{ dbt.date_trunc("day", "charge_date") }} as date) as charge_day,
-        cast({{ dbt.date_trunc("week", "charge_date") }} as date) as charge_week,
-        cast({{ dbt.date_trunc("month", "charge_date") }} as date) as charge_month,
+        cast(charge_date as {{ dbt.type_timestamp() }}) as charged_at,
+        cast(service_start_date as {{ dbt.type_timestamp() }}) as service_started_at
+    from {{ var('invoice_item') }}
+
+),
+
+invoice_item_enhanced as (
+
+    select *,
+        cast({{ dbt.date_trunc("day", "charged_at") }} as date) as charge_day,
+        cast({{ dbt.date_trunc("week", "charged_at") }} as date) as charge_week,
+        cast({{ dbt.date_trunc("month", "charged_at") }} as date) as charge_month,
         case when cast(processing_type as {{ dbt.type_string() }}) = '1' 
             then charge_amount_home_currency else 0 end as discount_amount_home_currency,
         case when cast(processing_type as {{ dbt.type_string() }}) = '1' 
             then charge_amount else 0 end as discount_amount,
-        cast({{ dbt.date_trunc("day", "service_start_date") }} as date) as service_start_day,
-        cast({{ dbt.date_trunc("week", "service_start_date") }} as date) as service_start_week,
-        cast({{ dbt.date_trunc("month", "service_start_date") }} as date) as service_start_month
-    from {{ var('invoice_item') }}
+        cast({{ dbt.date_trunc("day", "service_started_at") }} as date) as service_start_day,
+        cast({{ dbt.date_trunc("week", "service_started_at") }} as date) as service_start_week,
+        cast({{ dbt.date_trunc("month", "service_started_at") }} as date) as service_start_month
+    from invoice_item
     where is_most_recent_record 
 ),
 

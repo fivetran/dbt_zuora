@@ -1,6 +1,7 @@
 with account as (
 
-    select * 
+    select *,
+        cast(created_date as {{ dbt.type_timestamp() }}) as created_at
     from {{ var('account') }} 
     where is_most_recent_record 
 ),
@@ -47,8 +48,8 @@ account_details as (
         mrr,
         status,
         auto_pay, 
-        {{ dbt_utils.safe_divide( dbt.datediff("account.created_date", dbt.current_timestamp_backcompat(), "day"), 30) }} as account_active_months,
-        case when {{ dbt.datediff("account.created_date", dbt.current_timestamp_backcompat(), "day") }} <= 30
+        {{ dbt_utils.safe_divide( dbt.datediff("account.created_at", dbt.current_timestamp(), "day"), 30) }} as account_active_months,
+        case when {{ dbt.datediff("account.created_at", dbt.current_timestamp(), "day") }} <= 30
             then true else false end as is_new_customer
     
         {{ fivetran_utils.persist_pass_through_columns('zuora_account_pass_through_columns') }}
@@ -67,7 +68,7 @@ account_totals as (
         max(most_recent_credit_balance_adjustment_date) as most_recent_credit_balance_adjustment_date,
         {% endif %}
 
-        sum(case when cast({{ dbt.date_trunc('day', dbt.current_timestamp_backcompat()) }} as date) > due_date
+        sum(case when cast({{ dbt.date_trunc('day', dbt.current_timestamp()) }} as date) > due_date
                 and invoice_amount != invoice_amount_paid 
                 then invoice_amount_unpaid else 0 end) as total_amount_past_due
         
