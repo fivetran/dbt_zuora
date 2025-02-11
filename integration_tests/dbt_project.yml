@@ -7,7 +7,7 @@ models:
   +schema: "zuora_{{ var('directed_schema','dev') }}"
 
 vars:
-  zuora_schema: zuora_integration_tests_1
+  zuora_schema: zuora_integration_tests_2
   zuora_source:
     zuora_account_identifier: "zuora_account_data"
     zuora_amendment_identifier: "zuora_amendment_data"
