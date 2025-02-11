@@ -1,7 +1,6 @@
 with account as (
 
-    select *,
-        cast(created_date as {{ dbt.type_timestamp() }}) as created_at
+    select *
     from {{ var('account') }} 
     where is_most_recent_record 
 ),
@@ -48,8 +47,8 @@ account_details as (
         mrr,
         status,
         auto_pay, 
-        {{ dbt_utils.safe_divide( dbt.datediff("account.created_at", dbt.current_timestamp(), "day"), 30) }} as account_active_months,
-        case when {{ dbt.datediff("account.created_at", dbt.current_timestamp(), "day") }} <= 30
+        {{ dbt_utils.safe_divide( dbt.datediff("account.created_date", dbt.current_timestamp(), "day"), 30) }} as account_active_months,
+        case when {{ dbt.datediff("account.created_date", dbt.current_timestamp(), "day") }} <= 30
             then true else false end as is_new_customer
     
         {{ fivetran_utils.persist_pass_through_columns('zuora_account_pass_through_columns') }}
