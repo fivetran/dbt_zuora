@@ -21,10 +21,10 @@ transactions_grouped as (
         sum(invoice_items) as daily_invoice_items,
 
         {% for col in sum_cols %}
-        {% if var('zuora__using_multicurrency', false) %}
-            sum({{ col }}) as daily_{{ col }},
-        {% else %} 
+        {% if not var('zuora__using_multicurrency', true) %}
             sum({{ col }}_home_currency) as daily_{{ col }},
+        {% else %} 
+            sum({{ col }}) as daily_{{ col }},
         {% endif %}
         {% endfor %}
 

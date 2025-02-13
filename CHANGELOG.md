@@ -1,5 +1,18 @@
+# dbt_zuora v0.3.2-a2
+This pre-release introduces the following updates.
+
+## Bug Fixes 
+- Modified the variable logic in `zuora__using_multicurrency` in these models so that the `*_amount` values are called by default rather than `*_amount_home_currency` when the variable isn't configured:
+  - `int_zuora__transaction_grouped`
+  - `zuora__line_item_history`
+  - `zuora__monthly_recurring_revenue` 
+- Single currency is now the proper default and multicurrency customers must leverage the variable to enable that functionality. ([#21](https://github.com/fivetran/dbt_zuora/pull/21))
+
+## Under the Hood
+- Created consistency test within `integration_tests` for the `zuora__monthly_recurring_revenue` model. ([#21](https://github.com/fivetran/dbt_zuora/pull/21))
+
 # dbt_zuora v0.3.2-a1
-This release introduces the following updates.
+This pre-release introduces the following updates.
  
 ## Bug Fixes (originating within the upstream `zuora_source` package):
 - Leveraged the `{{ dbt.type_timestamp() }}` macro within staging models for all timestamp fields. Certain Redshift warehouses sync these fields as `timestamp with time zone` fields by default, causing errors in the `zuora` package. This macro appropriately removes timezone values from the UTC timestamps and ensures successful compilations of these models. 
