@@ -1,15 +1,16 @@
 # dbt_zuora v0.3.2-a2
 This pre-release introduces the following updates.
 
-## Bug Fixes 
-- Modified the variable logic in `zuora__using_multicurrency` in these models so that the `*_amount` values are called by default rather than `*_amount_home_currency` when the variable isn't configured:
-  - `int_zuora__transaction_grouped`
-  - `zuora__line_item_history`
-  - `zuora__monthly_recurring_revenue` 
-- Single currency is now the proper default and multicurrency customers must leverage the variable to enable that functionality. ([#21](https://github.com/fivetran/dbt_zuora/pull/21))
+## Bug Fixes  
+- Flipped the variable logic in `zuora__using_multicurrency` in these models so that the `*_amount` values are called by default rather than `*_amount_home_currency` when the variable isn't set: ([#21](https://github.com/fivetran/dbt_zuora/pull/21))
+  - `zuora__line_item_history`: For setting the `gross_revenue` and `discount_revenue` values (these values are then used to calculate `net_revenue`).
+  - `zuora__monthly_recurring_revenue`: For setting the `mrr_expected_current_month` value.
+  - `int_zuora__transaction_grouped`: For setting daily amount values for invoices, discounts, taxes and credit balance adjustments to flow downsteram into the `zuora__account_daily_overview` model.
+- Multicurrency customers must set the `zuora__using_multicurrency` variable to `true` to enable that functionality. ([#21](https://github.com/fivetran/dbt_zuora/pull/21))
 
 ## Under the Hood
 - Created consistency test within `integration_tests` for the `zuora__monthly_recurring_revenue` model. ([#21](https://github.com/fivetran/dbt_zuora/pull/21))
+- Updated `run_models.sh` to remove duplicative Buildkite script.
 
 # dbt_zuora v0.3.2-a1
 This pre-release introduces the following updates.

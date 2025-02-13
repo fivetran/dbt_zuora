@@ -91,7 +91,7 @@ invoice_revenue_items as (
 
     select
         invoice_item_id, 
-        {% if not var('zuora__using_multicurrency', true) %}
+        {% if var('zuora__using_multicurrency', false) %}
         charge_amount_home_currency as gross_revenue,
         case when cast(processing_type as {{ dbt.type_string() }})= '1' 
             then charge_amount_home_currency else 0 end as discount_revenue
