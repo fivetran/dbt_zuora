@@ -10,7 +10,7 @@ vars:
   # Uncomment when regenerating docs
   # zuora__standardized_billing_model_enabled: true
 
-  zuora_schema: zuora_integration_tests_2
+  zuora_schema: zuora_integration_tests_3
   zuora_source:
     zuora_account_identifier: "zuora_account_data"
     zuora_amendment_identifier: "zuora_amendment_data"
