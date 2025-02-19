@@ -1,0 +1,46 @@
+version: 2
+
+sources:
+  - name: zuora
+    schema: zuora_zuora  # Ensure this matches `warehouse.zuora_zuora`
+    tables:
+      - name: zuora__line_item_history
+      - name: zuora__account_daily_overview
+  - name: int_tables
+    schema: zuora_zuora_int
+    tables:
+      - name: int_zuora__account_enriched
+      - name: int_zuora__account_partitions
+      - name: int_zuora__account_rolling_totals
+      - name: int_zuora__account_running_totals
+      - name: int_zuora___billing_enriched
+      - name: int_zuora__mrr_date_spine
+      - name: int_zuora__transaction_date_spine
+      - name: int_zuora__transactions_grouped
+  - name: zuora_source
+    schema: zuora_zuora_source
+    tables:
+      - name: stg_zuora__invoice_item
+      - name: stg_zuora__invoice
+      - name: stg_zuora__account
+      - name: stg_zuora__amendment
+      - name: stg_zuora__contact
+      - name: stg_zuora__credit_balance_adjustment
+      - name: stg_zuora__invoice_payment
+      - name: stg_zuora__order
+      - name: stg_zuora__payment
+      - name: stg_zuora__payment_method
+      - name: stg_zuora__product_rate_plan_charge
+      - name: stg_zuora__product_rate_plan
+      - name: stg_zuora__product
+      - name: stg_zuora__rate_plan_charge
+      - name: stg_zuora__rate_plan
+      - name: stg_zuora__refund
+      - name: stg_zuora__refund_invoice_payment
+      - name: stg_zuora__subscription
+      - name: stg_zuora__taxation_item
+  - name: test
+    schema: zuora_zuora_zuora_test
+    tables:
+      - name: zuora__line_item_history
+

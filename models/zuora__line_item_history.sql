@@ -6,7 +6,7 @@ with invoice_item_enhanced as (
         cast({{ dbt.date_trunc("month", "charge_date") }} as date) as charge_month,
         case when cast(processing_type as {{ dbt.type_string() }}) = '1' 
             then charge_amount_home_currency else 0 end as discount_amount_home_currency,
-        case when cast(processing_type as {{ dbt.type_string() }}) = '1' 
+        case when cast(processing_type as {{ dbt.type_string() }}) = '1'
             then charge_amount else 0 end as discount_amount,
         cast({{ dbt.date_trunc("day", "service_start_date") }} as date) as service_start_day,
         cast({{ dbt.date_trunc("week", "service_start_date") }} as date) as service_start_week,
@@ -64,18 +64,6 @@ amendment as (
     where is_most_recent_record
 ),
 
-{% if var('zuora__using_taxation_item', true) %}
-taxation_item as (
-
-    select 
-        invoice_item_id,
-        sum(tax_amount_home_currency) as tax_amount_home_currency
-    from {{ var('taxation_item') }}
-    where is_most_recent_record
-    group by 1
-), 
-{% endif %}
-
 account_enhanced as (
 
     select  
@@ -83,23 +71,16 @@ account_enhanced as (
         cast({{ dbt.date_trunc("day", "account_created_at") }} as date) as account_creation_day, 
         cast({{ dbt.date_trunc("day", "first_charge_processed_at") }} as date) as first_charge_day,
         account_status
-    from {{ ref('zuora__account_daily_overview') }}
+    from {{ source('zuora', 'zuora__account_daily_overview') }}
     {{ dbt_utils.group_by(4) }}
 ),
 
 invoice_revenue_items as (
-
     select
         invoice_item_id, 
-        {% if var('zuora__using_multicurrency', false) %}
-        charge_amount as gross_revenue,
-        case when cast(processing_type as {{ dbt.type_string() }})= '1' 
-            then charge_amount else 0 end as discount_revenue
-        {% else %} 
-        charge_amount_home_currency as gross_revenue,
-        case when cast(processing_type as {{ dbt.type_string() }})= '1' 
-            then charge_amount_home_currency else 0 end as discount_revenue
-        {% endif %}
+        COALESCE(charge_amount_home_currency, charge_amount) AS gross_revenue,  -- ✅ Use charge_amount if home_currency is NULL
+        CASE WHEN cast(processing_type as {{ dbt.type_string() }}) = '1'
+            THEN COALESCE(charge_amount_home_currency, charge_amount) ELSE 0 END AS discount_revenue
     from invoice_item_enhanced
 ),
 
@@ -136,11 +117,6 @@ line_item_history as (
         invoice_item_enhanced.subscription_id,
         invoice_item_enhanced.sku,
         invoice_item_enhanced.tax_amount,
-
-        {% if var('zuora__using_taxation_item', true) %}
-        taxation_item.tax_amount_home_currency,
-        {% endif %}
-
         invoice_item_enhanced.transaction_currency,
         invoice_item_enhanced.unit_price,
         invoice_item_enhanced.uom,
@@ -203,11 +179,6 @@ line_item_history as (
             on invoice_item_enhanced.account_id = account_enhanced.account_id
         left join invoice_revenue_items
             on invoice_item_enhanced.invoice_item_id = invoice_revenue_items.invoice_item_id
-        
-        {% if var('zuora__using_taxation_item', true) %}
-        left join taxation_item 
-            on invoice_item_enhanced.invoice_item_id = taxation_item.invoice_item_id
-        {% endif %}
 )
 
 select * 
