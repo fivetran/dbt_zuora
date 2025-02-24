@@ -8,7 +8,7 @@ This release introduces the following updates.
   - `int_zuora__transaction_grouped`: For setting daily amount values for invoices, discounts, taxes and credit balance adjustments to flow downsteram into the `zuora__account_daily_overview` model.
 - Multicurrency customers must set the `zuora__using_multicurrency` variable to `true` to enable that functionality. ([#21](https://github.com/fivetran/dbt_zuora/pull/21))
 - Leveraged the `{{ dbt.type_timestamp() }}` macro within staging models for all timestamp fields. Certain Redshift warehouses sync these fields as `timestamp with time zone` fields by default, causing errors in the `zuora` package. This macro appropriately removes timezone values from the UTC timestamps and ensures successful compilations of these models. 
-  - For more details, please refer to the relevant [dbt_zuora_source v0.2.2-a1 release](https://github.com/fivetran/dbt_zuora_source/releases/tag/v0.2.2-a1).
+  - For more details, please refer to the [dbt_zuora_source v0.2.2 release](https://github.com/fivetran/dbt_zuora_source/releases/tag/v0.2.2).
 - Updated `subscription_period_started_at` and `subscription_period_ended_at` with the `{{ dbt.type_timestamp() }}` cast in `zuora__line_item_enhanced` to remove date/timestamp mismatches on the `union all` function. ([#20](https://github.com/fivetran/dbt_zuora/pull/20))
 
 ## Under the Hood
