@@ -75,7 +75,7 @@ Include the following zuora package version in your `packages.yml` file.
 ```yaml
 packages:
   - package: fivetran/zuora
-    version: 0.3.2-a2
+    version: [">=0.3.0", "<0.4.0"]
 ```
 Do NOT include the `zuora_source` package in this file. The transformation package itself has a dependency on it and will install the source package as well.
 
@@ -202,7 +202,7 @@ This dbt package is dependent on the following dbt packages. These dependencies 
 ```yml
 packages:
     - package: fivetran/zuora_source
-      version: 0.2.2-a1
+      version: [">=0.2.0", "<0.3.0"]
 
     - package: fivetran/fivetran_utils
       version: [">=0.4.0", "<0.5.0"]
