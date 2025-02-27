@@ -16,7 +16,7 @@ with spine as (
     {# If only compiling, creates range going back 1 year #}
     {% else %} 
         {% set calc_first_date = dbt.dateadd("year", "-1", "current_date") %}
-        {% set calc_last_date = dbt.current_timestamp_backcompat() %}
+        {% set calc_last_date = dbt.current_timestamp() %}
     {% endif %}
 
     {# Prioritizes variables over calculated dates #}

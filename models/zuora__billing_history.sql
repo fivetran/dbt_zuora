@@ -23,7 +23,7 @@ with invoice as (
         due_date,
         status,
         source_type as purchase_type,
-        sum(case when cast({{ dbt.date_trunc('day', dbt.current_timestamp_backcompat()) }} as date) > due_date
+        sum(case when cast({{ dbt.date_trunc('day', dbt.current_timestamp()) }} as date) > due_date
                 and amount != payment_amount
                 then balance else 0 end) as total_amount_past_due
     from {{ var('invoice') }} 

@@ -1,4 +1,68 @@
-# dbt_zuora version.version
+# dbt_zuora v0.3.2
+This release introduces the following updates.
+
+## Bug Fixes
+- Resolved flipped logic around the `zuora__using_multicurrency` [variable](https://github.com/fivetran/dbt_zuora?tab=readme-ov-file#step-5-configure-the-multicurrency-variable-for-customers-billing-in-multiple-currencies). ([#22](https://github.com/fivetran/dbt_zuora/pull/22))
+  - Ensured that, for multicurrency users, `*_amount_home_currency` fields are used and that `*_amount` values are used for single-currency users. Previously, this was erroneously flipped. The models impacted include: 
+    - `zuora__line_item_history`: This affects the `gross_revenue` and `discount_revenue` values (these values are then used to calculate `net_revenue`).
+    - `zuora__monthly_recurring_revenue`: This affects the `mrr_expected_current_month` value.
+    - `int_zuora__transaction_grouped`: This affects daily amount values for invoices, discounts, taxes and credit balance adjustments to flow downstream into the `zuora__account_daily_overview` model.
+  - Customers must set the `zuora__using_multicurrency` variable to `true` to enable multicurrency. ([#22](https://github.com/fivetran/dbt_zuora/pull/22))
+- Leveraged the `{{ dbt.type_timestamp() }}` macro within staging models for all timestamp fields. Certain Redshift warehouses sync these fields as `timestamp with time zone` fields by default, causing errors in the `zuora` package. This macro appropriately removes timezone values from the UTC timestamps and ensures successful compilations of these models. 
+  - For more details, please refer to the [dbt_zuora_source v0.2.2 release](https://github.com/fivetran/dbt_zuora_source/releases/tag/v0.2.2).
+- Also cast `subscription_period_started_at` and `subscription_period_ended_at` as `{{ dbt.type_timestamp() }}` in `zuora__line_item_enhanced` to remove date/timestamp mismatches on the `union all` function. ([#20](https://github.com/fivetran/dbt_zuora/pull/20))
+
+## Under the Hood
+- Replaced the deprecated `dbt.current_timestamp_backcompat()` function with `dbt.current_timestamp()` to ensure all timestamps are captured in UTC.  ([#20](https://github.com/fivetran/dbt_zuora/pull/20))
+  - This change is applied in the following end models:
+    - `zuora__billing_history`
+    - `zuora__line_item_history`
+    - `zuora__subscription_overview`
+  - As well as the intermediate models:
+    - `int_zuora__account_enriched`
+    - `int_zuora__mrr_date_spine`
+    - `int_zuora__transaction_date_spine`
+- Added consistency tests within `integration_tests` for the `zuora__billing_history`, `zuora__monthly_recurring_revenue` and `zuora__subscription_overview` models. ([#20](https://github.com/fivetran/dbt_zuora/pull/20) & [#22](https://github.com/fivetran/dbt_zuora/pull/22))
+- Updated `run_models.sh` to remove duplicative Buildkite script.
+
+## Documentation
+- Added Quickstart model counts to README. ([#19](https://github.com/fivetran/dbt_zuora/pull/19))
+- Corrected references to connectors and connections in the README. ([#19](https://github.com/fivetran/dbt_zuora/pull/19))
+
+# dbt_zuora v0.3.2-a2
+This pre-release introduces the following updates.
+
+## Bug Fixes
+- Flipped the variable logic in `zuora__using_multicurrency` in these models so that the `*_amount` values are called by default rather than `*_amount_home_currency` when the variable isn't set: ([#22](https://github.com/fivetran/dbt_zuora/pull/22))
+  - Ensured that, for multicurrency users, `*_amount_home_currency` fields are used and that `*_amount` values are used for single-currency users. Previously, this was erroneously flipped. The models impacted include: 
+    - `zuora__line_item_history`: This affects the `gross_revenue` and `discount_revenue` values (these values are then used to calculate `net_revenue`).
+    - `zuora__monthly_recurring_revenue`: This affects the `mrr_expected_current_month` value.
+    - `int_zuora__transaction_grouped`: This affects daily amount values for invoices, discounts, taxes and credit balance adjustments to flow downstream into the `zuora__account_daily_overview` model.
+  - Customers must set the `zuora__using_multicurrency` variable to `true` to enable multicurrency. ([#22](https://github.com/fivetran/dbt_zuora/pull/22))
+
+## Under the Hood
+- Created consistency test within `integration_tests` for the `zuora__monthly_recurring_revenue` model. ([#22](https://github.com/fivetran/dbt_zuora/pull/21))
+- Updated `run_models.sh` to remove duplicative Buildkite script.
+
+# dbt_zuora v0.3.2-a1
+This pre-release introduces the following updates.
+ 
+## Bug Fixes (originating within the upstream `zuora_source` package):
+- Leveraged the `{{ dbt.type_timestamp() }}` macro within staging models for all timestamp fields. Certain Redshift warehouses sync these fields as `timestamp with time zone` fields by default, causing errors in the `zuora` package. This macro appropriately removes timezone values from the UTC timestamps and ensures successful compilations of these models. 
+- For more details, please refer to the relevant [dbt_zuora_source v0.2.2-a1 release](https://github.com/fivetran/dbt_zuora_source/releases/tag/v0.2.2-a1).
+- Also cast `subscription_period_started_at` and `subscription_period_ended_at` as `{{ dbt.type_timestamp() }}` in `zuora__line_item_enhanced` to remove date/timestamp mismatches on the `union all` function. ([#20](https://github.com/fivetran/dbt_zuora/pull/20))
+
+## Under the Hood
+- Replaced the deprecated `dbt.current_timestamp_backcompat()` function with `dbt.current_timestamp()` to ensure all timestamps are captured in UTC.  ([#20](https://github.com/fivetran/dbt_zuora/pull/20))
+  - This change is applied in the following end models:
+    - `zuora__billing_history`
+    - `zuora__line_item_history`
+    - `zuora__subscription_overview`
+  - As well as the intermediate models:
+    - `int_zuora__account_enriched`
+    - `int_zuora__mrr_date_spine`
+    - `int_zuora__transaction_date_spine`
+- Added consistency tests within `integration_tests` for the `zuora__billing_history` and `zuora__subscription_overview` models. ([#20](https://github.com/fivetran/dbt_zuora/pull/20))
 
 ## Documentation
 - Added Quickstart model counts to README. ([#19](https://github.com/fivetran/dbt_zuora/pull/19))

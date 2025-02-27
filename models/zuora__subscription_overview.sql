@@ -89,7 +89,7 @@ subscription_overview as (
             then {{ dbt.datediff('subscription.' ~ date_col ~ '_start_date', 'subscription.' ~ date_col ~ '_end_date', 'day') }} 
             when subscription.term_type = 'EVERGREEN' and subscription.cancelled_date is not null
             then {{ dbt.datediff('subscription.' ~ date_col ~ '_start_date', 'subscription.cancelled_date', 'day') }}
-            else {{ dbt.datediff('subscription.' ~ date_col ~ '_start_date', dbt.current_timestamp_backcompat(), 'day') }}
+            else {{ dbt.datediff('subscription.' ~ date_col ~ '_start_date', dbt.current_timestamp(), 'day') }}
             end as {{ date_col }}_days
         {{ ',' if not loop.last -}}
         {% endfor %}

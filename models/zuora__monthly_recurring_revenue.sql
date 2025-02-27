@@ -20,9 +20,9 @@ mrr_by_account as (
         coalesce(month_spine.account_month, line_items.service_start_month) as account_month,
 
         {% if var('zuora__using_multicurrency', false) %}
-        sum(case when charge_mrr is null then 0 else charge_mrr end) as mrr_expected_current_month,
-        {% else %} 
         sum(case when charge_mrr_home_currency is null then 0 else charge_mrr_home_currency end) as mrr_expected_current_month,
+        {% else %} 
+        sum(case when charge_mrr is null then 0 else charge_mrr end) as mrr_expected_current_month,
         {% endif %}
 
         {% set sum_cols = ['gross', 'discount', 'net'] %}
