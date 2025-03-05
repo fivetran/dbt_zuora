@@ -156,7 +156,7 @@ line_item_history as (
         product_rate_plan.description as product_rate_plan_description,
         invoice_revenue_items.gross_revenue,
         invoice_revenue_items.discount_revenue,
-        invoice_revenue_items.gross_revenue - invoice_revenue_items.discount_revenue as net_revenue
+        invoice_revenue_items.gross_revenue + invoice_revenue_items.discount_revenue as net_revenue -- changed - to + because we store negative numbers.
 
         {{ fivetran_utils.persist_pass_through_columns('zuora_subscription_pass_through_columns', identifier='subscription') }}
 

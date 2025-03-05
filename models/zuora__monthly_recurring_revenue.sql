@@ -64,7 +64,9 @@ current_vs_previous_mrr as (
             lag({{ col }}_current_month_non_mrr) over (partition by account_id order by account_month) as {{ col }}_previous_month_non_mrr,
         {% endfor %}
 
-        row_number() over (partition by account_id order by account_month) as account_month_number
+        row_number() over (partition by account_id order by account_month) as account_month_number,
+        (gross_current_month_mrr - gross_previous_month_mrr) as delta_gross_mrr_mom,
+        (net_current_month_mrr - net_previous_month_mrr) as delta_net_mrr_mom
     from mrr_by_account
     {{ dbt_utils.group_by(9) }}
 ),
@@ -73,19 +75,33 @@ mrr_type as (
     select 
         {{ dbt_utils.generate_surrogate_key(['account_id', 'account_month']) }} as account_monthly_id,
         *,
+
+        -- Existing MRR Type Calculation (Gross)
         case
+            when (gross_current_month_mrr = 0.0 or gross_current_month_mrr is null)
+                and (gross_previous_month_mrr > 0.0) then 'churned'
+            when gross_current_month_mrr > gross_previous_month_mrr then 'expansion'
+            when gross_current_month_mrr < gross_previous_month_mrr then 'contraction'
+            when gross_current_month_mrr = gross_previous_month_mrr then 'unchanged'
+            when gross_previous_month_mrr is null then 'new'
+            when (gross_previous_month_mrr = 0.0 and gross_current_month_mrr > 0.0
+                and account_month_number >= 3) then 'reactivation'
+            else null
+        end as gross_mrr_type,
+
+        -- New MRR Type Calculation (Net)
+        case
+            when (net_current_month_mrr = 0.0 or net_current_month_mrr is null)
+                and (net_previous_month_mrr > 0.0) then 'churned'
             when net_current_month_mrr > net_previous_month_mrr then 'expansion'
             when net_current_month_mrr < net_previous_month_mrr then 'contraction'
             when net_current_month_mrr = net_previous_month_mrr then 'unchanged'
             when net_previous_month_mrr is null then 'new'
-            when (net_current_month_mrr = 0.0 or net_current_month_mrr is null)
-                and (net_previous_month_mrr != 0.0)
-                then 'churned'
             when (net_previous_month_mrr = 0.0 and net_current_month_mrr > 0.0
-                and account_month_number >= 3)
-                then 'reactivation'
+                and account_month_number >= 3) then 'reactivation'
             else null
         end as net_mrr_type
+
     from current_vs_previous_mrr
 )
 
