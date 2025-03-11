@@ -3,27 +3,52 @@ version: '0.3.1'
 config-version: 2
 require-dbt-version: [">=1.3.0", "<2.0.0"]
 profile: 'zuora'
+
 vars:
-  zuora: 
-    account: "{{ source('zuora_source', 'stg_zuora__account') }}"
-    amendment: "{{ source('zuora_source', 'stg_zuora__amendment') }}"
-    contact: "{{ source('zuora_source', 'stg_zuora__contact') }}"
-    credit_balance_adjustment: "{{ source('zuora_source', 'stg_zuora__credit_balance_adjustment') }}"
-    invoice: "{{ source('zuora_source', 'stg_zuora__invoice') }}"
-    invoice_item: "{{ source('zuora_source', 'stg_zuora__invoice_item') }}"
-    invoice_payment: "{{ source('zuora_source', 'stg_zuora__invoice_payment') }}"
-    order: "{{ source('zuora_source', 'stg_zuora__order') }}"
-    payment: "{{ source('zuora_source', 'stg_zuora__payment') }}"
-    payment_method: "{{ source('zuora_source', 'stg_zuora__payment_method') }}"
-    product_rate_plan_charge: "{{ source('zuora_source', 'stg_zuora__product_rate_plan_charge') }}"
-    product_rate_plan: "{{ source('zuora_source', 'stg_zuora__product_rate_plan') }}"
-    product: "{{ source('zuora_source', 'stg_zuora__product') }}"
-    rate_plan_charge: "{{ source('zuora_source', 'stg_zuora__rate_plan_charge') }}"
-    rate_plan: "{{ source('zuora_source', 'stg_zuora__rate_plan') }}"
-    refund: "{{ source('zuora_source', 'stg_zuora__refund') }}"
-    refund_invoice_payment: "{{ source('zuora_source', 'stg_zuora__refund_invoice_payment') }}"
-    subscription: "{{ source('zuora_source', 'stg_zuora__subscription') }}"
-    taxation_item: "{{ source('zuora_source', 'stg_zuora__taxation_item') }}"
+  # Map schema inputs to actual schemas in the warehouse
+  schema_map:
+    zuora_1: "zuora_zuora"
+    zuora_2: "zuora_dsa_zuora"
+    zuora_test: "zuora_zuora_zuora_test"
+
+  # Map schema values to source reference names for output models
+  output_map:
+    zuora_1: zuora
+    zuora_2: zuora_dsa
+
+  # Map schema inputs to staging source schemas
+  staging_map:
+    zuora_1: "zuora_source"
+    zuora_2: "zuora_dsa_source"
+    zuora_test: "zuora_zuora_zuora_test"
+
+  # Map schema inputs to intermediate schemas (for int tables)
+  int_map:
+    zuora_1: "int_tables"
+    zuora_2: "int_tables_dsa"
+
+  # Define dynamic sources based on the schema passed
+  zuora:
+    line_item_history: "{{ var('schema_map')[var('schema')] ~ '__line_item_history' }}"
+    account: "{{ source(var('staging_map')[var('schema')], 'stg_zuora__account') }}"
+    amendment: "{{ source(var('staging_map')[var('schema')], 'stg_zuora__amendment') }}"
+    contact: "{{ source(var('staging_map')[var('schema')], 'stg_zuora__contact') }}"
+    credit_balance_adjustment: "{{ source(var('staging_map')[var('schema')], 'stg_zuora__credit_balance_adjustment') }}"
+    invoice: "{{ source(var('staging_map')[var('schema')], 'stg_zuora__invoice') }}"
+    invoice_item: "{{ source(var('staging_map')[var('schema')], 'stg_zuora__invoice_item') }}"
+    invoice_payment: "{{ source(var('staging_map')[var('schema')], 'stg_zuora__invoice_payment') }}"
+    order: "{{ source(var('staging_map')[var('schema')], 'stg_zuora__order') }}"
+    payment: "{{ source(var('staging_map')[var('schema')], 'stg_zuora__payment') }}"
+    payment_method: "{{ source(var('staging_map')[var('schema')], 'stg_zuora__payment_method') }}"
+    product_rate_plan_charge: "{{ source(var('staging_map')[var('schema')], 'stg_zuora__product_rate_plan_charge') }}"
+    product_rate_plan: "{{ source(var('staging_map')[var('schema')], 'stg_zuora__product_rate_plan') }}"
+    product: "{{ source(var('staging_map')[var('schema')], 'stg_zuora__product') }}"
+    rate_plan_charge: "{{ source(var('staging_map')[var('schema')], 'stg_zuora__rate_plan_charge') }}"
+    rate_plan: "{{ source(var('staging_map')[var('schema')], 'stg_zuora__rate_plan') }}"
+    refund: "{{ source(var('staging_map')[var('schema')], 'stg_zuora__refund') }}"
+    refund_invoice_payment: "{{ source(var('staging_map')[var('schema')], 'stg_zuora__refund_invoice_payment') }}"
+    subscription: "{{ source(var('staging_map')[var('schema')], 'stg_zuora__subscription') }}"
+    taxation_item: "{{ source(var('staging_map')[var('schema')], 'stg_zuora__taxation_item') }}"
 
   zuora_account_pass_through_columns: []
   zuora_rate_plan_pass_through_columns: []
@@ -32,5 +57,4 @@ vars:
 
 models:
   zuora:
-    +schema: zuora_dbt  # Change to new schema
     +materialized: table

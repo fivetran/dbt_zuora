@@ -1,3 +1,11 @@
+{{ config(
+    materialized='table',
+    alias=var('schema_map')[var('schema')] ~ '__billing_history'
+) }}
+
+{% set source_name = var('staging_map')[var('schema', 'zuora_1')] %}
+{% set int_name = var('int_map')[var('schema', 'zuora_1')] %}
+
 with invoice as (
 
     select
@@ -9,7 +17,7 @@ with invoice as (
         amount as invoice_amount,
         amount_home_currency as invoice_amount_home_currency,
         payment_amount as invoice_amount_paid,
-        amount - payment_amount as invoice_amount_unpaid, 
+        amount - payment_amount as invoice_amount_unpaid,
         tax_amount,
         refund_amount,
 
@@ -26,16 +34,16 @@ with invoice as (
         sum(case when cast({{ dbt.date_trunc('day', dbt.current_timestamp_backcompat()) }} as date) > due_date
                 and amount != payment_amount
                 then balance else 0 end) as total_amount_past_due
-    from {{ var('invoice') }} 
-    where is_most_recent_record    
+    from {{ source(source_name, 'stg_zuora__invoice') }}
+    where is_most_recent_record
     {{ dbt_utils.group_by(18) if var('zuora__using_credit_balance_adjustment', true) else dbt_utils.group_by(17) }}
 ),
 
 billing_enriched as (
 
-    select * 
-    from {{ ref('int_zuora__billing_enriched') }} 
-), 
+    select *
+    from {{ source(int_name, 'int_zuora__billing_enriched') }}
+),
 
 billing_history as (
 
@@ -55,7 +63,7 @@ billing_history as (
         {% if var('zuora__using_credit_balance_adjustment', true) %}
         invoice.credit_balance_adjustment_amount,
         {% endif %}
-        
+
         {% if var('zuora__using_taxation_item', true) %}
         billing_enriched.tax_amount_home_currency,
         {% endif %}
@@ -75,12 +83,12 @@ billing_history as (
         billing_enriched.first_charge_date,
         billing_enriched.most_recent_charge_date,
         billing_enriched.invoice_service_start_date,
-        billing_enriched.invoice_service_end_date,        
-        billing_enriched.payments, 
+        billing_enriched.invoice_service_end_date,
+        billing_enriched.payments,
         billing_enriched.invoice_amount_paid_home_currency,
-        invoice.invoice_amount_home_currency - billing_enriched.invoice_amount_paid_home_currency as invoice_amount_unpaid_home_currency, 
+        invoice.invoice_amount_home_currency - billing_enriched.invoice_amount_paid_home_currency as invoice_amount_unpaid_home_currency,
         billing_enriched.first_payment_date,
-        billing_enriched.most_recent_payment_date, 
+        billing_enriched.most_recent_payment_date,
         billing_enriched.payment_methods
 
         {% if var('zuora__using_credit_balance_adjustment', true) %}
@@ -91,7 +99,7 @@ billing_history as (
         {% endif %}
 
     from invoice
-    left join billing_enriched on 
+    left join billing_enriched on
         invoice.invoice_id = billing_enriched.invoice_id
 )
 

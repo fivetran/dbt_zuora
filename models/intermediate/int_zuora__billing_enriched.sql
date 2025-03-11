@@ -1,6 +1,9 @@
+{% set source_name = var('staging_map')[var('schema', 'zuora_1')] %}
+{% set int_name = var('int_map')[var('schema', 'zuora_1')] %}
+
 with invoice_item_enriched as (
 
-    select 
+    select
         invoice_id,
         count(distinct invoice_item_id) as invoice_items,
         count(distinct product_id) as products,
@@ -12,17 +15,17 @@ with invoice_item_enriched as (
         max(charge_date) as most_recent_charge_date,
         min(service_start_date) as invoice_service_start_date,
         max(service_end_date) as invoice_service_end_date
-    from {{ var('invoice_item') }}
+    from {{ source(source_name, 'stg_zuora__invoice_item') }}
     where is_most_recent_record
     {{ dbt_utils.group_by(1) }}
 ),
 
 invoice_payment as (
 
-    select 
+    select
         invoice_id,
         payment_id
-    from {{ var('invoice_payment') }} 
+    from {{ source(source_name, 'stg_zuora__invoice_payment') }}
     where is_most_recent_record
 ),
 
@@ -33,21 +36,21 @@ payment as (
         payment_number,
         effective_date as payment_date,
         status as payment_status,
-        type as payment_type, 
+        type as payment_type,
         amount_home_currency as payment_amount_home_currency,
         payment_method_id
-    from {{ var('payment') }}
+    from {{ source(source_name, 'stg_zuora__payment') }}
     where is_most_recent_record
 ),
 
 payment_method as (
-    
+
     select 
         payment_method_id,
         type as payment_method_type,
         coalesce(ach_account_type, bank_transfer_account_type, credit_card_type, paypal_type, sub_type) as payment_method_subtype,
         active as is_payment_method_active
-    from {{ var('payment_method') }} 
+    from {{ source(source_name, 'stg_zuora__payment_method') }}
     where is_most_recent_record
 ),
 
@@ -61,7 +64,7 @@ credit_balance_adjustment as (
         reason_code as credit_balance_adjustment_reason_code,
         amount_home_currency as credit_balance_adjustment_amount_home_currency,
         adjustment_date as credit_balance_adjustment_date
-    from {{ var('credit_balance_adjustment') }}
+    from {{ source(source_name, 'stg_zuora__credit_balance_adjustment') }}
     where is_most_recent_record
 ),
 {% endif %}
@@ -70,9 +73,9 @@ credit_balance_adjustment as (
 taxes as (
 
     select
-        invoice_id, 
+        invoice_id,
         sum(tax_amount_home_currency) as tax_amount_home_currency
-    from {{ var('taxation_item') }} 
+    from {{ source(source_name, 'stg_zuora__taxation_item') }}
     where is_most_recent_record
     {{ dbt_utils.group_by(1) }}
 ),
@@ -97,10 +100,10 @@ billing_enriched as (
         taxes.tax_amount_home_currency,
         {% endif %}
 
-        count(distinct payment.payment_id) as payments, 
+        count(distinct payment.payment_id) as payments,
         sum(payment_amount_home_currency) as invoice_amount_paid_home_currency,
         min(payment_date) as first_payment_date,
-        max(payment_date) as most_recent_payment_date, 
+        max(payment_date) as most_recent_payment_date,
         count(distinct payment_method.payment_method_id) as payment_methods
 
         {% if var('zuora__using_credit_balance_adjustment', true) %}
@@ -111,7 +114,7 @@ billing_enriched as (
         {% endif %}
 
     from invoice_item_enriched
-    left join invoice_payment 
+    left join invoice_payment
         on invoice_item_enriched.invoice_id = invoice_payment.invoice_id
     left join payment
         on invoice_payment.payment_id = payment.payment_id
@@ -120,7 +123,7 @@ billing_enriched as (
     
     {% if var('zuora__using_credit_balance_adjustment', true) %}
     left join credit_balance_adjustment
-        on invoice_item_enriched.invoice_id = credit_balance_adjustment.invoice_id 
+        on invoice_item_enriched.invoice_id = credit_balance_adjustment.invoice_id
     {% endif %}
 
     {% if var('zuora__using_taxation_item', true) %}
@@ -128,7 +131,7 @@ billing_enriched as (
         on invoice_item_enriched.invoice_id = taxes.invoice_id
     {% endif %}
 
-    {{ dbt_utils.group_by(12) if var('zuora__using_taxation_item', true) else dbt_utils.group_by(11) }} 
+    {{ dbt_utils.group_by(12) if var('zuora__using_taxation_item', true) else dbt_utils.group_by(11) }}
 )
 
 select * 

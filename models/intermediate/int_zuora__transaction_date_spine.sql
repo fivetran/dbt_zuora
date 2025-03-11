@@ -1,13 +1,15 @@
+{% set source_name = var('staging_map')[var('schema', 'zuora_1')] %}
+{% set int_name = var('int_map')[var('schema', 'zuora_1')] %}
 
 with spine as (
 
     {% if execute %}
     {% if not var('zuora_daily_overview_first_date', None) or not var('zuora_daily_overview_last_date', None) %}
         {% set date_query %}
-        select 
+        select
             min( invoice_date ) as min_date,
             max( invoice_date ) as max_date
-        from {{ source('zuora', 'invoice') }}
+        from {{ source(source_name, 'stg_zuora__invoice') }}
         {% endset %}
 
         {% set calc_first_date = run_query(date_query).columns[0][0]|string %}
@@ -15,7 +17,7 @@ with spine as (
     {% endif %}
 
     {# If only compiling, creates range going back 1 year #}
-    {% else %} 
+    {% else %}
         {% set calc_first_date = dbt.dateadd("year", "-1", "current_date") %}
         {% set calc_last_date = dbt.current_timestamp_backcompat() %}
     {% endif %}
@@ -44,17 +46,17 @@ account_first_invoice as (
 date_spine as (
 
     select
-        cast({{ dbt.date_trunc("day", "date_day") }} as date) as date_day, 
-        cast({{ dbt.date_trunc("week", "date_day") }} as date) as date_week, 
+        cast({{ dbt.date_trunc("day", "date_day") }} as date) as date_day,
+        cast({{ dbt.date_trunc("week", "date_day") }} as date) as date_week,
         cast({{ dbt.date_trunc("month", "date_day") }} as date) as date_month,
-        cast({{ dbt.date_trunc("year", "date_day") }} as date) as date_year,  
+        cast({{ dbt.date_trunc("year", "date_day") }} as date)  as date_year,
         row_number() over (order by cast({{ dbt.date_trunc("day", "date_day") }} as date)) as date_index
     from spine
 ),
 
 final as (
 
-    select 
+    select
         distinct account_first_invoice.account_id,
         date_spine.date_day,
         date_spine.date_week,

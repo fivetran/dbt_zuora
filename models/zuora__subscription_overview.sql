@@ -1,21 +1,29 @@
+{{ config(
+    materialized='table',
+    alias=var('schema_map')[var('schema')] ~ '__subscription_overview'
+) }}
+
+{% set source_name = var('staging_map')[var('schema', 'zuora_1')] %}
+{% set int_name = var('int_map')[var('schema', 'zuora_1')] %}
+
 with subscription as (
 
     select *
-    from {{ var('subscription') }}  
+    from {{ source(source_name, 'stg_zuora__subscription') }}
     where is_most_recent_record
 ),
 
 rate_plan_charge as (
 
     select * 
-    from {{ var('rate_plan_charge') }}
+    from {{ source(source_name, 'stg_zuora__rate_plan_charge') }}
     where is_most_recent_record
 ),
 
 amendment as (
 
     select *
-    from {{ var('amendment') }}
+    from {{ source(source_name, 'stg_zuora__amendment') }}
     where is_most_recent_record
 ),
 
@@ -25,12 +33,12 @@ account_overview as (
     select 
         account_id,
         account_name
-    from {{ ref('zuora__account_overview') }} 
+    from {{ ref('zuora__account_overview') }}
 ),
 
 subscription_overview as (
 
-    select  
+    select
         {{ dbt_utils.generate_surrogate_key(['subscription.subscription_id', 'rate_plan_charge.rate_plan_charge_id', 'amendment.amendment_id']) }} as subscription_key,
         subscription.subscription_id,
         subscription.account_id,
@@ -38,10 +46,10 @@ subscription_overview as (
         subscription.auto_renew,
         subscription.cancel_reason,
         subscription.cancelled_date,
-        subscription.current_term, 
-        subscription.current_term_period_type, 
+        subscription.current_term,
+        subscription.current_term_period_type,
         subscription.initial_term,
-        subscription.initial_term_period_type, 
+        subscription.initial_term_period_type,
         subscription.is_latest_version,
         subscription.previous_subscription_id,
         subscription.renewal_term,
@@ -54,7 +62,7 @@ subscription_overview as (
         subscription.term_end_date,
         subscription.term_type,
         subscription.version,
-        rate_plan_charge.rate_plan_charge_id, 
+        rate_plan_charge.rate_plan_charge_id,
         rate_plan_charge.name as rate_plan_charge_name,
         rate_plan_charge.billing_period as charge_billing_period,
         rate_plan_charge.billing_timing as charge_billing_timing,
@@ -79,14 +87,14 @@ subscription_overview as (
         case when subscription.{{ interval_col }}_period_type = 'Week' then 7 * subscription.{{ interval_col }}
             when subscription.{{ interval_col }}_period_type = 'Month' then 30 * subscription.{{ interval_col }}
             when subscription.{{ interval_col }}_period_type = 'Year' then 365 * subscription.{{ interval_col }}
-            else subscription.{{ interval_col }} 
+            else subscription.{{ interval_col }}
             end as {{ interval_col }}_days,
         {% endfor %}
 
         {% set date_cols = ['subscription', 'term'] %}
         {% for date_col in date_cols %}
         case when subscription.term_type = 'TERMED'
-            then {{ dbt.datediff('subscription.' ~ date_col ~ '_start_date', 'subscription.' ~ date_col ~ '_end_date', 'day') }} 
+            then {{ dbt.datediff('subscription.' ~ date_col ~ '_start_date', 'subscription.' ~ date_col ~ '_end_date', 'day') }}
             when subscription.term_type = 'EVERGREEN' and subscription.cancelled_date is not null
             then {{ dbt.datediff('subscription.' ~ date_col ~ '_start_date', 'subscription.cancelled_date', 'day') }}
             else {{ dbt.datediff('subscription.' ~ date_col ~ '_start_date', dbt.current_timestamp_backcompat(), 'day') }}
@@ -103,7 +111,7 @@ subscription_overview as (
         on subscription.subscription_id = rate_plan_charge.subscription_id
     left join amendment
         on subscription.subscription_id = amendment.subscription_id
-    left join account_overview 
+    left join account_overview
         on subscription.account_id = account_overview.account_id
 )
 

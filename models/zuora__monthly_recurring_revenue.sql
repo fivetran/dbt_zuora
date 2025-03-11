@@ -1,13 +1,29 @@
+{{ config(
+    materialized='table',
+    alias=var('schema_map')[var('schema')] ~ '__monthly_recurring_revenue'
+) }}
+
+{% set source_name = var('staging_map')[var('schema', 'zuora_1')] %}
+{% set int_name = var('int_map')[var('schema', 'zuora_1')] %}
+
+{% if var('schema', 'zuora_1') == 'zuora_1' %}
+    {% set line_item_table = 'zuora_dbt.zuora_zuora__line_item_history' %}
+{% elif var('schema', 'zuora_1') == 'zuora_2' %}
+    {% set line_item_table = 'zuora_dbt.zuora_dsa_zuora__line_item_history' %}
+{% else %}
+    {% set line_item_table = 'zuora_dbt.zuora_zuora__line_item_history' %}
+{% endif %}
+
 with line_items as (
     select *
-    FROM {{ source('test', 'zuora__line_item_history') }}
+    from {{ line_item_table }}
 ),
 
 month_spine as (
     select
         account_id,
         date_month as account_month
-    FROM {{ source('int_tables', 'int_zuora__mrr_date_spine') }}
+    from {{ source(int_name, 'int_zuora__mrr_date_spine') }}
     {{ dbt_utils.group_by(2) }}
 ),
 
@@ -16,7 +32,7 @@ mrr_by_account as (
         coalesce(month_spine.account_id, line_items.account_id) as account_id,
         coalesce(month_spine.account_month, line_items.service_start_month) as account_month,
 
-        {% if var('zuora__using_multicurrency', false) %}
+        {% if true %}  -- Changed from var('zuora__using_multicurrency', false)
         sum(case when charge_mrr is null then 0 else charge_mrr end) as mrr_expected_current_month,
         {% else %}
         sum(case when charge_mrr_home_currency is null then 0 else charge_mrr_home_currency end) as mrr_expected_current_month,
@@ -24,25 +40,17 @@ mrr_by_account as (
 
         {% set sum_cols = ['gross', 'discount', 'net'] %}
         {% for col in sum_cols %}
-            sum(case
-                when lower(charge_type) = 'recurring'
-                then COALESCE({{ col }}_revenue, 0)
-                else 0
-            end) as {{ col }}_current_month_mrr,
-
-            sum(case
-                when lower(charge_type) != 'recurring'
-                then COALESCE({{ col }}_revenue, 0)
-                else 0
-            end) as {{ col }}_current_month_non_mrr
+            sum(case when lower(charge_type) = 'recurring' and {{col}}_revenue is not null then {{col}}_revenue else 0 end) as {{col}}_current_month_mrr,
+            sum(case when lower(charge_type) != 'recurring' and {{col}}_revenue is not null then {{col}}_revenue else 0 end) as {{col}}_current_month_non_mrr
             {{ ',' if not loop.last }}
         {% endfor %}
 
     from month_spine
     left join line_items
-        on COALESCE(month_spine.account_month, '1900-01-01') = COALESCE(line_items.service_start_month, '1900-01-01')
-        and COALESCE(month_spine.account_id, '-1') = COALESCE(line_items.account_id, '-1')
+        on month_spine.account_month = line_items.service_start_month
+        and month_spine.account_id = line_items.account_id
     {{ dbt_utils.group_by(2) }}
+
 ),
 
 current_vs_previous_mrr as (
@@ -72,11 +80,9 @@ current_vs_previous_mrr as (
 ),
 
 mrr_type as (
-    select 
+    select
         {{ dbt_utils.generate_surrogate_key(['account_id', 'account_month']) }} as account_monthly_id,
         *,
-
-        -- Existing MRR Type Calculation (Gross)
         case
             when (gross_current_month_mrr = 0.0 or gross_current_month_mrr is null)
                 and (gross_previous_month_mrr > 0.0) then 'churned'
@@ -89,7 +95,6 @@ mrr_type as (
             else null
         end as gross_mrr_type,
 
-        -- New MRR Type Calculation (Net)
         case
             when (net_current_month_mrr = 0.0 or net_current_month_mrr is null)
                 and (net_previous_month_mrr > 0.0) then 'churned'
@@ -101,7 +106,6 @@ mrr_type as (
                 and account_month_number >= 3) then 'reactivation'
             else null
         end as net_mrr_type
-
     from current_vs_previous_mrr
 )
 
