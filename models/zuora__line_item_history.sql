@@ -1,115 +1,95 @@
-with invoice_item_enhanced as (
+{{ config(
+    materialized='table',
+    alias=var('schema_map')[var('schema')] ~ '__line_item_history'
+) }}
 
+{% set source_name = var('staging_map')[var('schema', 'zuora_1')] %}
+{% set int_name = var('int_map')[var('schema', 'zuora_1')] %}
+
+with invoice_item_enhanced as (
     select *,
         cast({{ dbt.date_trunc("day", "charge_date") }} as date) as charge_day,
         cast({{ dbt.date_trunc("week", "charge_date") }} as date) as charge_week,
         cast({{ dbt.date_trunc("month", "charge_date") }} as date) as charge_month,
-        case when cast(processing_type as {{ dbt.type_string() }}) = '1' 
+        case when cast(processing_type as {{ dbt.type_string() }}) = '1'
             then charge_amount_home_currency else 0 end as discount_amount_home_currency,
-        case when cast(processing_type as {{ dbt.type_string() }}) = '1' 
+        case when cast(processing_type as {{ dbt.type_string() }}) = '1'
             then charge_amount else 0 end as discount_amount,
         cast({{ dbt.date_trunc("day", "service_start_date") }} as date) as service_start_day,
         cast({{ dbt.date_trunc("week", "service_start_date") }} as date) as service_start_week,
         cast({{ dbt.date_trunc("month", "service_start_date") }} as date) as service_start_month
-    from {{ var('invoice_item') }}
-    where is_most_recent_record 
+    from {{ source(source_name, 'stg_zuora__invoice_item') }}
+    where is_most_recent_record
 ),
 
 invoice as (
-
     select * 
-    from {{ var('invoice') }}
-    where is_most_recent_record 
+    from {{ source(source_name, 'stg_zuora__invoice') }}
+    where is_most_recent_record
 ),
 
 product as (
-
-    select * 
-    from {{ var('product') }}
+    select *
+    from {{ source(source_name, 'stg_zuora__product') }}
     where is_most_recent_record
 ),
 
 product_rate_plan as (
-
-    select * 
-    from {{ var('product_rate_plan') }} 
+    select *
+    from {{ source(source_name, 'stg_zuora__product_rate_plan') }}
     where is_most_recent_record
 ),
 
 product_rate_plan_charge as (
-
-    select * 
-    from {{ var('product_rate_plan_charge') }} 
+    select *
+    from {{ source(source_name, 'stg_zuora__product_rate_plan_charge') }}
     where is_most_recent_record
-), 
+),
 
 rate_plan_charge as (
-
-    select * 
-    from {{ var('rate_plan_charge') }} 
+    select *
+    from {{ source(source_name, 'stg_zuora__rate_plan_charge') }}
     where is_most_recent_record
-), 
+),
 
 subscription as (
-
     select *
-    from {{ var('subscription') }} 
+    from {{ source(source_name, 'stg_zuora__subscription') }}
     where is_most_recent_record
 ),
 
 amendment as (
-
     select *
-    from {{ var('amendment') }} 
+    from {{ source(source_name, 'stg_zuora__amendment') }}
     where is_most_recent_record
 ),
 
-{% if var('zuora__using_taxation_item', true) %}
-taxation_item as (
-
-    select 
-        invoice_item_id,
-        sum(tax_amount_home_currency) as tax_amount_home_currency
-    from {{ var('taxation_item') }}
-    where is_most_recent_record
-    group by 1
-), 
-{% endif %}
-
 account_enhanced as (
-
-    select  
+    select
         account_id,
-        cast({{ dbt.date_trunc("day", "account_created_at") }} as date) as account_creation_day, 
+        cast({{ dbt.date_trunc("day", "account_created_at") }} as date) as account_creation_day,
         cast({{ dbt.date_trunc("day", "first_charge_processed_at") }} as date) as first_charge_day,
         account_status
-    from {{ ref('zuora__account_daily_overview') }}
+    from {{ source(var('output_map')[var('schema')], 'zuora__account_daily_overview') }}
     {{ dbt_utils.group_by(4) }}
 ),
 
-invoice_revenue_items as (
 
+
+invoice_revenue_items as (
     select
-        invoice_item_id, 
-        {% if var('zuora__using_multicurrency', false) %}
-        charge_amount as gross_revenue,
-        case when cast(processing_type as {{ dbt.type_string() }})= '1' 
-            then charge_amount else 0 end as discount_revenue
-        {% else %} 
-        charge_amount_home_currency as gross_revenue,
-        case when cast(processing_type as {{ dbt.type_string() }})= '1' 
-            then charge_amount_home_currency else 0 end as discount_revenue
-        {% endif %}
+        invoice_item_id,
+        COALESCE(charge_amount_home_currency, charge_amount) AS gross_revenue,
+        CASE WHEN cast(processing_type as {{ dbt.type_string() }}) = '1'
+            THEN COALESCE(charge_amount_home_currency, charge_amount) ELSE 0 END AS discount_revenue
     from invoice_item_enhanced
 ),
 
-
 line_item_history as (
-
-    select 
-        invoice_item_enhanced.invoice_item_id, 
-        invoice_item_enhanced.account_id,  
-        account_enhanced.account_creation_day, 
+    select
+        invoice_item_enhanced.invoice_item_id,
+        invoice_item_enhanced.account_id,
+        account_enhanced.account_creation_day,
         account_enhanced.account_status,
         invoice_item_enhanced.amendment_id,
         invoice_item_enhanced.balance,
@@ -136,20 +116,15 @@ line_item_history as (
         invoice_item_enhanced.subscription_id,
         invoice_item_enhanced.sku,
         invoice_item_enhanced.tax_amount,
-
-        {% if var('zuora__using_taxation_item', true) %}
-        taxation_item.tax_amount_home_currency,
-        {% endif %}
-
         invoice_item_enhanced.transaction_currency,
         invoice_item_enhanced.unit_price,
         invoice_item_enhanced.uom,
         invoice.invoice_number,
         invoice.invoice_date,
-        invoice.due_date as invoice_due_date,   
+        invoice.due_date as invoice_due_date,
         subscription.auto_renew as subscription_auto_renew,
         subscription.cancel_reason as subscription_cancel_reason,
-        subscription.cancelled_date as subscription_cancel_date, 
+        subscription.cancelled_date as subscription_cancel_date,
         subscription.service_activation_date as subscription_service_activation_date,
         subscription.status as subscription_status,
         subscription.subscription_start_date,
@@ -175,12 +150,12 @@ line_item_history as (
         product.category as product_category,
         product.description as product_description,
         product.effective_start_date as product_start_date,
-        product.effective_end_date as product_end_date, 
+        product.effective_end_date as product_end_date,
         product_rate_plan.name as product_rate_plan_name,
         product_rate_plan.description as product_rate_plan_description,
         invoice_revenue_items.gross_revenue,
         invoice_revenue_items.discount_revenue,
-        invoice_revenue_items.gross_revenue - invoice_revenue_items.discount_revenue as net_revenue
+        invoice_revenue_items.gross_revenue + invoice_revenue_items.discount_revenue as net_revenue
 
         {{ fivetran_utils.persist_pass_through_columns('zuora_subscription_pass_through_columns', identifier='subscription') }}
 
@@ -191,23 +166,18 @@ line_item_history as (
             on invoice_item_enhanced.invoice_id = invoice.invoice_id
         left join subscription
             on invoice_item_enhanced.subscription_id = subscription.subscription_id
-        left join rate_plan_charge 
+        left join rate_plan_charge
             on invoice_item_enhanced.rate_plan_charge_id = rate_plan_charge.rate_plan_charge_id
         left join amendment
             on invoice_item_enhanced.amendment_id = amendment.amendment_id
         left join product
             on invoice_item_enhanced.product_id = product.product_id
         left join product_rate_plan
-            on invoice_item_enhanced.product_rate_plan_id = product_rate_plan.product_rate_plan_id 
+            on invoice_item_enhanced.product_rate_plan_id = product_rate_plan.product_rate_plan_id
         left join account_enhanced
             on invoice_item_enhanced.account_id = account_enhanced.account_id
         left join invoice_revenue_items
             on invoice_item_enhanced.invoice_item_id = invoice_revenue_items.invoice_item_id
-        
-        {% if var('zuora__using_taxation_item', true) %}
-        left join taxation_item 
-            on invoice_item_enhanced.invoice_item_id = taxation_item.invoice_item_id
-        {% endif %}
 )
 
 select * 

@@ -1,0 +1,10 @@
+packages:
+  - package: fivetran/zuora_source
+    version: 0.2.1
+  - package: fivetran/fivetran_utils
+    version: 0.4.10
+  - package: dbt-labs/spark_utils
+    version: 0.3.0
+  - package: dbt-labs/dbt_utils
+    version: 1.3.0
+sha1_hash: 02497d2300f2bcf59e87911264d361320f5e86bf

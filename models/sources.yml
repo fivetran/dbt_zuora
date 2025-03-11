@@ -1,0 +1,93 @@
+version: 2
+
+sources:
+  # ZUORA schemas for model table output
+  - name: zuora
+    schema: zuora_zuora
+    tables:
+      - name: zuora__line_item_history
+      - name: zuora__account_daily_overview
+  - name: zuora_dsa
+    schema: zuora_dsa_zuora
+    tables:
+      - name: zuora__line_item_history
+      - name: zuora__account_daily_overview
+
+  # Zuora Int tables
+  - name: int_tables
+    schema: zuora_zuora_int
+    tables:
+      - name: int_zuora__account_enriched
+      - name: int_zuora__account_partitions
+      - name: int_zuora__account_rolling_totals
+      - name: int_zuora__account_running_totals
+      - name: int_zuora__billing_enriched
+      - name: int_zuora__mrr_date_spine
+      - name: int_zuora__transaction_date_spine
+      - name: int_zuora__transactions_grouped
+
+  - name: int_tables_dsa
+    schema: zuora_dsa_zuora_int
+    tables:
+      - name: int_zuora__account_enriched
+      - name: int_zuora__account_partitions
+      - name: int_zuora__account_rolling_totals
+      - name: int_zuora__account_running_totals
+      - name: int_zuora__billing_enriched
+      - name: int_zuora__mrr_date_spine
+      - name: int_zuora__transaction_date_spine
+      - name: int_zuora__transactions_grouped
+
+  # STAGING TABLES
+  - name: zuora_source
+    schema: zuora_zuora_source
+    tables:
+      - name: stg_zuora__invoice_item
+      - name: stg_zuora__invoice
+      - name: stg_zuora__account
+      - name: stg_zuora__amendment
+      - name: stg_zuora__contact
+      - name: stg_zuora__credit_balance_adjustment
+      - name: stg_zuora__invoice_payment
+      - name: stg_zuora__order
+      - name: stg_zuora__payment
+      - name: stg_zuora__payment_method
+      - name: stg_zuora__product_rate_plan_charge
+      - name: stg_zuora__product_rate_plan
+      - name: stg_zuora__product
+      - name: stg_zuora__rate_plan_charge
+      - name: stg_zuora__rate_plan
+      - name: stg_zuora__refund
+      - name: stg_zuora__refund_invoice_payment
+      - name: stg_zuora__subscription
+      - name: stg_zuora__taxation_item
+
+  - name: zuora_dsa_source
+    schema: zuora_dsa_zuora_source
+    tables:
+      - name: stg_zuora__invoice_item
+      - name: stg_zuora__invoice
+      - name: stg_zuora__account
+      - name: stg_zuora__amendment
+      - name: stg_zuora__contact
+      - name: stg_zuora__credit_balance_adjustment
+      - name: stg_zuora__invoice_payment
+      - name: stg_zuora__order
+      - name: stg_zuora__payment
+      - name: stg_zuora__payment_method
+      - name: stg_zuora__product_rate_plan_charge
+      - name: stg_zuora__product_rate_plan
+      - name: stg_zuora__product
+      - name: stg_zuora__rate_plan_charge
+      - name: stg_zuora__rate_plan
+      - name: stg_zuora__refund
+      - name: stg_zuora__refund_invoice_payment
+      - name: stg_zuora__subscription
+      - name: stg_zuora__taxation_item
+
+  # TARGET TABLES WITH PREFIX IN `zuora_dbt`
+  - name: daysmart_models
+    schema: zuora_dbt
+    tables:
+      - name: zuora_zuora__line_item_history
+      - name: zuora_dsa_zuora__line_item_history
