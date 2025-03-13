@@ -105,7 +105,7 @@ account_subscription_data as (
 account_cumulatives as (
     
     select 
-        account_totals.account_id,
+        account_details.account_id,
         account_details.created_date,
         account_details.name,
         account_details.account_number,
