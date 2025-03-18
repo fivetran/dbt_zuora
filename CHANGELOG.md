@@ -2,7 +2,7 @@
 This release introduces the following updates.
 
 ## Bug Fixes
-- Fixed an issue in the `zuora__subscription_overview` model by improving the handling of amendments and their relationship with subscriptions.
+- Fixed an issue in the `int_zuora__account_enriched` model by including accounts that don't have billing history.
 
 # dbt_zuora v0.3.2
 This release introduces the following updates.
