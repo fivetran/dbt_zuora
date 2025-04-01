@@ -1,3 +1,5 @@
+# dbt_zuora v0.3.3
+
 # dbt_zuora v0.3.2
 This release introduces the following updates.
 
