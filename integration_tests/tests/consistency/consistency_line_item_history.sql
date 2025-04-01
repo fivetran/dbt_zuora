@@ -5,12 +5,12 @@
 
 with prod as (
     select *
-    from {{ target.schema }}_zuora_prod.zuora__monthly_recurring_revenue
+    from {{ target.schema }}_zuora_prod.zuora__line_item_history
 ),
 
 dev as (
     select *
-    from {{ target.schema }}_zuora_dev.zuora__monthly_recurring_revenue
+    from {{ target.schema }}_zuora_dev.zuora__line_item_history
 ), 
 
 prod_not_in_dev as (

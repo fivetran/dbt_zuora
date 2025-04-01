@@ -1,8 +1,14 @@
 # dbt_zuora v0.3.3 
-This release introduces the following updates.
+[PR #27](https://github.com/fivetran/dbt_zuora/pull/27) includes the following updates.
 
 ## Bug Fixes
-- Fixed an issue in the `int_zuora__account_enriched` model by including accounts that don't have billing history.
+- Fixed an issue in the `int_zuora__account_enriched` model by including accounts that don't have billing history. These acccounts with no billing history now persist to downstream models like `zuora__account_overview`, `zuora__subscription_overview` and `zuora__account_daily_overview`.
+
+## Under The Hood
+- Added and updated new consistency tests to test and validate bug fixes work as expected.
+
+## Contributors
+- [@paulavidela](https://github.com/paulavidela) ([#26](https://github.com/fivetran/dbt_zuora/pull/26))
 
 # dbt_zuora v0.3.2
 This release introduces the following updates.
