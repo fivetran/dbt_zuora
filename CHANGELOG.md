@@ -5,7 +5,8 @@
 - Fixed an issue in the `int_zuora__account_enriched` model by including accounts that don't have billing history. These acccounts with no billing history now persist to downstream models like `zuora__account_overview`, `zuora__subscription_overview` and `zuora__account_daily_overview`.
 
 ## Under The Hood
-- Added and updated new consistency tests to test and validate bug fixes work as expected.
+- Added new and updated existing consistency tests to test and validate bug fixes work as expected.
+- Updated column types section in `integration_tests/dbt_project.yml` in order to stop runtime warnings. 
 
 ## Contributors
 - [@paulavidela](https://github.com/paulavidela) ([#26](https://github.com/fivetran/dbt_zuora/pull/26))
