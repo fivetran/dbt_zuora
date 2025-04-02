@@ -1,8 +1,9 @@
-# dbt_zuora v0.3.3 
+# dbt_zuora v0.4.0
 [PR #27](https://github.com/fivetran/dbt_zuora/pull/27) includes the following updates.
 
 ## Bug Fixes
-- Fixed an issue in the `int_zuora__account_enriched` model by including accounts that don't have billing history. These acccounts with no billing history now persist to downstream models like `zuora__account_overview`, `zuora__subscription_overview` and `zuora__account_daily_overview`.
+- Fixes the join for `account_id` in the `int_zuora__account_enriched` model so accounts that don't have billing history still get populated. The join now pulls from a CTE that gathers all account detail records so no accounts are left out.
+- These accounts with no billing history now will now have more accurate results in downstream models from  `int_zuora__account_enriched`, as account fields will now properly populate in `zuora__account_overview`, `zuora__subscription_overview` and `zuora__account_daily_overview`. We've decided to make **this a breaking change** due to these multiple models being impacted.
 
 ## Under The Hood
 - Added new and updated existing consistency tests to test and validate bug fixes work as expected.
