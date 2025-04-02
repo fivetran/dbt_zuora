@@ -5,13 +5,14 @@
 
 with prod as (
     select *
-    from {{ target.schema }}_zuora_prod.zuora__monthly_recurring_revenue
+    from {{ target.schema }}_zuora_prod.zuora__account_daily_overview
 ),
 
 dev as (
     select *
-    from {{ target.schema }}_zuora_dev.zuora__monthly_recurring_revenue
+    from {{ target.schema }}_zuora_dev.zuora__account_daily_overview
 ), 
+
 
 prod_not_in_dev as (
     -- rows from prod not found in dev
