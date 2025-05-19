@@ -1,3 +1,10 @@
+# dbt_zuora v0.5.0
+[PR #28](https://github.com/fivetran/dbt_zuora/pull/28) includes the following changes.
+
+## Features
+- Enabled the `stripe__line_item_enhanced` model by default. Previously, this model required opting in via the `stripe__standardized_billing_model_enabled` variable. This change ensures the model is available by default for Quickstart users.
+  - Users can still disable the model by setting the variable to `false` in `dbt_project.yml`.
+
 # dbt_zuora v0.4.0
 [PR #27](https://github.com/fivetran/dbt_zuora/pull/27) includes the following updates.
 
