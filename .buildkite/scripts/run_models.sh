@@ -19,7 +19,7 @@ dbt deps
 dbt seed --target "$db" --full-refresh
 dbt run --target "$db" --full-refresh
 dbt test --target "$db"
-dbt run --vars '{zuora__using_credit_balance_adjustment: false, zuora__using_taxation_item: false, zuora__using_refund: false, zuora__using_refund_invoice_payment: false}' --target "$db" --full-refresh
+dbt run --vars '{zuora__standardized_billing_model_enabled: false, zuora__using_credit_balance_adjustment: false, zuora__using_taxation_item: false, zuora__using_refund: false, zuora__using_refund_invoice_payment: false}' --target "$db" --full-refresh
 dbt test --target "$db"
 
 dbt run-operation fivetran_utils.drop_schemas_automation --target "$db"
