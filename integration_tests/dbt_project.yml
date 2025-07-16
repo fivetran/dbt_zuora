@@ -35,6 +35,8 @@ dispatch:
     search_order: ['spark_utils', 'dbt_utils']
 
 seeds:
+  +docs:
+    show: False
   zuora_integration_tests:
     +column_types:
       _fivetran_synced: "timestamp"
@@ -166,3 +168,6 @@ seeds:
       +column_types:
         current_term: "{{ 'INT64' if target.type == 'bigquery' else 'bigint' }}"
         renewal_term: "{{ 'INT64' if target.type == 'bigquery' else 'bigint' }}"
+flags:
+  send_anonymous_usage_stats: False
+  use_colors: True
