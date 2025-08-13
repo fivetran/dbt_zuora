@@ -47,6 +47,12 @@ An example churn report is separately available in the analysis folder:
 ### Example Visualizations
 Curious what these tables can do? Check out example visualizations from the [zuora__line_item_enhanced](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__line_item_enhanced) table in the [Fivetran Billing Model Streamlit App](https://fivetran-billing-model.streamlit.app/), and see how you can use these tables in your own reporting. Below is a screenshot of an example report—-explore the app for more.
 
+<p align="center">
+<a href="https://fivetran-billing-model.streamlit.app/">
+    <img src="https://raw.githubusercontent.com/fivetran/dbt_zuora/main/images/streamlit_example.png" alt="Streamlit Billing Model App" width="75%">
+</a>
+</p>
+
 ### Materialized Models
 Each Quickstart transformation job run materializes 51 models if all components of this data model are enabled. This count includes all staging, intermediate, and final models materialized as `view`, `table`, or `incremental`.
 <!--section-end-->
@@ -132,7 +138,7 @@ vars:
 ```
 
 #### Passing Through Additional Fields
-This package includes all source columns defined in the [macros folder of the dbt_zuora_source package](https://github.com/fivetran/dbt_zuora_source/tree/main/macros). You can add more columns using our pass-through column variables. These variables allow the pass-through fields to be aliased (`alias`) and casted (`transform_sql`) if desired, but not required. Datatype casting is configured via a SQL snippet within the `transform_sql` key. You may add the desired SQL while omitting the `as field_name` at the end and your custom pass-though fields will be casted accordingly. Use the below format for declaring the respective pass-through variables:
+This package includes all source columns defined in the [macros folder of this package](https://github.com/fivetran/dbt_zuora/tree/main/macros). You can add more columns using our pass-through column variables. These variables allow the pass-through fields to be aliased (`alias`) and casted (`transform_sql`) if desired, but not required. Datatype casting is configured via a SQL snippet within the `transform_sql` key. You may add the desired SQL while omitting the `as field_name` at the end and your custom pass-though fields will be casted accordingly. Use the below format for declaring the respective pass-through variables:
 
 ```yml
 vars:
@@ -164,7 +170,7 @@ models:
 
 #### Change the source table references
 If an individual source table has a different name than the package expects, add the table name as it appears in your destination to the respective variable:
-> IMPORTANT: See this project's [`dbt_project.yml`](https://github.com/fivetran/dbt_zuora_source/blob/main/dbt_project.yml) variable declarations to see the expected names.
+> IMPORTANT: See this project's [`dbt_project.yml`](https://github.com/fivetran/dbt_zuora/blob/main/dbt_project.yml) variable declarations to see the expected names.
 
 ```yml
 vars:
@@ -223,5 +229,5 @@ This dbt package takes several opinionated stances in order to provide the custo
 If you would like a deeper explanation of the decisions we made to our models in this dbt package, you may reference the [DECISIONLOG](https://github.com/fivetran/dbt_zuora/blob/main/DECISIONLOG.md).
 
 ## Are there any resources available?
-- If you have questions or want to reach out for help, see the [GitHub Issue](https://github.com/fivetran/dbt_zuora_source/issues/new/choose) section to find the right avenue of support for you.
+- If you have questions or want to reach out for help, see the [GitHub Issue](https://github.com/fivetran/dbt_zuora/issues/new/choose) section to find the right avenue of support for you.
 - If you would like to provide feedback to the dbt package team at Fivetran or would like to request a new dbt package, fill out our [Feedback Form](https://www.surveymonkey.com/r/DQ7K7WW).
