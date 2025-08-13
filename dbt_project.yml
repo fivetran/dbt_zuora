@@ -1,29 +1,29 @@
 name: 'zuora'
-version: '0.5.0'
+version: '1.0.0'
 config-version: 2
 require-dbt-version: [">=1.3.0", "<2.0.0"]
 
 vars:
   zuora: 
-    account: "{{ ref('stg_zuora__account') }}" 
-    amendment: "{{ ref('stg_zuora__amendment') }}"
-    contact: "{{ ref('stg_zuora__contact') }}"
-    credit_balance_adjustment: "{{ ref('stg_zuora__credit_balance_adjustment') }}"
-    invoice: "{{ ref('stg_zuora__invoice') }}"
-    invoice_item: "{{ ref('stg_zuora__invoice_item') }}"
-    invoice_payment: "{{ ref('stg_zuora__invoice_payment') }}" 
-    order: "{{ ref('stg_zuora__order') }}" 
-    payment: "{{ ref('stg_zuora__payment') }}"
-    payment_method: "{{ ref('stg_zuora__payment_method') }}"
-    product_rate_plan_charge: "{{ ref('stg_zuora__product_rate_plan_charge') }}"
-    product_rate_plan: "{{ ref('stg_zuora__product_rate_plan') }}"
-    product: "{{ ref('stg_zuora__product') }}"
-    rate_plan_charge: "{{ ref('stg_zuora__rate_plan_charge') }}"
-    rate_plan: "{{ ref('stg_zuora__rate_plan') }}"
-    refund: "{{ ref('stg_zuora__refund') }}"
-    refund_invoice_payment: "{{ ref('stg_zuora__refund_invoice_payment') }}"
-    subscription: "{{ ref('stg_zuora__subscription') }}"
-    taxation_item: "{{ ref('stg_zuora__taxation_item') }}"
+    account: "{{ source('zuora', 'account') }}" 
+    amendment: "{{ source('zuora', 'amendment') }}"
+    contact: "{{ source('zuora', 'contact') }}"
+    credit_balance_adjustment: "{{ source('zuora', 'credit_balance_adjustment') }}"
+    invoice: "{{ source('zuora', 'invoice') }}"
+    invoice_item: "{{ source('zuora', 'invoice_item') }}"
+    invoice_payment: "{{ source('zuora', 'invoice_payment') }}" 
+    order: "{{ source('zuora', 'order') }}" 
+    payment: "{{ source('zuora', 'payment') }}"
+    payment_method: "{{ source('zuora', 'payment_method') }}"
+    product_rate_plan_charge: "{{ source('zuora', 'product_rate_plan_charge') }}"
+    product_rate_plan: "{{ source('zuora', 'product_rate_plan') }}"
+    product: "{{ source('zuora', 'product') }}"
+    rate_plan_charge: "{{ source('zuora', 'rate_plan_charge') }}"
+    rate_plan: "{{ source('zuora', 'rate_plan') }}"
+    refund: "{{ source('zuora', 'refund') }}"
+    refund_invoice_payment: "{{ source('zuora', 'refund_invoice_payment') }}"
+    subscription: "{{ source('zuora', 'subscription') }}"
+    taxation_item: "{{ source('zuora', 'taxation_item') }}"
 
   zuora_account_pass_through_columns: []
   zuora_rate_plan_pass_through_columns: []
@@ -37,5 +37,8 @@ models:
     intermediate:
       +schema: zuora_int
       +materialized: table
+    staging:
+      +schema: zuora_source
+      +materialized: view
 
   

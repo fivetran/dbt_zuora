@@ -26,7 +26,7 @@ with invoice as (
         sum(case when cast({{ dbt.date_trunc('day', dbt.current_timestamp()) }} as date) > due_date
                 and amount != payment_amount
                 then balance else 0 end) as total_amount_past_due
-    from {{ var('invoice') }} 
+    from {{ ref('stg_zuora__invoice') }} 
     where is_most_recent_record    
     {{ dbt_utils.group_by(18) if var('zuora__using_credit_balance_adjustment', true) else dbt_utils.group_by(17) }}
 ),

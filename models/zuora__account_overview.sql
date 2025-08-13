@@ -7,7 +7,7 @@ with account_enriched as (
 contact as (
 
     select *
-    from {{ var('contact') }} 
+    from {{ ref('stg_zuora__contact') }} 
     where is_most_recent_record
     and is_most_recent_account_contact 
 ),
