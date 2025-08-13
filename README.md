@@ -13,7 +13,7 @@
 </p>
 
 ## What does this dbt package do?
-- Produces modeled tables that leverage Zuora data from [Fivetran's connector](https://fivetran.com/docs/applications/zuora) in the format described by [this ERD](https://fivetran.com/docs/applications/zuora#schemainformation) and builds off the output of our [Zuora source package](https://github.com/fivetran/dbt_zuora_source).
+- Produces modeled tables that leverage Zuora data from [Fivetran's connector](https://fivetran.com/docs/applications/zuora) in the format described by [this ERD](https://fivetran.com/docs/applications/zuora#schemainformation).
 
 - Enables you to better understand your Zuora data. The package achieves this by performing the following:
     - Enhancing the balance transaction entries with useful fields from related tables 
@@ -75,9 +75,9 @@ Include the following zuora package version in your `packages.yml` file.
 ```yaml
 packages:
   - package: fivetran/zuora
-    version: [">=0.5.0", "<0.6.0"]
+    version: [">=1.0.0", "<1.1.0"]
 ```
-Do NOT include the `zuora_source` package in this file. The transformation package itself has a dependency on it and will install the source package as well.
+> All required sources and staging models are now bundled into this transformation package. Do not include `fivetran/zuora_source` in your `packages.yml` since this package has been deprecated.
 
 
 ### Step 3: Define database and schema variables
@@ -160,12 +160,10 @@ By default this, package will build the Zuora staging models within a schema tit
 
 ```yml
 models:
-  zuora:
-    +schema: my_new_schema_name # leave blank for just the target_schema
-    intermediate:
-      +schema: my_new_schema_name # leave blank for just the target_schema
-  zuora_source:
-    +schema: my_new_schema_name # leave blank for just the target_schema
+    zuora:
+      +schema: my_new_schema_name # Leave +schema: blank to use the default target_schema.
+      staging:
+        +schema: my_new_schema_name # Leave +schema: blank to use the default target_schema.
 ```
 
 #### Change the source table references
@@ -201,9 +199,6 @@ This dbt package is dependent on the following dbt packages. These dependencies 
 > IMPORTANT: If you have any of these dependent packages in your own `packages.yml` file, we highly recommend that you remove them from your root `packages.yml` to avoid package version conflicts.
 ```yml
 packages:
-    - package: fivetran/zuora_source
-      version: [">=0.2.0", "<0.3.0"]
-
     - package: fivetran/fivetran_utils
       version: [">=0.4.0", "<0.5.0"]
 

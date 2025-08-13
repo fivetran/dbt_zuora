@@ -1,21 +1,21 @@
 with subscription as (
 
     select *
-    from {{ var('subscription') }}  
+    from {{ ref('stg_zuora__subscription') }}  
     where is_most_recent_record
 ),
 
 rate_plan_charge as (
 
     select * 
-    from {{ var('rate_plan_charge') }}
+    from {{ ref('stg_zuora__rate_plan_charge') }}
     where is_most_recent_record
 ),
 
 amendment as (
 
     select *
-    from {{ var('amendment') }}
+    from {{ ref('stg_zuora__amendment') }}
     where is_most_recent_record
 ),
 

@@ -11,56 +11,56 @@ with invoice_item_enhanced as (
         cast({{ dbt.date_trunc("day", "service_start_date") }} as date) as service_start_day,
         cast({{ dbt.date_trunc("week", "service_start_date") }} as date) as service_start_week,
         cast({{ dbt.date_trunc("month", "service_start_date") }} as date) as service_start_month
-    from {{ var('invoice_item') }}
+    from {{ ref('stg_zuora__invoice_item') }}
     where is_most_recent_record 
 ),
 
 invoice as (
 
     select * 
-    from {{ var('invoice') }}
+    from {{ ref('stg_zuora__invoice') }}
     where is_most_recent_record 
 ),
 
 product as (
 
     select * 
-    from {{ var('product') }}
+    from {{ ref('stg_zuora__product') }}
     where is_most_recent_record
 ),
 
 product_rate_plan as (
 
     select * 
-    from {{ var('product_rate_plan') }} 
+    from {{ ref('stg_zuora__product_rate_plan') }} 
     where is_most_recent_record
 ),
 
 product_rate_plan_charge as (
 
     select * 
-    from {{ var('product_rate_plan_charge') }} 
+    from {{ ref('stg_zuora__product_rate_plan_charge') }} 
     where is_most_recent_record
 ), 
 
 rate_plan_charge as (
 
     select * 
-    from {{ var('rate_plan_charge') }} 
+    from {{ ref('stg_zuora__rate_plan_charge') }} 
     where is_most_recent_record
 ), 
 
 subscription as (
 
     select *
-    from {{ var('subscription') }} 
+    from {{ ref('stg_zuora__subscription') }} 
     where is_most_recent_record
 ),
 
 amendment as (
 
     select *
-    from {{ var('amendment') }} 
+    from {{ ref('stg_zuora__amendment') }} 
     where is_most_recent_record
 ),
 
@@ -70,7 +70,7 @@ taxation_item as (
     select 
         invoice_item_id,
         sum(tax_amount_home_currency) as tax_amount_home_currency
-    from {{ var('taxation_item') }}
+    from {{ ref('stg_zuora__taxation_item') }}
     where is_most_recent_record
     group by 1
 ), 
