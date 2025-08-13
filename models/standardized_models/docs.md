@@ -6,10 +6,6 @@ The source type of the invoice.
 The date the line item was created. 
 {% enddocs %}
 
-{% docs currency %}
-The currency of the line item.
-{% enddocs %}
-
 {% docs customer_city %}
 City in which the customer associated to the invoice is located.
 {% enddocs %}
@@ -70,7 +66,6 @@ The effective date of the payment.
 There are no fees in Zuora. Therefore, this will always be null.
 {% enddocs %}
 
-
 {% docs payment_id %}
 The invoice_payments payment_id.
 {% enddocs %}
@@ -81,10 +76,6 @@ Name of the payment method.
 
 {% docs payment_method_id %}
 Unique identifier of the payment method.
-{% enddocs %}
-
-{% docs product_id %}
-Unique identifier of the product.
 {% enddocs %}
 
 {% docs product_name %}
