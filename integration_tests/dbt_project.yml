@@ -8,7 +8,7 @@ models:
 
 vars:
   zuora_schema: zuora_integration_tests_4
-  zuora_source:
+  zuora:
     zuora_account_identifier: "zuora_account_data"
     zuora_amendment_identifier: "zuora_amendment_data"
     zuora_contact_identifier: "zuora_contact_data"
