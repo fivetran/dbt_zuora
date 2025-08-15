@@ -39,5 +39,6 @@ models:
       +materialized: table
     staging:
       +schema: zuora_source
+      +materialized: table
       tmp:
         +materialized: view
