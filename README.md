@@ -158,7 +158,7 @@ vars:
       alias: "coolest_field_name"
 ```
 #### Change the build schema
-By default this package will build the Zuora staging models within a schema titled (<target_schema> + _zuora_source), the Zuora intermediate models within a schema titled (<target_schema> + _zuora_int), and the Zuora final models within a schema titled (<target_schema> + _zuora) in your target database. If this is not where you would like your modeled Zuora data to be written to, add the following configuration to your dbt_project.yml file:
+By default this package will build the Zuora staging models within a schema titled (<target_schema> + `_zuora_source`), the Zuora intermediate models within a schema titled (<target_schema> + `_zuora_int`), and the Zuora final models within a schema titled (<target_schema> + `_zuora`) in your target database. If this is not where you would like your modeled Zuora data to be written to, add the following configuration to your `dbt_project.yml` file:
 
 ```yml
 models:
