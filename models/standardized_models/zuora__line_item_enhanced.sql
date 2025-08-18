@@ -3,61 +3,61 @@
 with line_items as (
 
     select * 
-    from {{ var('invoice_item')}}
+    from {{ ref('stg_zuora__invoice_item') }}
     where is_most_recent_record 
 
 ), accounts as (
 
     select * 
-    from {{ var('account') }}
+    from {{ ref('stg_zuora__account') }}
     where is_most_recent_record 
 
 ), contacts as (
 
     select * 
-    from {{ var('contact') }}
+    from {{ ref('stg_zuora__contact') }}
     where is_most_recent_record 
 
 ), invoices as (
 
     select * 
-    from {{ var('invoice') }}
+    from {{ ref('stg_zuora__invoice') }}
     where is_most_recent_record 
 
 ), invoice_payments as (
 
     select * 
-    from {{ var('invoice_payment') }}
+    from {{ ref('stg_zuora__invoice_payment') }}
     where is_most_recent_record 
 
 ), payments as (
 
     select * 
-    from {{ var('payment') }}
+    from {{ ref('stg_zuora__payment') }}
     where is_most_recent_record
 
 ), payment_methods as (
 
     select * 
-    from {{ var('payment_method') }}
+    from {{ ref('stg_zuora__payment_method') }}
     where is_most_recent_record
 
 ), products as (
 
     select * 
-    from {{ var('product') }}
+    from {{ ref('stg_zuora__product') }}
     where is_most_recent_record
 
 ), subscriptions as (
 
     select *
-    from {{ var('subscription') }} 
+    from {{ ref('stg_zuora__subscription') }} 
     where is_most_recent_record
 
 ), rate_plan as (
 
     select * 
-    from {{ var('rate_plan') }}
+    from {{ ref('stg_zuora__rate_plan') }}
     where is_most_recent_record 
 
 ), enhanced as (

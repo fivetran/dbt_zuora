@@ -1,0 +1,1274 @@
+version: 2
+sources:
+  - name: zuora
+    database: "{% if target.type != 'spark'%}{{ var ('zuora_database', target.database) }}{% endif %}"    
+    schema: "{{ var('zuora_schema', 'zuora')}}"
+  
+    loader: fivetran
+    
+    config:
+      loaded_at_field: _fivetran_synced
+
+    tables:
+      - name: account
+        identifier: "{{ var('zuora_account_identifier', 'account')}}"
+        description: "{{ doc('account_table') }}"
+        columns:
+          - name: id
+            description: "{{ doc('id') }} account table."
+          - name: _fivetran_synced
+            description: '{{ doc("_fivetran_synced") }}'
+          - name: _fivetran_deleted
+            description: '{{ doc("_fivetran_deleted") }}'
+          - name: account_number
+            description: Unique account number assigned to the account. 
+          - name: auto_pay
+            description: Indicates if future payments are automatically collected when they're due during a Payment Run.
+          - name: balance
+            description: Current outstanding balance for the account. Can be calculated by (Total Invoice Balance - Total Credit Balance)
+          - name: batch
+            description: Organizes your customer accounts into groups to optimize your billing and payment operations.
+          - name: bill_cycle_day
+            description: Day on which bill runs generate invoices for the account.
+          - name: bill_to_contact_id
+            description: "{{ doc('bill_to_contact_id') }}" 
+          - name: created_date
+            description: "{{ doc('created_date') }} the account."
+          - name: created_by_id
+            description: "{{ doc('created_by_id') }} the account."
+          - name: credit_balance
+            description: Total credit balance for the account.
+          - name: crm_id
+            description: CRM account id, used in Salesforce integration.
+          - name: currency
+            description: "{{ doc('currency') }}" 
+          - name: default_payment_method_id
+            description: "{{ doc('default_payment_method_id') }}"
+          - name: last_invoice_date
+            description: The date when the previous invoice was generated for the account. The field value is null if no invoice has ever been generated for the account.
+          - name: mrr
+            description: The amount of predictable revenue expected to be received on a monthly basis.
+          - name: name
+            description: Account name as displayed in Zuora.
+          - name: notes
+            description: Comments about the account.
+          - name: parent_account_id 
+            description: Identifier of the parent customer account for this account. Use this field if you have customer hierarchy enabled.
+          - name: payment_term 
+            description: Indicates when the customer pays for subscriptions.
+          - name: sold_to_contact_id
+            description: "{{ doc('sold_to_contact_id') }}" 
+          - name: status
+            description: Status of the account in the system.
+          - name: tax_exempt_effective_date
+            description: Date when the customer's tax exemption starts.
+          - name: tax_exempt_expiration_date
+            description: Date when the customer's tax exemption certificate expires.
+          - name: tax_exempt_status
+            description: Status of the account's tax exemption.
+          - name: total_debit_memo_balance
+            description: Total balance of the account's debit memos.
+          - name: total_invoice_balance
+            description: Total balance of the account's invoices.
+          - name: unapplied_balance
+            description: Total of unapplied payments not applied to invoices or debit memos.
+          - name: unapplied_credit_memo_amount
+            description: Total of credit memos created that has been created, but not used to settle or offset an invoice balance or a debit memo balance.
+          - name: updated_date
+            description: "{{ doc('updated_date') }} the account."
+          - name: updated_by_id
+            description: "{{ doc('updated_by_id') }} the account." 
+          - name: vatid
+            description: EU Value Added Tax id. 
+
+      - name: amendment
+        identifier: "{{ var('zuora_amendment_identifier', 'amendment')}}"
+        description: "{{ doc('amendment_table') }}"
+        columns: 
+          - name: id
+            description: "{{ doc('id') }} amendment table."
+          - name: _fivetran_synced
+            description: '{{ doc("_fivetran_synced") }}'
+          - name: _fivetran_deleted
+            description: '{{ doc("_fivetran_deleted") }}'
+          - name: auto_renew
+            description: Determines whether the subscription is automatically renewed, or whether it expires at the end of the term and needs to be manually renewed.
+          - name: booking_date
+            description: The date when the amendment is signed.
+          - name: code
+            description: A unique alphanumeric string that identifies the amendment.
+          - name: contract_effective_date
+            description: The date when the amendment's changes become effective for billing purposes.
+          - name: created_by_id
+            description: "{{ doc('created_by_id') }} the amendment."
+          - name: created_date
+            description: "{{ doc('created_date') }} the amendment."
+          - name: current_term
+            description: The length of the period for the current subscription term. 
+          - name: current_term_period_type
+            description: The period type for the current subscription term.
+          - name: customer_acceptance_date
+            description: The date when the customer accepts the amendment's changes to the subscription.
+          - name: description
+            description: A description of the amendment.
+          - name: effective_date
+            description: The date when the amendment's changes take effective. This field validates that the amendment's changes are within valid ranges of products and product rate plans.
+          - name: name
+            description: The name of the amendment.
+          - name: new_rate_plan_id
+            description: The id of the rate plan that was added to the subscription by this amendment.
+          - name: removed_rate_plan_id
+            description: The id of the rate plan that was removed from the subscription by this amendment.
+          - name: renewal_setting
+            description: Specifies whether a termed subscription will remain termed or change to evergreen when it is renewed.
+          - name: renewal_term
+            description: The term of renewal for the amended subscription.
+          - name: renewal_term_period_type
+            description: The period type for the subscription renewal term.
+          - name: resume_date
+            description: The date when the subscription resumption takes effect.
+          - name: service_activation_date
+            description: The date when service is activated.
+          - name: specific_update_date
+            description: The date when the UpdateProduct amendment takes effect.
+          - name: status
+            description: The status of the amendment.
+          - name: subscription_id
+            description: The id of the subscription that the amendment changes.
+          - name: suspend_date
+            description: The date when the subscription suspension takes effect.
+          - name: term_start_date
+            description: The date when the new terms and conditions take effect.
+          - name: term_type
+            description: Indicates if the subscription is TERMED (expiration date, must be manually renewed), EVERGREEN (doesn't have expiration date, must be manually ended).
+          - name: type
+            description: The type of amendment.
+          - name: updated_by_id
+            description: "{{ doc('updated_by_id') }} the amendment."
+          - name: updated_date
+            description: "{{ doc('updated_date') }} the amendment."
+
+      - name: contact
+        identifier: "{{ var('zuora_contact_identifier', 'contact')}}"
+        description: "{{ doc('contact_table') }}"
+        columns:
+          - name: id 
+            description: "{{ doc('id') }} contact table."
+          - name: _fivetran_synced
+            description: '{{ doc("_fivetran_synced") }}'
+          - name: _fivetran_deleted
+            description: '{{ doc("_fivetran_deleted") }}'
+          - name: account_id
+            description: The Zuora account id associated with this contact.
+          - name: address_1
+            description: The first line of the contact's address, which is often a street address or business name.
+          - name: address_2
+            description: The second line of the contact's address.
+          - name: city
+            description: The city of the contact's address.
+          - name: country
+            description: The country of the contact's address.
+          - name: created_by_id
+            description: "{{ doc('created_by_id') }} the contact."
+          - name: created_date
+            description: "{{ doc('created_date') }} the contact."
+          - name: description
+            description: A description for the contact.
+          - name: first_name
+            description: The contact's first name.
+          - name: last_name
+            description: The contact's last name.
+          - name: postal_code
+            description: The zip code for the contact's address.  
+          - name: state
+            description: The state for the contact's address.  
+          - name: updated_by_id
+            description: "{{ doc('updated_by_id') }} the contact."
+          - name: updated_date 
+            description: "{{ doc('updated_date') }} the contact."
+          - name: work_email
+            description: The contact's business email address.
+          - name: work_phone
+            description: The contact's business phone number.
+
+      - name: credit_balance_adjustment
+        identifier: "{{ var('zuora_credit_balance_adjustment_identifier', 'credit_balance_adjustment')}}"
+        description: "{{ doc('credit_balance_adjustment_table') }}"
+        columns:
+          - name: id
+            description: "{{ doc('id') }} credit balance adjustment table."
+          - name: _fivetran_synced
+            description: '{{ doc("_fivetran_synced") }}'
+          - name: _fivetran_deleted
+            description: '{{ doc("_fivetran_deleted") }}'
+          - name: account_id
+            description: The account id of the credit balance's account. Zuora generates this value from the source transaction.
+          - name: account_receivable_accounting_code_id
+            description: The accounting code ID for the account receivable account to which the adjustment was made.
+          - name: accounting_code
+            description: The accounting code for the credit balance adjustment, maps to a bank account in the accounting system.
+          - name: adjustment_date
+            description: The date when the credit balance adjustment is applied.
+          - name: amount
+            description: The amount of the credit balance adjustment.
+          - name: amount_home_currency
+            description: The amount of the adjustment in the home currency of the account. 
+          - name: bill_to_contact_id
+            description: "{{ doc('bill_to_contact_id') }}" 
+          - name: cancelled_on
+            description: Date when the credit balance adjustment was canceled.
+          - name: comment
+            description: Comments about the credit balance adjustment.
+          - name: created_by_id
+            description: "{{ doc('created_by_id') }} the credit balance adjustment."
+          - name: created_date
+            description: "{{ doc('created_date') }} the credit balance adjustment." 
+          - name: default_payment_method_id
+            description: "{{ doc('default_payment_method_id') }}"  
+          - name: exchange_rate
+            description: The exchange rate used for the adjustment. 
+          - name: exchange_rate_date
+            description: The date of the exchange rate used for the adjustment. 
+          - name: home_currency
+            description: "{{ doc('home_currency') }}"  
+          - name: invoice_id
+            description: The ID of the invoice associated with the adjustment. 
+          - name: journal_entry_id
+            description: The ID of the journal entry associated with the adjustment. 
+          - name: number
+            description: A unique identifier for the credit balance adjustment.
+          - name: parent_account_id
+            description: The ID of the parent account associated with the adjustment. 
+          - name: reason_code
+            description: The reason code for the adjustment. 
+          - name: reference_id
+            description: The reference ID for the adjustment. 
+          - name: sold_to_contact_id
+            description: "{{ doc('sold_to_contact_id') }}" 
+          - name: source_transaction_id
+            description: The id of the object that the credit balance adjustment is applied to. 
+          - name: source_transaction_number
+            description: The number of the object that the credit balance adjustment is applied to. 
+          - name: source_transaction_type
+            description: The source of the credit balance adjustment.
+          - name: status
+            description: The status of the credit balance adjustment. 
+          - name: transaction_currency
+            description: "{{ doc('transaction_currency') }}" 
+          - name: transferred_to_accounting
+            description: Indicates the status of the credit balance adjustment's transfer to an external accounting system, such as Netsuite.
+          - name: type
+            description: Specifies if the credit balance adjustment increases or decrease the amount of the credit balance.
+          - name: updated_by_id
+            description: "{{ doc('updated_by_id') }} the credit balance adjustment."
+          - name: updated_date
+            description: "{{ doc('updated_date') }} the credit balance adjustment."
+
+      - name: invoice
+        identifier: "{{ var('zuora_invoice_identifier', 'invoice')}}"
+        description: "{{ doc('invoice_table') }}"
+        columns:
+          - name: id 
+            description: "{{ doc('id') }} invoice table."
+          - name: _fivetran_synced
+            description: '{{ doc("_fivetran_synced") }}'
+          - name: _fivetran_deleted
+            description: '{{ doc("_fivetran_deleted") }}'
+          - name: account_id
+            description: The account identifier associated with the invoice.
+          - name: adjustment_amount 
+            description: The amount of the invoice adjustments associated with the invoice. 
+          - name: amount
+            description: The sum of all charges and taxes associated with the invoice.
+          - name: amount_home_currency  
+            description: The total amount of the invoice in the home currency of the customer's billing account.
+          - name: amount_without_tax
+            description: The sum of all charges associated with the invoice. Taxes are excluded from this value.
+          - name: amount_without_tax_home_currency
+            description: The amount of the invoice that is not subject to tax, in the home currency of the customer's billing account.
+          - name: auto_pay
+            description: Whether invoices are automatically picked up for processing in the corresponding payment run. 
+          - name: balance
+            description: The remaining balance of the invoice after all payments, adjustments, and refunds are applied.
+          - name: bill_to_contact_id
+            description: "{{ doc('bill_to_contact_id') }}"
+          - name: comments
+            description: Additional comments about the invoice.
+          - name: created_by_id
+            description: "{{ doc('created_by_id') }} the invoice."
+          - name: created_date 
+            description: "{{ doc('created_date') }} the invoice."
+          - name: credit_balance_adjustment_amount
+            description: The total amount of credit balance adjustments applied to the invoice.
+          - name: credit_memo_amount
+            description: The total amount of credit memos applied to the invoice.
+          - name: default_payment_method_id
+            description: "{{ doc('default_payment_method_id') }}"
+          - name: due_date
+            description: The due date of the invoice.
+          - name: exchange_rate
+            description: The exchange rate used to convert the invoice amount into the customer's billing account currency.
+          - name: exchange_rate_date
+            description: The date the exchange rate was last updated.
+          - name: home_currency
+            description: "{{ doc('home_currency') }}"  
+          - name: includes_one_time
+            description: Specifies whether the invoice includes one-time charges.
+          - name: includes_recurring
+            description: Specifies whether the invoice includes recurring charges. 
+          - name: includes_usage
+            description: Specifies whether the invoice includes usage charges.
+          - name: invoice_date
+            description: Specifies the date on which to generate the invoice.
+          - name: invoice_number
+            description: The unique identification number for the invoice.
+          - name: last_email_sent_date
+            description: The date when the invoice was last emailed.
+          - name: parent_account_id
+            description: The id of the parent account, if the invoice is associated with a parent-child account relationship.
+          - name: payment_amount
+            description: The amount of payments applied to the invoice.
+          - name: payment_term
+            description: The name of the payment term associated with the invoice.
+          - name: posted_by
+            description: The user id of the person who moved the invoice to Posted status.
+          - name: posted_date
+            description: The date when the invoice was posted.
+          - name: refund_amount
+            description: Specifies the amount of a refund that was applied against an earlier payment on the invoice.
+          - name: sold_to_contact_id
+            description: "{{ doc('sold_to_contact_id') }}" 
+          - name: source
+            description: The source of the invoice.
+          - name: source_id
+            description: The identifier of the value in the source field.
+          - name: source_type
+            description: The type of the invoice source.
+          - name: status
+            description: The status of the invoice in the system. This status is not the status of the payment of the invoice, just the status of the invoice itself.
+          - name: target_date
+            description: The date the invoice is generated.
+          - name: tax_amount
+            description: The total amount of the taxes applied to the invoice.
+          - name: tax_status
+            description: The status of tax calculation related to the invoice.
+          - name: transaction_currency
+            description: The currency in which the invoice is billed.
+          - name: transferred_to_accounting
+            description: Indicates whether the invoice has been transferred to the accounting system.
+          - name: updated_by_id
+            description: "{{ doc('updated_by_id') }} the invoice."
+          - name: updated_date 
+            description: "{{ doc('updated_date') }} the invoice."
+
+      - name: invoice_item
+        identifier: "{{ var('zuora_invoice_item_identifier', 'invoice_item')}}"
+        description: "{{ doc('invoice_item_table') }}"
+        columns:
+          - name: id 
+            description: "{{ doc('id') }} invoice item table."
+          - name: _fivetran_synced
+            description: '{{ doc("_fivetran_synced") }}'
+          - name: _fivetran_deleted
+            description: '{{ doc("_fivetran_deleted") }}'
+          - name: account_id
+            description: id of the account associated with this invoice item.
+          - name: account_receivable_accounting_code_id
+            description: id of the accounting code for the account receivable account for this invoice item.
+          - name: accounting_code
+            description: Accounting code for the invoice item.
+          - name: amendment_id
+            description: id of the amendment associated with this invoice item.
+          - name: applied_to_invoice_item_id
+            description: id of the invoice item that this invoice item is applied to.
+          - name: balance
+            description: Balance of the invoice item.
+          - name: bill_to_contact_id
+            description: id of the contact to whom the invoice item is billed.
+          - name: charge_amount
+            description: Amount charged for the invoice item.
+          - name: charge_amount_home_currency
+            description: Amount charged for the invoice item in the home currency.
+          - name: charge_date
+            description: Date on which the charge for the invoice item was made.
+          - name: charge_name
+            description: Name of the charge associated with this invoice item.
+          - name: created_by_id
+            description: id of the user who created this invoice item.
+          - name: created_date
+            description: Date on which the invoice item was created.
+          - name: deferred_revenue_accounting_code_id
+            description: id of the accounting code for the deferred revenue account for this invoice item.
+          - name: exchange_rate
+            description: Exchange rate for the invoice item.
+          - name: exchange_rate_date
+            description: Date of the exchange rate for the invoice item.
+          - name: home_currency
+            description: Currency used for the invoice item in the home currency.
+          - name: invoice_id
+            description: id of the invoice associated with this invoice item.
+          - name: journal_entry_id
+            description: id of the journal entry associated with this invoice item.
+          - name: parent_account_id
+            description: id of the parent account associated with this invoice item.
+          - name: processing_type
+            description: Type of processing for the invoice item.
+          - name: product_id
+            description: id of the product associated with this invoice item.
+          - name: product_rate_plan_charge_id
+            description: id of the product rate plan charge associated with this invoice item.
+          - name: product_rate_plan_id
+            description: id of the product rate plan associated with this invoice item.
+          - name: quantity
+            description: Quantity associated with the invoice item.
+          - name: rate_plan_charge_id
+            description: id of the rate plan charge associated with this invoice item.
+          - name: rate_plan_id
+            description: id of the rate plan associated with this invoice item.
+          - name: recognized_revenue_accounting_code_id
+            description: id of the accounting code for the recognized revenue account for this invoice item.
+          - name: rev_rec_start_date
+            description: Date on which revenue recognition starts for the invoice item.
+          - name: service_end_date
+            description: End date of the service associated with the invoice item.
+          - name: service_start_date
+            description: Start date of the service associated with the invoice item.
+          - name: sku
+            description: SKU of the invoice item.
+          - name: sold_to_contact_id
+            description: The id of the contact to whom the product or service was sold.
+          - name: source_item_type
+            description: The type of the source item that created the invoice item.
+          - name: subscription_id
+            description: The id of the subscription associated with the invoice item.
+          - name: tax_amount
+            description: The tax amount for the invoice item.
+          - name: tax_mode
+            description: The tax mode for the invoice item.
+          - name: transaction_currency
+            description: The transaction currency for the invoice item.
+          - name: unit_price
+            description: The unit price for the invoice item.
+          - name: uom
+            description: The unit of measure for the invoice item.
+          - name: updated_by_id
+            description: The id of the user who last updated the invoice item.
+          - name: updated_date
+            description: The date and time when the invoice item was last updated.
+
+      - name: invoice_payment
+        identifier: "{{ var('zuora_invoice_payment_identifier', 'invoice_payment')}}"
+        description: invoice payment details
+        columns:
+          - name: id 
+            description: "{{ doc('id') }} invoice item table."
+          - name: _fivetran_synced
+            description: '{{ doc("_fivetran_synced") }}'
+          - name: _fivetran_deleted
+            description: '{{ doc("_fivetran_deleted") }}'
+          - name: account_id        
+            description: The id of the customer account that the invoice payment is associated with.
+          - name: account_receivable_accounting_code_id
+            description: The id of the accounting code for the account receivable account.
+          - name: accounting_period_id
+            description: The id of the accounting period associated with the invoice payment.
+          - name: amount
+            description: The amount of the invoice payment.
+          - name: amount_currency_rounding
+            description: The amount of the invoice payment after rounding to the nearest currency unit.
+          - name: amount_home_currency
+            description: The amount of the invoice payment in the home currency of the customer account.
+          - name: bill_to_contact_id
+            description: The id of the contact associated with the billing address for the invoice payment.
+          - name: cash_accounting_code_id
+            description: The id of the accounting code for the cash account.
+          - name: created_by_id
+            description: The id of the user who created the invoice payment.
+          - name: created_date
+            description: The date and time when the invoice payment was created.
+          - name: default_payment_method_id
+            description: The id of the default payment method for the customer account.
+          - name: exchange_rate
+            description: The exchange rate used to convert the transaction currency of the invoice payment to the home currency of the customer account.
+          - name: exchange_rate_date
+            description: The date of the exchange rate used to convert the transaction currency of the invoice payment to the home currency of the customer account.
+          - name: home_currency
+            description: The home currency of the customer account.
+          - name: invoice_id
+            description: The id of the invoice associated with the invoice payment.
+          - name: journal_entry_id
+            description: The id of the journal entry created for the invoice payment.
+          - name: journal_run_id
+            description: The id of the journal run associated with the invoice payment.
+          - name: parent_account_id
+            description: The id of the parent account for the customer account associated with the invoice payment.
+          - name: payment_id
+            description: The id of the payment associated with the invoice payment.
+          - name: payment_method_id
+            description: The id of the payment method used for the invoice payment.
+          - name: provider_exchange_rate_date
+            description: The date of the exchange rate used by the payment provider to convert the transaction currency of the invoice payment to the currency of the payment provider.
+          - name: refund_amount
+            description: The amount of the refund applied to the invoice payment.
+          - name: sold_to_contact_id
+            description: The id of the contact associated with the shipping address for the invoice payment.
+          - name: transaction_currency
+            description: The currency of the invoice payment.
+          - name: updated_by_id
+            description: The id of the user who last updated the invoice payment.
+          - name: updated_date
+            description: The date and time when the invoice payment was last updated. 
+
+      - name: order
+        identifier: >
+          {% if target.type == 'snowflake' %}{{ var('zuora_order_identifier', '"ORDER"') }}
+          {% else %}{{ var('zuora_order_identifier', 'order') }}{% endif %}
+        description: "{{ doc('order_table') }}"
+        columns:
+          - name: id
+            description: "{{ doc('id') }} order table."
+          - name: _fivetran_synced
+            description: '{{ doc("_fivetran_synced") }}'
+          - name: _fivetran_deleted
+            description: '{{ doc("_fivetran_deleted") }}'   
+          - name: account_id
+            description: The id of the account associated with this order.
+          - name: bill_to_contact_id
+            description: The id of the contact associated with the billing address for this order.
+          - name: category
+            description: The category of the order, such as NewSubscription or Amendment.
+          - name: created_by_id
+            description: The id of the user who created this order.
+          - name: created_date
+            description: The date and time when this order was created.
+          - name: default_payment_method_id
+            description: The id of the default payment method used for this order.
+          - name: description
+            description: A brief description of this order.
+          - name: error_code
+            description: The error code associated with this order, if any.
+          - name: error_message
+            description: The error message associated with this order, if any.
+          - name: order_date
+            description: The date and time when this order was placed.
+          - name: order_number
+            description: The unique identifier for this order.
+          - name: response
+            description: The response associated with this order, if any.
+          - name: scheduled_date
+            description: The date and time when this order is scheduled to be processed.
+          - name: sold_to_contact_id
+            description: The id of the contact associated with the shipping address for this order.
+          - name: state
+            description: The state of this order, such as Draft or Processing.
+          - name: status
+            description: The status of this order, such as Pending or Completed.
+          - name: updated_by_id
+            description: The id of the user who last updated this order.
+          - name: updated_date
+            description: The date and time when this order was last updated.
+
+      - name: payment
+        identifier: "{{ var('zuora_payment_identifier', 'payment')}}"
+        description: "{{ doc('payment_table') }}"
+        columns:
+          - name: id
+            description: The unique identifier of the payment.
+          - name: _fivetran_synced
+            description: '{{ doc("_fivetran_synced") }}'
+          - name: _fivetran_deleted
+            description: '{{ doc("_fivetran_deleted") }}'
+          - name: account_id
+            description: The id of the Zuora account associated with the payment.
+          - name: accounting_code
+            description: The accounting code associated with the payment.
+          - name: amount
+            description: The amount of the payment in the transaction currency.
+          - name: amount_home_currency
+            description: The amount of the payment in the home currency.
+          - name: applied_amount
+            description: The amount of the payment that has been applied to one or more invoices.
+          - name: applied_credit_balance_amount
+            description: The amount of the payment that has been applied to a credit balance.
+          - name: bill_to_contact_id
+            description: The id of the contact to which the payment should be billed.
+          - name: cancelled_on
+            description: The date the payment was cancelled.
+          - name: comment
+            description: A comment associated with the payment.
+          - name: created_by_id
+            description: The id of the user who created the payment.
+          - name: created_date
+            description: The date the payment was created.
+          - name: currency
+            description: The currency of the payment.
+          - name: effective_date
+            description: The date the payment will be effective.
+          - name: exchange_rate
+            description: The exchange rate used to convert the payment amount from the transaction currency to the home currency.
+          - name: exchange_rate_date
+            description: The date the exchange rate was set.
+          - name: home_currency
+            description: The home currency of the payment.
+          - name: parent_account_id
+            description: The id of the parent account associated with the payment.
+          - name: payment_method_id
+            description: The id of the payment method used for the payment.
+          - name: payment_number
+            description: The payment number assigned by Zuora.
+          - name: refund_amount
+            description: The amount of the payment that has been refunded.
+          - name: settled_on
+            description: The date the payment was settled.
+          - name: sold_to_contact_id
+            description: The id of the contact who made the payment.
+          - name: status
+            description: The status of the payment.
+          - name: submitted_on
+            description: The date the payment was submitted.
+          - name: transaction_currency
+            description: The transaction currency of the payment.
+          - name: transferred_to_accounting
+            description: Whether the payment has been transferred to the accounting system.
+          - name: type
+            description: The type of the payment.
+          - name: unapplied_amount
+            description: The amount of the payment that has not yet been applied.
+          - name: updated_by_id
+            description: The id of the user who last updated the payment.
+          - name: updated_date
+            description: The date the payment was last updated.
+
+      - name: payment_method
+        identifier: "{{ var('zuora_payment_method_identifier', 'payment_method')}}"
+        description: "{{ doc('payment_method_table') }}"
+        columns:
+          - name: id
+            description: The unique identifier of the payment method.
+          - name: _fivetran_synced
+            description: '{{ doc("_fivetran_synced") }}'
+          - name: _fivetran_deleted
+            description: '{{ doc("_fivetran_deleted") }}'   
+          - name: account_id
+            description: The unique identifier of the account associated with this payment method.
+          - name: ach_account_type
+            description: The account type for ACH payment methods.
+          - name: active
+            description: A Boolean value indicating whether this payment method is active.
+          - name: bank_transfer_account_type
+            description: The account type for bank transfer payment methods.
+          - name: created_by_id
+            description: The unique identifier of the user who created this payment method.
+          - name: created_date
+            description: The date and time when this payment method was created.
+          - name: credit_card_type
+            description: The credit card type for credit card payment methods.
+          - name: last_failed_sale_transaction_date
+            description: The date and time when the last sale transaction failed for this payment method.
+          - name: last_transaction_date_time
+            description: The date and time of the last transaction for this payment method.
+          - name: last_transaction_status
+            description: The status of the last transaction for this payment method.
+          - name: max_consecutive_payment_failures
+            description: The maximum number of consecutive payment failures allowed for this payment method.
+          - name: name
+            description: The name of the payment method.
+          - name: num_consecutive_failures
+            description: The number of consecutive payment failures for this payment method.
+          - name: payment_method_status
+            description: The status of the payment method.
+          - name: paypal_type
+            description: The PayPal account type for PayPal payment methods.
+          - name: sub_type
+            description: The sub-type of the payment method.
+          - name: total_number_of_error_payments
+            description: The total number of error payments for this payment method.
+          - name: total_number_of_processed_payments
+            description: The total number of processed payments for this payment method.
+          - name: type
+            description: The type of the payment method.
+          - name: updated_by_id
+            description: The unique identifier of the user who last updated this payment method.
+          - name: updated_date
+            description: The date and time when this payment method was last updated.
+
+      - name: product
+        identifier: "{{ var('zuora_product_identifier', 'product')}}"
+        description: "{{ doc('product_table') }}"
+        columns:
+          - name: id
+            description: The unique identifier for the product.
+          - name: category
+            description: The category of the product.
+          - name: created_by_id
+            description: The id of the user who created the product.
+          - name: created_date
+            description: The date and time when the product was created.
+          - name: description
+            description: A description of the product.
+          - name: effective_end_date
+            description: The date when the product is no longer available for purchase.
+          - name: effective_start_date
+            description: The date when the product becomes available for purchase.
+          - name: name
+            description: The name of the product.
+          - name: sku
+            description: The SKU (stock keeping unit) of the product.
+          - name: updated_by_id
+            description: The id of the user who last updated the product.
+          - name: updated_date
+            description: The date and time when the product was last updated.
+          - name: _fivetran_deleted
+            description: '{{ doc("_fivetran_deleted") }}'
+    
+      - name: product_rate_plan
+        identifier: "{{ var('zuora_product_rate_plan_identifier', 'product_rate_plan')}}"
+        description: "{{ doc('product_rate_plan_table') }}"
+        columns:
+          - name: id
+            description: Unique identifier of the product rate plan.
+          - name: _fivetran_synced
+            description: '{{ doc("_fivetran_synced") }}'
+          - name: _fivetran_deleted
+            description: '{{ doc("_fivetran_deleted") }}'   
+          - name: created_by_id
+            description: The id of the Zuora user who created the product rate plan.
+          - name: created_date
+            description: The date and time when the product rate plan was created.
+          - name: description
+            description: A brief description of the product rate plan.
+          - name: effective_end_date
+            description: The date when the product rate plan will no longer be effective.
+          - name: effective_start_date
+            description: The date when the product rate plan becomes effective.
+          - name: name
+            description: The name of the product rate plan.
+          - name: product_id
+            description: The id of the product that this rate plan belongs to.
+          - name: updated_by_id
+            description: The id of the Zuora user who last updated the product rate plan.
+          - name: updated_date
+            description: The date and time when the product rate plan was last updated.
+
+      - name: product_rate_plan_charge
+        identifier: "{{ var('zuora_product_rate_plan_charge_identifier', 'product_rate_plan_charge')}}"
+        description: "{{ doc('product_rate_plan_charge_table') }}"
+        columns:
+          - name: id
+            description: Unique identifier of the product rate plan charge.
+          - name: _fivetran_synced
+            description: '{{ doc("_fivetran_synced") }}'
+          - name: _fivetran_deleted
+            description: '{{ doc("_fivetran_deleted") }}'             
+          - name: account_receivable_accounting_code_id
+            description: The id of the accounting code for the accounts receivable account.
+          - name: accounting_code
+            description: The accounting code for the charge.
+          - name: apply_discount_to
+            description: The type of charge to which discounts apply.
+          - name: bill_cycle_day
+            description: The day of the bill cycle on which the charge should be billed.
+          - name: bill_cycle_type
+            description: The type of bill cycle for the charge.
+          - name: billing_period
+            description: The billing period for the charge.
+          - name: charge_model
+            description: The charge model for the charge.
+          - name: charge_type
+            description: The type of charge.
+          - name: created_by_id
+            description: The id of the user who created the charge.
+          - name: created_date
+            description: The date on which the charge was created.
+          - name: default_quantity
+            description: The default quantity for the charge.
+          - name: deferred_revenue_accounting_code_id
+            description: The id of the accounting code for deferred revenue.
+          - name: description
+            description: A description of the charge.
+          - name: discount_class_id
+            description: The id of the discount class for the charge.
+          - name: discount_level
+            description: The level at which the discount is applied.
+          - name: end_date_condition
+            description: The condition that determines when the charge ends.
+          - name: exclude_item_billing_from_revenue_accounting
+            description: Indicates whether the charge should be excluded from revenue accounting.
+          - name: exclude_item_booking_from_revenue_accounting
+            description: Indicates whether the charge should be excluded from booking revenue accounting.
+          - name: included_units
+            description: The number of units included in the charge.
+          - name: is_stacked_discount
+            description: Indicates whether the discount is a stacked discount. Values are true or false.
+          - name: list_price_base
+            description: The price used to calculate the charge.
+          - name: max_quantity
+            description: The maximum number of units allowed for this charge.
+          - name: min_quantity
+            description: The minimum number of units required for this charge.
+          - name: name
+            description: The name of the product rate plan charge.
+          - name: product_id
+            description: The unique identifier of the product associated with the product rate plan charge.
+          - name: product_rate_plan_id
+            description: The unique identifier of the product rate plan associated with the product rate plan charge.
+          - name: specific_billing_period
+            description: The billing period for this product rate plan charge. Values are DAY, WEEK, MONTH, and YEAR.
+          - name: tax_mode
+            description: Indicates how the charge is taxed. Values are TAXABLE, NON-TAXABLE, and TAXED_INCLUSIVE.
+          - name: taxable
+            description: Indicates whether the charge is taxable. Values are true or false.
+          - name: trigger_event
+            description: The event that triggers the charge. Values are SERVICE_ACTIVATION, CONTRACT_EFFECTIVE, CUSTOMER_ACCEPTANCE, or SERVICE_USAGE.
+          - name: uom
+            description: The unit of measure for the charge.
+          - name: up_to_periods
+            description: The maximum number of billing periods allowed for this charge.
+          - name: up_to_periods_type
+            description: The billing period type for the up to periods setting. Values are DAY, WEEK, MONTH, and YEAR.
+          - name: updated_by_id
+            description: The unique identifier of the user who last updated the product rate plan charge.
+          - name: updated_date
+            description: The date and time when the product rate plan charge was last updated.
+          - name: use_discount_specific_accounting_code
+            description: Indicates whether the discount uses a specific accounting code. Values are true or false.
+          - name: weekly_bill_cycle_day
+            description: The day of the week when the bill cycle starts for a weekly billing period. Values are MON, TUE, WED, THU, FRI, SAT, and SUN.
+
+      - name: rate_plan
+        identifier: "{{ var('zuora_rate_plan_identifier', 'rate_plan')}}"
+        description: "{{ doc('rate_plan_table') }}"
+        columns:
+          - name: id
+            description: The unique identifier of the rate plan.
+          - name: _fivetran_synced
+            description: '{{ doc("_fivetran_synced") }}'
+          - name: _fivetran_deleted
+            description: '{{ doc("_fivetran_deleted") }}'   
+          - name: account_id
+            description: The unique identifier of the account that the rate plan belongs to.
+          - name: amendment_id
+            description: The unique identifier of the amendment that the rate plan belongs to.
+          - name: bill_to_contact_id
+            description: The unique identifier of the contact that the rate plan is billed to.
+          - name: created_by_id
+            description: The unique identifier of the user who created the rate plan.
+          - name: created_date
+            description: The date and time when the rate plan was created.
+          - name: default_payment_method_id
+            description: The unique identifier of the default payment method for the rate plan.
+          - name: name
+            description: The name of the rate plan.
+          - name: original_rate_plan_id
+            description: The unique identifier of the original rate plan that was used to create the rate plan.
+          - name: product_id
+            description: The unique identifier of the product that the rate plan belongs to.
+          - name: product_rate_plan_id
+            description: The unique identifier of the product rate plan that the rate plan belongs to.
+          - name: sold_to_contact_id
+            description: The unique identifier of the contact that the rate plan is sold to.
+          - name: subscription_id
+            description: The unique identifier of the subscription that the rate plan belongs to.
+          - name: updated_by_id
+            description: The unique identifier of the user who last updated the rate plan.
+          - name: updated_date
+            description: The date and time when the rate plan was last updated.
+
+      - name: rate_plan_charge
+        identifier: "{{ var('zuora_rate_plan_charge_identifier', 'rate_plan_charge')}}"
+        description: "{{ doc('rate_plan_charge_table') }}"
+        columns:
+          - name: id
+            description: The unique identifier for the rate plan charge.
+          - name: _fivetran_synced
+            description: '{{ doc("_fivetran_synced") }}'
+          - name: _fivetran_deleted
+            description: '{{ doc("_fivetran_deleted") }}'   
+          - name: account_id
+            description: The unique identifier of the account associated with the rate plan charge.
+          - name: account_receivable_accounting_code_id
+            description: The unique identifier for the accounting code that represents the account receivable for this charge.
+          - name: accounting_code
+            description: The accounting code associated with this charge.
+          - name: amended_by_order_on
+            description: The date when the amendment order was created or processed.
+          - name: amendment_id
+            description: The unique identifier for the amendment associated with this rate plan charge.
+          - name: apply_discount_to
+            description: The type of discount that is applied to the charge.
+          - name: bill_cycle_day
+            description: The day of the month when the billing cycle for the charge ends.
+          - name: bill_cycle_type
+            description: The type of billing cycle that the charge uses.
+          - name: bill_to_contact_id
+            description: The unique identifier of the contact associated with the account's billing information.
+          - name: bill_to_contact_snapshot_id
+            description: The unique identifier for the snapshot of the bill-to contact information that was used when the charge was created.
+          - name: billing_period
+            description: The billing period for the charge.
+          - name: billing_timing
+            description: The timing of the charge.
+          - name: booking_exchange_rate
+            description: The exchange rate for the charge when it was booked.
+          - name: booking_exchange_rate_date
+            description: The date on which the exchange rate for the charge when it was booked was determined.
+          - name: charge_model
+            description: The model used to calculate the charge.
+          - name: charge_number
+            description: The number of the charge within the subscription.
+          - name: charge_type
+            description: The type of charge.
+          - name: charged_through_date
+            description: The date through which the charge has been charged.
+          - name: created_by_id
+            description: The unique identifier of the user who created the rate plan charge.
+          - name: created_date
+            description: The date and time when the rate plan charge was created.
+          - name: credit_option
+            description: The option used to calculate the credit for the charge.
+          - name: default_payment_method_id
+            description: The unique identifier of the default payment method for the account.
+          - name: deferred_revenue_accounting_code_id
+            description: The unique identifier for the accounting code that represents the deferred revenue for this charge.
+          - name: description
+            description: The description of the rate plan charge.
+          - name: discount_level
+            description: The level of the discount applied to the charge.
+          - name: dmrc
+            description: The amount of the charge in the charge currency.
+          - name: dmrchome_currency
+            description: The amount of the charge in the home currency of the company.
+          - name: dtcv
+            description: The deferred tax calculated value of the rate plan charge.
+          - name: dtcvhome_currency
+            description: The deferred tax calculated value of the rate plan charge in the home currency.
+          - name: effective_end_date
+            description: The date on which the rate plan charge is no longer in effect.
+          - name: effective_start_date
+            description: The date on which the rate plan charge goes into effect.
+          - name: end_date_condition
+            description: The condition that triggers the end date of the rate plan charge.
+          - name: exchange_rate
+            description: The exchange rate used for the rate plan charge.
+          - name: exchange_rate_date
+            description: The date on which the exchange rate was determined.
+          - name: home_currency
+            description: "{{ doc('home_currency') }}"
+          - name: is_prepaid
+            description: A boolean value indicating whether the rate plan charge is prepaid.
+          - name: is_processed
+            description: A boolean value indicating whether the rate plan charge has been processed.
+          - name: mrr
+            description: The monthly recurring revenue of the rate plan charge.
+          - name: mrrhome_currency
+            description: The monthly recurring revenue of the rate plan charge in the home currency.
+          - name: name
+            description: The name of the rate plan charge.
+          - name: number_of_periods
+            description: The number of billing periods for the rate plan charge.
+          - name: original_id
+            description: The original id of the rate plan charge.
+          - name: original_order_date
+            description: The date on which the original order was placed.
+          - name: price_change_option
+            description: The option selected for handling price changes for the rate plan charge.
+          - name: price_increase_percentage
+            description: The percentage increase applied to the rate plan charge price.
+          - name: processed_through_date
+            description: The date through which the rate plan charge has been processed.
+          - name: product_id
+            description: The unique identifier of the product associated with the rate plan charge.
+          - name: product_rate_plan_charge_id
+            description: The unique identifier of the product rate plan charge associated with the rate plan charge.
+          - name: product_rate_plan_id
+            description: The unique identifier of the product rate plan associated with the rate plan charge.
+          - name: quantity
+            description: The quantity associated with the rate plan charge.
+          - name: rate_plan_id
+            description: The unique identifier of the rate plan associated with the rate plan charge.
+          - name: recognized_revenue_accounting_code_id
+            description: The unique identifier of the accounting code associated with recognized revenue for the rate plan charge.
+          - name: segment
+            description: The segment associated with the rate plan charge.
+          - name: sold_to_contact_id
+            description: The unique identifier of the contact associated with the sold-to account.
+          - name: specific_billing_period
+            description: The specific billing period associated with the rate plan charge.
+          - name: specific_end_date
+            description: The specific end date associated with the rate plan charge.
+          - name: specific_list_price_base
+            description: The list price base for the rate plan charge.
+          - name: subscription_id
+            description: The id of the subscription associated with the rate plan charge.
+          - name: tcv
+            description: The total contract value for the rate plan charge.
+          - name: tcvhome_currency
+            description: The home currency value of the Total Contract Value.
+          - name: transaction_currency
+            description: The currency in which the transaction occurs.
+          - name: trigger_date
+            description: The date on which the trigger event occurs.
+          - name: trigger_event
+            description: The type of trigger event that is associated with the rate plan charge.
+          - name: uom
+            description: The unit of measure for the quantity of the rate plan charge.
+          - name: up_to_periods
+            description: The maximum number of billing periods for which the charge is applicable.
+          - name: up_to_periods_type
+            description: The time unit that is used to calculate the maximum number of billing periods for which the charge is applicable.
+          - name: updated_by_id
+            description: The id of the user who last updated the rate plan charge.
+          - name: updated_date
+            description: The date and time when the rate plan charge was last updated.
+          - name: version
+            description: The version number of the rate plan charge.
+          - name: weekly_bill_cycle_day
+            description: The day of the week on which the bill cycle starts.
+
+      - name: refund
+        identifier: "{{ var('zuora_refund_identifier', 'refund')}}"
+        description: "{{ doc('refund_table') }}"
+        columns:
+          - name: id
+            description: The unique identifier of the refund object.
+          - name: _fivetran_synced
+            description: '{{ doc("_fivetran_synced") }}'
+          - name: _fivetran_deleted
+            description: '{{ doc("_fivetran_deleted") }}' 
+          - name: accounting_code
+            description: The accounting code associated with the refund.
+          - name: amount
+            description: The amount of the refund.
+          - name: cancelled_on
+            description: The date and time when the refund was cancelled.
+          - name: comment
+            description: A comment about the refund.
+          - name: created_by_id
+            description: The id of the user who created the refund.
+          - name: created_date
+            description: The date and time when the refund was created.
+          - name: method_type
+            description: The type of the refund method.
+          - name: payment_method_id
+            description: The id of the payment method used for the refund.
+          - name: refund_date
+            description: The date when the refund was processed.
+          - name: refund_number
+            description: The refund number associated with the refund.
+          - name: refund_transaction_time
+            description: The date and time when the refund transaction was processed.
+          - name: settled_on
+            description: The date and time when the refund was settled.
+          - name: source_type
+            description: The type of the refund source.
+          - name: status
+            description: The status of the refund.
+          - name: submitted_on
+            description: The date and time when the refund was submitted.
+          - name: transferred_to_accounting
+            description: A flag that indicates whether the refund was transferred to the accounting system.
+          - name: type
+            description: The type of the refund.
+          - name: updated_by_id
+            description: The id of the user who last updated the refund.
+          - name: updated_date
+            description: The date and time when the refund was last updated.
+
+      - name: refund_invoice_payment
+        identifier: "{{ var('zuora_refund_invoice_payment_identifier', 'refund_invoice_payment')}}"
+        description: refund invoice payment details
+        columns:
+          - name: id
+            description: The id of the refund invoice payment in Zuora.
+          - name: _fivetran_synced 
+            description: '{{ doc("_fivetran_synced") }}' 
+          - name: _fivetran_deleted
+            description: '{{ doc("_fivetran_deleted") }}'
+          - name: created_by_id
+            description: The id of the user who created the refund invoice payment in Zuora.
+          - name: created_date
+            description: The date and time when the refund invoice payment was created in Zuora.
+          - name: refund_amount
+            description: The amount of the refund invoice payment in the currency of the invoice.
+          - name: updated_by_id
+            description: The id of the user who last updated the refund invoice payment in Zuora.
+          - name: updated_date
+            description: The date and time when the refund invoice payment was last updated in Zuora.
+
+      - name: subscription
+        identifier: "{{ var('zuora_subscription_identifier', 'subscription')}}"
+        description: "{{ doc('subscription_table') }}"
+        columns:
+          - name: id
+            description: The unique identifier for the subscription.
+          - name: _fivetran_synced
+            description: '{{ doc("_fivetran_synced") }}'
+          - name: _fivetran_deleted
+            description: '{{ doc("_fivetran_deleted") }}' 
+          - name: account_id
+            description: The unique identifier for the account associated with the subscription.
+          - name: auto_renew
+            description: Indicates whether the subscription is set to automatically renew at the end of the term.
+          - name: bill_to_contact_id
+            description: The unique identifier for the contact that will be billed for the subscription.
+          - name: cancel_reason
+            description: The reason for cancelling the subscription, if applicable.
+          - name: cancelled_date
+            description: The date on which the subscription was cancelled, if applicable.
+          - name: contract_acceptance_date
+            description: The date on which the contract was accepted by the customer.
+          - name: contract_effective_date
+            description: The date on which the contract became effective.
+          - name: created_by_id
+            description: The unique identifier for the user who created the subscription.
+          - name: created_date
+            description: The date on which the subscription was created.
+          - name: current_term
+            description: The length of the current subscription term.
+          - name: current_term_period_type
+            description: The unit of time for the current subscription term (e.g. "Month", "Year").
+          - name: default_payment_method_id
+            description: The unique identifier for the default payment method associated with the subscription.
+          - name: externally_managed_by
+            description: Indicates whether the subscription is externally managed by another system or platform.
+          - name: initial_term
+            description: The length of the initial subscription term.
+          - name: initial_term_period_type
+            description: The unit of time for the initial subscription term (e.g. "Month", "Year").
+          - name: invoice_owner_id
+            description: The unique identifier for the user who will receive invoice notifications for the subscription.
+          - name: is_invoice_separate
+            description: Indicates whether the subscription is invoiced separately from other subscriptions on the same account.
+          - name: is_latest_version
+            description: Indicates whether the subscription is the latest version of the subscription on the account.
+          - name: last_booking_date
+            description: The date on which the most recent booking was created for the subscription.
+          - name: name
+            description: The name of the subscription.
+          - name: notes
+            description: Additional notes or comments about the subscription.
+          - name: original_created_date
+            description: The date on which the original subscription was created, if the current subscription is a renewal.
+          - name: original_id
+            description: The unique identifier for the original subscription, if the current subscription is a renewal.
+          - name: parent_account_id
+            description: The unique identifier for the parent account associated with the subscription.
+          - name: payment_term
+            description: The payment term associated with the subscription.
+          - name: previous_subscription_id
+            description: The unique identifier for the previous subscription associated with the subscription.
+          - name: renewal_term
+            description: The length of the renewal subscription term.
+          - name: renewal_term_period_type
+            description: The type of the renewal term for the subscription.
+          - name: revision
+            description: The revision number for the subscription.
+          - name: service_activation_date
+            description: The date the subscription was activated.
+          - name: sold_to_contact_id
+            description: The unique identifier for the sold-to contact associated with the subscription.
+          - name: status
+            description: The status of the subscription.
+          - name: subscription_end_date
+            description: The end date of the subscription.
+          - name: subscription_start_date
+            description: The start date of the subscription.
+          - name: term_end_date
+            description: The end date of the subscription term.
+          - name: term_start_date
+            description: The start date of the subscription term.
+          - name: term_type
+            description: The type of subscription term.
+          - name: updated_by_id
+            description: The unique identifier of the user who last updated the subscription.
+          - name: updated_date
+            description: The date the subscription was last updated.
+          - name: version
+            description: The version number of the subscription.
+
+      - name: taxation_item
+        identifier: "{{ var('zuora_taxation_item_identifier', 'taxation_item')}}"
+        description: "{{ doc('taxation_item_table') }}"
+        columns:
+          - name: id
+            description: The unique identifier of the taxation item.
+          - name: _fivetran_synced
+            description: '{{ doc("_fivetran_synced") }}'
+          - name: _fivetran_deleted
+            description: '{{ doc("_fivetran_deleted") }}' 
+          - name: account_id
+            description: The id of the account associated with the taxation item.
+          - name: account_receivable_accounting_code_id
+            description: The id of the accounting code for the account receivable.
+          - name: accounting_code
+            description: The accounting code associated with the taxation item.
+          - name: amendment_id
+            description: The id of the amendment associated with the taxation item.
+          - name: balance
+            description: The balance of the taxation item.
+          - name: bill_to_contact_id
+            description: The id of the contact associated with the billing of the taxation item.
+          - name: created_by_id
+            description: The id of the user who created the taxation item.
+          - name: created_date
+            description: The date when the taxation item was created.
+          - name: credit_amount
+            description: The credit amount of the taxation item.
+          - name: exchange_rate
+            description: The exchange rate of the taxation item.
+          - name: exchange_rate_date
+            description: The date of the exchange rate of the taxation item.
+          - name: exempt_amount
+            description: The exempt amount of the taxation item.
+          - name: exempt_amount_home_currency
+            description: The exempt amount in home currency of the taxation item.
+          - name: home_currency
+            description: The home currency of the taxation item.
+          - name: invoice_id
+            description: The id of the invoice associated with the taxation item.
+          - name: invoice_item_id
+            description: The id of the invoice item associated with the taxation item.
+          - name: journal_entry_id
+            description: The id of the journal entry associated with the taxation item.
+          - name: name
+            description: The name of the taxation item.
+          - name: payment_amount
+            description: The payment amount of the taxation item.
+          - name: product_id
+            description: The id of the product associated with the taxation item.
+          - name: product_rate_plan_charge_id
+            description: The id of the product rate plan charge associated with the taxation item.
+          - name: product_rate_plan_id
+            description: The id of the product rate plan associated with the taxation item.
+          - name: rate_plan_charge_id
+            description: The id of the rate plan charge associated with the taxation item.
+          - name: rate_plan_id
+            description: The id of the rate plan associated with the taxation item.
+          - name: sales_tax_payable_accounting_code_id
+            description: The id of the accounting code for the sales tax payable.
+          - name: sold_to_contact_id
+            description: The id of the contact associated with the sale of the taxation item.
+          - name: subscription_id
+            description: The id of the subscription associated with the taxation item.
+          - name: tax_amount
+            description: The tax amount of the taxation item.
+          - name: tax_amount_home_currency
+            description: The tax amount in home currency of the taxation item.
+          - name: tax_date
+            description: The date of the tax of the taxation item.
+          - name: tax_description
+            description: The description of the tax of the taxation item.
+          - name: tax_mode
+            description: The tax mode of the taxation item.
+          - name: tax_rate
+            description: The tax rate of the taxation item.
+          - name: tax_rate_type
+            description: The type of tax rate that applies to the taxation item.
+          - name: transaction_currency
+            description: The currency in which the transaction was processed.
+          - name: updated_by_id
+            description: The id of the user who last updated the taxation item.
+          - name: updated_date
+            description: The date and time the taxation item was last updated.
+
+

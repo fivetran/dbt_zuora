@@ -1,7 +1,7 @@
 with account as (
 
     select *
-    from {{ var('account') }} 
+    from {{ ref('stg_zuora__account') }} 
     where is_most_recent_record 
 ),
 
@@ -14,14 +14,14 @@ billing_history as (
 subscription as (
 
     select * 
-    from {{ var('subscription') }} 
+    from {{ ref('stg_zuora__subscription') }} 
     where is_most_recent_record
 ), 
 
 invoice_item as (
 
     select * 
-    from {{ var('invoice_item')}}
+    from {{ ref('stg_zuora__invoice_item') }}
     where is_most_recent_record
 ),
 
@@ -30,7 +30,7 @@ account_payment_data as (
     select 
         account_id,
         sum(amount) as account_amount_paid
-    from {{ var('payment') }} 
+    from {{ ref('stg_zuora__payment') }} 
     where is_most_recent_record
         and account_id is not null
     {{ dbt_utils.group_by(1) }}
