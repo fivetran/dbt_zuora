@@ -3,19 +3,19 @@
     enabled=var('fivetran_validation_tests_enabled', false)
 ) }}
 
+{% set exclude_cols = ['source_relation', 'invoice_amount', 'invoice_amount_home_currency', 'invoice_amount_paid', 'invoice_amount_unpaid',
+    'tax_amount', 'refund_amount', 'credit_balance_adjustment_amount', 'tax_amount_home_currency',
+    'invoice_amount_paid_home_currency', 'invoice_amount_unpaid_home_currency', 'discount_charges',
+    'discount_charges_home_currency'] + var('consistency_test_exclude_metrics', []) %}
+
+-- this test ensures the zuora__billing_history end model matches the prior version
 with prod as (
-    select *
-    except(invoice_amount, invoice_amount_home_currency, invoice_amount_paid, invoice_amount_unpaid, tax_amount,
-        refund_amount, credit_balance_adjustment_amount, tax_amount_home_currency, invoice_amount_paid_home_currency,
-        invoice_amount_unpaid_home_currency, discount_charges, discount_charges_home_currency)
+    select {{ dbt_utils.star(from=ref('zuora__billing_history'), except=exclude_cols) }}
     from {{ target.schema }}_zuora_prod.zuora__billing_history
 ),
 
 dev as (
-    select *
-    except(invoice_amount, invoice_amount_home_currency, invoice_amount_paid, invoice_amount_unpaid, tax_amount,
-        refund_amount, credit_balance_adjustment_amount, tax_amount_home_currency, invoice_amount_paid_home_currency,
-        invoice_amount_unpaid_home_currency, discount_charges, discount_charges_home_currency)
+    select {{ dbt_utils.star(from=ref('zuora__billing_history'), except=exclude_cols) }}
     from {{ target.schema }}_zuora_dev.zuora__billing_history
 ), 
 

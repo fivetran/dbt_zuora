@@ -1,2 +1,7 @@
-select * 
-from {{ var('product_rate_plan_charge') }}
+{{
+    zuora.zuora_union_connections(
+        connection_dictionary='zuora_sources',
+        single_source_name='zuora',
+        single_table_name='product_rate_plan_charge'
+    )
+}}

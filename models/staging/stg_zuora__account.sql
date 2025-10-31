@@ -14,12 +14,14 @@ fields as (
                 staging_columns=get_account_columns()
             )
         }}
+        {{ zuora.apply_source_relation() }}
     from base
 ),
 
 final as (
-    
-    select 
+
+    select
+        source_relation,
         id as account_id,
         account_number,
         auto_pay,
@@ -49,7 +51,7 @@ final as (
         updated_by_id,
         cast(updated_date as {{ dbt.type_timestamp() }}) as updated_date,
         vatid,
-        row_number() over (partition by id order by updated_date desc) = 1 as is_most_recent_record
+        row_number() over (partition by id {{ zuora.partition_by_source_relation() }} order by updated_date desc) = 1 as is_most_recent_record
 
         {{ fivetran_utils.fill_pass_through_columns('zuora_account_pass_through_columns') }}
 

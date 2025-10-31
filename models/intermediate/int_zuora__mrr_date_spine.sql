@@ -1,12 +1,13 @@
+-- depends_on: {{ ref('stg_zuora__invoice_item_tmp') }}
 with spine as (
 
     {% if execute %}
     {% if not var('zuora_mrr_first_date', None) or not var('zuora_mrr_last_date', None) %}
         {% set date_query %}
-        select 
+        select
             min( service_start_date ) as min_date,
             max( service_start_date ) as max_date
-        from {{ source('zuora', 'invoice_item') }}
+        from {{ ref('stg_zuora__invoice_item_tmp') }}
         {% endset %}
 
         {% set calc_first_date = run_query(date_query).columns[0][0]|string %}
@@ -33,11 +34,12 @@ with spine as (
 
 account_service_history as (
 
-    select 
+    select
+        source_relation,
         account_id,
         min(service_start_month) as first_service_month
     from {{ ref('zuora__line_item_history') }}
-    {{ dbt_utils.group_by(1) }}
+    {{ dbt_utils.group_by(2) }}
 ),
 
 date_spine as (
@@ -53,15 +55,16 @@ date_spine as (
 
 final as (
 
-    select 
-        distinct account_service_history.account_id,
+    select distinct
+        account_service_history.source_relation,
+        account_service_history.account_id,
         date_spine.date_day,
         date_spine.date_week,
         date_spine.date_month,
         date_spine.date_year,
         date_spine.date_index
     from account_service_history
-    cross join date_spine 
+    cross join date_spine
     where cast({{ dbt.date_trunc('day', 'account_service_history.first_service_month') }} as date) <= date_spine.date_day
 )
 

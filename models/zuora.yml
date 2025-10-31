@@ -4,10 +4,11 @@ models:
   - name: zuora__account_daily_overview
     description: Each record is a day in an account and its accumulated balance totals based on all line item transactions up to that day.   
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: account_daily_id
         description: Unique account key, based on account id and date of balance data.
         tests:
-          - unique
           - not_null
       - name: account_id
         description:  "{{ doc('created_date') }} the account."
@@ -83,10 +84,10 @@ models:
   - name: zuora__account_overview
     description: Each record represents an account enriched with metrics about their associated transactions.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: account_id
-        description: Primary key for the account.
-        tests: 
-          - unique 
+        description: Primary key for the account. 
       - name: account_created_at
         description: "{{ doc('created_date') }} the account."
       - name: account_name
@@ -173,10 +174,11 @@ models:
   - name: zuora__billing_history
     description: Each record is an invoice to evaluate the history of charges billed, enhanced with additional details from payments, refunds, adjustments, discounts, and taxes.
     columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: invoice_id
-        description: "{{ doc('id') }} invoice table."  
+        description: "{{ doc('id') }} invoice table."
         tests:
-          - unique
           - not_null
       - name: account_id
         description: The account associated with the invoice.
@@ -261,7 +263,6 @@ models:
       - name: invoice_item_id
         description: "{{ doc('id') }} invoice item table."
         tests:
-          - unique
           - not_null
       - name: account_id
         description: Identifier of the account associated with this invoice item.
@@ -408,7 +409,6 @@ models:
       - name: account_monthly_id
         description: The unique identifier for the account id and month.
         tests:
-          - unique
           - not_null
       - name: account_id
         description: Unique identifier of the account.
@@ -450,10 +450,9 @@ models:
   - name: zuora__subscription_overview
     description: Each record is a subscription, enhanced with additional details from rate plan charges and amendments.
     columns: 
-      - name: subscription_key 
+      - name: subscription_key
         description: The unique subscription key, defined by subscription id, rate plan charge id, and amendment id.
         tests:
-          - unique
           - not_null
       - name: subscription_id
         description: The unique identifier for the subscription.

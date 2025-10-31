@@ -14,12 +14,14 @@ fields as (
                 staging_columns=get_product_rate_plan_charge_columns()
             )
         }}
+        {{ zuora.apply_source_relation() }}
     from base
 ),
 
 final as (
-    
-    select 
+
+    select
+        source_relation,
         id as product_rate_plan_charge_id,
         account_receivable_accounting_code_id,
         accounting_code,
@@ -58,7 +60,7 @@ final as (
         cast(updated_date as {{ dbt.type_timestamp() }}) as updated_date,
         use_discount_specific_accounting_code,
         weekly_bill_cycle_day,
-        row_number() over (partition by id order by updated_date desc) = 1 as is_most_recent_record
+        row_number() over (partition by id {{ zuora.partition_by_source_relation() }} order by updated_date desc) = 1 as is_most_recent_record
     from fields
     where not coalesce(_fivetran_deleted, false)
 )

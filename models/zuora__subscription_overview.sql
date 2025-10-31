@@ -22,16 +22,18 @@ amendment as (
 
 account_overview as (
 
-    select 
+    select
+        source_relation,
         account_id,
         account_name
-    from {{ ref('zuora__account_overview') }} 
+    from {{ ref('zuora__account_overview') }}
 ),
 
 subscription_overview as (
 
-    select  
-        {{ dbt_utils.generate_surrogate_key(['subscription.subscription_id', 'rate_plan_charge.rate_plan_charge_id', 'amendment.amendment_id']) }} as subscription_key,
+    select
+        subscription.source_relation,
+        {{ dbt_utils.generate_surrogate_key(['subscription.source_relation', 'subscription.subscription_id', 'rate_plan_charge.rate_plan_charge_id', 'amendment.amendment_id']) }} as subscription_key,
         subscription.subscription_id,
         subscription.account_id,
         account_overview.account_name,
@@ -101,10 +103,13 @@ subscription_overview as (
     from subscription
     left join rate_plan_charge
         on subscription.subscription_id = rate_plan_charge.subscription_id
+        and subscription.source_relation = rate_plan_charge.source_relation
     left join amendment
         on subscription.subscription_id = amendment.subscription_id
-    left join account_overview 
+        and subscription.source_relation = amendment.source_relation
+    left join account_overview
         on subscription.account_id = account_overview.account_id
+        and subscription.source_relation = account_overview.source_relation
 )
 
 select * 

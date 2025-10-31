@@ -16,7 +16,8 @@ account_overview as (
 
 account_daily_overview as (
 
-    select 
+    select
+        account_running_totals.source_relation,
         account_running_totals.account_daily_id,
         account_running_totals.account_id,
         account_running_totals.date_day,        
@@ -56,6 +57,7 @@ account_daily_overview as (
     from account_running_totals
     left join account_overview
         on account_running_totals.account_id = account_overview.account_id
+        and account_running_totals.source_relation = account_overview.source_relation
 )
 
 select * 

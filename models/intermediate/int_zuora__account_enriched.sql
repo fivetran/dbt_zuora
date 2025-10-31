@@ -27,30 +27,32 @@ invoice_item as (
 
 account_payment_data as (
 
-    select 
+    select
+        source_relation,
         account_id,
         sum(amount) as account_amount_paid
-    from {{ ref('stg_zuora__payment') }} 
+    from {{ ref('stg_zuora__payment') }}
     where is_most_recent_record
         and account_id is not null
-    {{ dbt_utils.group_by(1) }}
+    {{ dbt_utils.group_by(2) }}
 ),
 
 account_details as (
 
-    select 
+    select
+        source_relation,
         account_id,
         created_date,
         name,
         account_number,
-        credit_balance, 
+        credit_balance,
         mrr,
         status,
-        auto_pay, 
+        auto_pay,
         {{ dbt_utils.safe_divide( dbt.datediff("account.created_date", dbt.current_timestamp(), "day"), 30) }} as account_active_months,
         case when {{ dbt.datediff("account.created_date", dbt.current_timestamp(), "day") }} <= 30
             then true else false end as is_new_customer
-    
+
         {{ fivetran_utils.persist_pass_through_columns('zuora_account_pass_through_columns') }}
 
     from account
@@ -59,7 +61,8 @@ account_details as (
 
 account_totals as (
 
-    select 
+    select
+        source_relation,
         account_id,
         max(most_recent_payment_date) as most_recent_payment_date,
 
@@ -68,48 +71,51 @@ account_totals as (
         {% endif %}
 
         sum(case when cast({{ dbt.date_trunc('day', dbt.current_timestamp()) }} as date) > due_date
-                and invoice_amount != invoice_amount_paid 
+                and invoice_amount != invoice_amount_paid
                 then invoice_amount_unpaid else 0 end) as total_amount_past_due
-        
+
         {% set sum_cols = ['refund_amount', 'discount_charges', 'tax_amount', 'invoice_amount', 'invoice_amount_home_currency', 'invoice_amount_paid', 'invoice_amount_unpaid'] %}
         {% for col in sum_cols %}
-        , sum({{ col }}) as total_{{ col }} 
+        , sum({{ col }}) as total_{{ col }}
         {% endfor %}
 
     from billing_history
-    {{ dbt_utils.group_by(1) }}
+    {{ dbt_utils.group_by(2) }}
 ),
 
 account_invoice_data as (
 
-    select 
+    select
+        source_relation,
         account_id,
         min(charge_date) as first_charge_date,
         max(charge_date) as most_recent_charge_date,
         count(distinct invoice_item_id) as invoice_item_count,
         count(distinct invoice_id) as invoice_count
     from invoice_item
-    {{ dbt_utils.group_by(1) }}
+    {{ dbt_utils.group_by(2) }}
 ),
 
 account_subscription_data as (
 
-    select 
+    select
+        source_relation,
         account_id,
         count(distinct subscription_id) as subscription_count,
         sum(case when lower(status) = 'active' then 1 else 0 end) as active_subscription_count
     from subscription
-    {{ dbt_utils.group_by(1) }}
+    {{ dbt_utils.group_by(2) }}
 ),
 
 account_cumulatives as (
-    
-    select 
+
+    select
+        account_details.source_relation,
         account_details.account_id,
         account_details.created_date,
         account_details.name,
         account_details.account_number,
-        account_details.credit_balance, 
+        account_details.credit_balance,
         account_details.mrr,
         account_details.status,
         account_details.auto_pay,
@@ -129,9 +135,9 @@ account_cumulatives as (
         account_totals.most_recent_payment_date,
 
         {% if var('zuora__using_credit_balance_adjustment', true) %}
-        account_totals.most_recent_credit_balance_adjustment_date, 
+        account_totals.most_recent_credit_balance_adjustment_date,
         {% endif %}
-        
+
         account_invoice_data.first_charge_date,
         account_invoice_data.most_recent_charge_date,
         account_invoice_data.invoice_item_count,
@@ -145,12 +151,16 @@ account_cumulatives as (
     from account_details
         left join account_totals
             on account_details.account_id = account_totals.account_id
+            and account_details.source_relation = account_totals.source_relation
         left join account_invoice_data
             on account_totals.account_id = account_invoice_data.account_id
+            and account_totals.source_relation = account_invoice_data.source_relation
         left join account_subscription_data
             on account_totals.account_id = account_subscription_data.account_id
+            and account_totals.source_relation = account_subscription_data.source_relation
         left join account_payment_data
             on account_totals.account_id = account_payment_data.account_id
+            and account_totals.source_relation = account_payment_data.source_relation
 )
 
 select * 

@@ -1,3 +1,19 @@
+# dbt_zuora v1.1.0
+
+## Schema/Data Change
+**1 total change • 0 possible breaking changes**
+
+| Data Model(s) | Change type | Old | New | Notes |
+| ------------- | ----------- | ----| --- | ----- |
+| All models | New column | | `source_relation` | Identifies the source connection when using multiple Zuora connections |
+
+## Feature Update
+- **Union Data Functionality**: This release supports running the package on multiple Zuora source connections. See the [README](https://github.com/fivetran/dbt_zuora/tree/main?tab=readme-ov-file#step-3-define-database-and-schema-variables) for details on how to leverage this feature.
+
+## Tests Update
+- Removes uniqueness tests. The new unioning feature requires combination-of-column tests to consider the new `source_relation` column in addition to the existing primary key, but this is not supported across dbt versions.
+- These tests will be reintroduced once a version-agnostic solution is available.
+
 # dbt_zuora v1.0.0
 
 [PR #31](https://github.com/fivetran/dbt_zuora/pull/31) includes the following updates:

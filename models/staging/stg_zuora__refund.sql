@@ -15,12 +15,14 @@ fields as (
                 staging_columns=get_refund_columns()
             )
         }}
+        {{ zuora.apply_source_relation() }}
     from base
 ),
 
 final as (
-    
-    select 
+
+    select
+        source_relation,
         id as refund_id,
         accounting_code,
         amount,
@@ -41,7 +43,7 @@ final as (
         type,
         updated_by_id,
         cast(updated_date as {{ dbt.type_timestamp() }}) as updated_date,
-        row_number() over (partition by id order by updated_date desc) = 1 as is_most_recent_record
+        row_number() over (partition by id {{ zuora.partition_by_source_relation() }} order by updated_date desc) = 1 as is_most_recent_record
     from fields
     where not coalesce(_fivetran_deleted, false)
 )

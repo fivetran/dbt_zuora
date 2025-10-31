@@ -1,6 +1,7 @@
 with invoice_item_enriched as (
 
-    select 
+    select
+        source_relation,
         invoice_id,
         count(distinct invoice_item_id) as invoice_items,
         count(distinct product_id) as products,
@@ -14,26 +15,28 @@ with invoice_item_enriched as (
         max(service_end_date) as invoice_service_end_date
     from {{ ref('stg_zuora__invoice_item') }}
     where is_most_recent_record
-    {{ dbt_utils.group_by(1) }}
+    {{ dbt_utils.group_by(2) }}
 ),
 
 invoice_payment as (
 
-    select 
+    select
+        source_relation,
         invoice_id,
         payment_id
-    from {{ ref('stg_zuora__invoice_payment') }} 
+    from {{ ref('stg_zuora__invoice_payment') }}
     where is_most_recent_record
 ),
 
 payment as (
 
     select
+        source_relation,
         payment_id,
         payment_number,
         effective_date as payment_date,
         status as payment_status,
-        type as payment_type, 
+        type as payment_type,
         amount_home_currency as payment_amount_home_currency,
         payment_method_id
     from {{ ref('stg_zuora__payment') }}
@@ -41,20 +44,22 @@ payment as (
 ),
 
 payment_method as (
-    
-    select 
+
+    select
+        source_relation,
         payment_method_id,
         type as payment_method_type,
         coalesce(ach_account_type, bank_transfer_account_type, credit_card_type, paypal_type, sub_type) as payment_method_subtype,
         active as is_payment_method_active
-    from {{ ref('stg_zuora__payment_method') }} 
+    from {{ ref('stg_zuora__payment_method') }}
     where is_most_recent_record
 ),
 
 {% if var('zuora__using_credit_balance_adjustment', true) %}
 credit_balance_adjustment as (
 
-    select 
+    select
+        source_relation,
         invoice_id,
         credit_balance_adjustment_id,
         number as credit_balance_adjustment_number,
@@ -70,17 +75,19 @@ credit_balance_adjustment as (
 taxes as (
 
     select
-        invoice_id, 
+        source_relation,
+        invoice_id,
         sum(tax_amount_home_currency) as tax_amount_home_currency
-    from {{ ref('stg_zuora__taxation_item') }} 
+    from {{ ref('stg_zuora__taxation_item') }}
     where is_most_recent_record
-    {{ dbt_utils.group_by(1) }}
+    {{ dbt_utils.group_by(2) }}
 ),
 {% endif %}
 
 billing_enriched as (
 
-    select 
+    select
+        invoice_item_enriched.source_relation,
         invoice_item_enriched.invoice_id,
         invoice_item_enriched.invoice_items,
         invoice_item_enriched.products,
@@ -97,10 +104,10 @@ billing_enriched as (
         taxes.tax_amount_home_currency,
         {% endif %}
 
-        count(distinct payment.payment_id) as payments, 
+        count(distinct payment.payment_id) as payments,
         sum(payment_amount_home_currency) as invoice_amount_paid_home_currency,
         min(payment_date) as first_payment_date,
-        max(payment_date) as most_recent_payment_date, 
+        max(payment_date) as most_recent_payment_date,
         count(distinct payment_method.payment_method_id) as payment_methods
 
         {% if var('zuora__using_credit_balance_adjustment', true) %}
@@ -111,24 +118,29 @@ billing_enriched as (
         {% endif %}
 
     from invoice_item_enriched
-    left join invoice_payment 
+    left join invoice_payment
         on invoice_item_enriched.invoice_id = invoice_payment.invoice_id
+        and invoice_item_enriched.source_relation = invoice_payment.source_relation
     left join payment
         on invoice_payment.payment_id = payment.payment_id
+        and invoice_payment.source_relation = payment.source_relation
     left join payment_method
         on payment.payment_method_id = payment_method.payment_method_id
-    
+        and payment.source_relation = payment_method.source_relation
+
     {% if var('zuora__using_credit_balance_adjustment', true) %}
     left join credit_balance_adjustment
-        on invoice_item_enriched.invoice_id = credit_balance_adjustment.invoice_id 
+        on invoice_item_enriched.invoice_id = credit_balance_adjustment.invoice_id
+        and invoice_item_enriched.source_relation = credit_balance_adjustment.source_relation
     {% endif %}
 
     {% if var('zuora__using_taxation_item', true) %}
     left join taxes
         on invoice_item_enriched.invoice_id = taxes.invoice_id
+        and invoice_item_enriched.source_relation = taxes.source_relation
     {% endif %}
 
-    {{ dbt_utils.group_by(12) if var('zuora__using_taxation_item', true) else dbt_utils.group_by(11) }} 
+    {{ dbt_utils.group_by(13) if var('zuora__using_taxation_item', true) else dbt_utils.group_by(12) }}
 )
 
 select * 

@@ -3,13 +3,16 @@
     enabled=var('fivetran_validation_tests_enabled', false)
 ) }}
 
+{% set exclude_cols = ['source_relation'] + var('consistency_test_exclude_metrics', []) %}
+
+-- this test ensures the zuora__monthly_recurring_revenue end model matches the prior version
 with prod as (
-    select *
+    select {{ dbt_utils.star(from=ref('zuora__monthly_recurring_revenue'), except=exclude_cols) }}
     from {{ target.schema }}_zuora_prod.zuora__monthly_recurring_revenue
 ),
 
 dev as (
-    select *
+    select {{ dbt_utils.star(from=ref('zuora__monthly_recurring_revenue'), except=exclude_cols) }}
     from {{ target.schema }}_zuora_dev.zuora__monthly_recurring_revenue
 ), 
 
