@@ -3,7 +3,7 @@
     enabled=var('fivetran_validation_tests_enabled', false)
 ) }}
 
-{% set exclude_cols = ['source_relation', 'invoice_amount', 'invoice_amount_home_currency', 'invoice_amount_paid', 'invoice_amount_unpaid',
+{% set exclude_cols = ['invoice_amount', 'invoice_amount_home_currency', 'invoice_amount_paid', 'invoice_amount_unpaid',
     'tax_amount', 'refund_amount', 'credit_balance_adjustment_amount', 'tax_amount_home_currency',
     'invoice_amount_paid_home_currency', 'invoice_amount_unpaid_home_currency', 'discount_charges',
     'discount_charges_home_currency'] + var('consistency_test_exclude_metrics', []) %}
