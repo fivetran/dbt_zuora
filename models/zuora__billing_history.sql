@@ -93,8 +93,8 @@ billing_history as (
         {% endif %}
 
     from invoice
-    left join billing_enriched on
-        invoice.invoice_id = billing_enriched.invoice_id
+    left join billing_enriched 
+        on invoice.invoice_id = billing_enriched.invoice_id
         and invoice.source_relation = billing_enriched.source_relation
 )
 

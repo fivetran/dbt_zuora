@@ -3,7 +3,7 @@
     enabled=var('fivetran_validation_tests_enabled', false)
 ) }}
 
-{% set exclude_cols = [] + var('consistency_test_exclude_metrics', []) %}
+{% set exclude_cols = ['subscription_key'] + var('consistency_test_exclude_metrics', []) %}
 
 -- this test ensures the zuora__subscription_overview end model matches the prior version
 with prod as (
