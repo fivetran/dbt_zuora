@@ -1,4 +1,5 @@
 # dbt_zuora v1.1.0
+[PR #34](https://github.com/fivetran/dbt_zuora/pull/34) includes the following updates:
 
 ## Schema/Data Change
 **4 total changes • 0 possible breaking changes**
