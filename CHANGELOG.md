@@ -2,7 +2,7 @@
 [PR #34](https://github.com/fivetran/dbt_zuora/pull/34) includes the following updates:
 
 ## Schema/Data Change
-**4 total changes • 0 possible breaking changes**
+**4 total changes • 3 possible breaking changes**
 
 | Data Model(s) | Change type | Old | New | Notes |
 | ------------- | ----------- | ----| --- | ----- |
