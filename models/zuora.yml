@@ -259,7 +259,9 @@ models:
 
   - name: zuora__line_item_history
     description: Each record is an invoice item meant to provide all details on all transactions at the most granular level, with details being brought in from subscriptions, amendments, rate plan charges, products, subscriptions, amendments and more.
-    columns: 
+    columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: invoice_item_id
         description: "{{ doc('id') }} invoice item table."
         tests:
@@ -405,7 +407,9 @@ models:
 
   - name: zuora__monthly_recurring_revenue
     description: Each record is an account and a month in that account, with details about its monthly recurring and non-recurring revenue in these time periods.
-    columns: 
+    columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: account_monthly_id
         description: The unique identifier for the account id and month.
         tests:
@@ -449,7 +453,9 @@ models:
 
   - name: zuora__subscription_overview
     description: Each record is a subscription, enhanced with additional details from rate plan charges and amendments.
-    columns: 
+    columns:
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: subscription_key
         description: The unique subscription key, defined by subscription id, rate plan charge id, and amendment id.
         tests:
