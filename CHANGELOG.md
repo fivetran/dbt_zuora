@@ -1,3 +1,23 @@
+# dbt_zuora v1.1.0
+[PR #34](https://github.com/fivetran/dbt_zuora/pull/34) includes the following updates:
+
+## Schema/Data Change
+**4 total changes • 3 possible breaking changes**
+
+| Data Model(s) | Change type | Old | New | Notes |
+| ------------- | ----------- | ----| --- | ----- |
+| All models | New column | | `source_relation` | Identifies the source connection when using multiple Zuora connections |
+| `zuora__subscription_overview` | Updated surrogate key | `subscription_key` = `subscription_id` + `rate_plan_charge_id` + `amendment_id` | `subscription_key` = `source_relation` + `subscription_id` + `rate_plan_charge_id` + `amendment_id` | Updated to include `source_relation` |
+| `zuora__monthly_recurring_revenue` | Updated surrogate key | `account_monthly_id` = `account_id` + `account_month` | `account_monthly_id` = `source_relation` + `account_id` + `account_month` | Updated to include `source_relation` |
+| `int_zuora__account_running_totals`<br>`zuora__account_daily_overview` | Updated surrogate key | `account_daily_id` = `account_id` + `date_day` | `account_daily_id` = `source_relation` + `account_id` + `date_day` | Updated to include `source_relation` |
+
+## Feature Update
+- **Union Data Functionality**: This release supports running the package on multiple Zuora source connections. See the [README](https://github.com/fivetran/dbt_zuora/tree/main?tab=readme-ov-file#step-3-define-database-and-schema-variables) for details on how to leverage this feature.
+
+## Tests Update
+- Removes uniqueness tests. The new unioning feature requires combination-of-column tests to consider the new `source_relation` column in addition to the existing primary key, but this is not supported across dbt versions.
+- These tests will be reintroduced once a version-agnostic solution is available.
+
 # dbt_zuora v1.0.0
 
 [PR #31](https://github.com/fivetran/dbt_zuora/pull/31) includes the following updates:

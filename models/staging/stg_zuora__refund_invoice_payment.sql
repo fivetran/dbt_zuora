@@ -15,19 +15,21 @@ fields as (
                 staging_columns=get_refund_invoice_payment_columns()
             )
         }}
+        {{ zuora.apply_source_relation() }}
     from base
 ),
 
 final as (
-    
-    select 
+
+    select
+        source_relation,
         id as refund_invoice_payment_id, 
         created_by_id,
         cast(created_date as {{ dbt.type_timestamp() }}) as created_date,
         refund_amount,
         updated_by_id,
         cast(updated_date as {{ dbt.type_timestamp() }}) as updated_date,
-        row_number() over (partition by id order by updated_date desc) = 1 as is_most_recent_record
+        row_number() over (partition by id {{ zuora.partition_by_source_relation() }} order by updated_date desc) = 1 as is_most_recent_record
     from fields
     where not coalesce(_fivetran_deleted, false)
 )

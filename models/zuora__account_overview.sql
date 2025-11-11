@@ -13,9 +13,10 @@ contact as (
 ),
 
 account_overview as (
-    
-    select 
-        account_enriched.account_id, 
+
+    select
+        account_enriched.source_relation,
+        account_enriched.account_id,
         account_enriched.created_date as account_created_at,
         account_enriched.name as account_name,
         account_enriched.account_number,
@@ -54,8 +55,9 @@ account_overview as (
         {{ fivetran_utils.persist_pass_through_columns('zuora_account_pass_through_columns', identifier='account_enriched') }}
 
     from account_enriched
-    left join contact 
+    left join contact
         on account_enriched.account_id = contact.account_id
+        and account_enriched.source_relation = contact.source_relation
 )
 
 select * 

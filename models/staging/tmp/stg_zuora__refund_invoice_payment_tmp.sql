@@ -1,4 +1,9 @@
 {{ config(enabled=var('zuora__using_refund_invoice_payment', true)) }}
 
-select * 
-from {{ var('refund_invoice_payment') }}
+{{
+    zuora.zuora_union_connections(
+        connection_dictionary='zuora_sources',
+        single_source_name='zuora',
+        single_table_name='refund_invoice_payment'
+    )
+}}

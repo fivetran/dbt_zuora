@@ -1,13 +1,13 @@
-
+-- depends_on: {{ ref('stg_zuora__invoice_tmp') }}
 with spine as (
 
     {% if execute %}
     {% if not var('zuora_daily_overview_first_date', None) or not var('zuora_daily_overview_last_date', None) %}
         {% set date_query %}
-        select 
+        select
             min( invoice_date ) as min_date,
             max( invoice_date ) as max_date
-        from {{ source('zuora', 'invoice') }}
+        from {{ ref('stg_zuora__invoice_tmp') }}
         {% endset %}
 
         {% set calc_first_date = run_query(date_query).columns[0][0]|string %}
@@ -34,11 +34,12 @@ with spine as (
 
 account_first_invoice as (
 
-    select 
+    select
+        source_relation,
         account_id,
         min(invoice_date) as first_invoice_date
     from {{ ref('zuora__billing_history') }}
-    {{ dbt_utils.group_by(1) }}
+    {{ dbt_utils.group_by(2) }}
 ),
 
 date_spine as (
@@ -54,8 +55,9 @@ date_spine as (
 
 final as (
 
-    select 
-        distinct account_first_invoice.account_id,
+    select distinct
+        account_first_invoice.source_relation,
+        account_first_invoice.account_id,
         date_spine.date_day,
         date_spine.date_week,
         date_spine.date_month,

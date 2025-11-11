@@ -3,13 +3,16 @@
     enabled=var('fivetran_validation_tests_enabled', false)
 ) }}
 
+{% set exclude_cols = ['subscription_key'] + var('consistency_test_exclude_metrics', []) %}
+
+-- this test ensures the zuora__subscription_overview end model matches the prior version
 with prod as (
-    select *
+    select {{ dbt_utils.star(from=ref('zuora__subscription_overview'), except=exclude_cols) }}
     from {{ target.schema }}_zuora_prod.zuora__subscription_overview
 ),
 
 dev as (
-    select *
+    select {{ dbt_utils.star(from=ref('zuora__subscription_overview'), except=exclude_cols) }}
     from {{ target.schema }}_zuora_dev.zuora__subscription_overview
 ), 
 

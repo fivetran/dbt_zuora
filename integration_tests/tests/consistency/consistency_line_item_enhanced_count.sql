@@ -3,6 +3,8 @@
     enabled=var('fivetran_validation_tests_enabled', false)
 ) }}
 
+{% set exclude_cols = var('consistency_test_exclude_metrics', []) %}
+
 -- this test is to make sure the rows counts are the same between versions
 with prod as (
     select count(*) as prod_rows

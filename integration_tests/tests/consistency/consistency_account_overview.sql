@@ -3,13 +3,16 @@
     enabled=var('fivetran_validation_tests_enabled', false)
 ) }}
 
+{% set exclude_cols = var('consistency_test_exclude_metrics', []) %}
+
+-- this test ensures the zuora__account_overview end model matches the prior version
 with prod as (
-    select *
+    select {{ dbt_utils.star(from=ref('zuora__account_overview'), except=exclude_cols) }}
     from {{ target.schema }}_zuora_prod.zuora__account_overview
 ),
 
 dev as (
-    select *
+    select {{ dbt_utils.star(from=ref('zuora__account_overview'), except=exclude_cols) }}
     from {{ target.schema }}_zuora_dev.zuora__account_overview
 ),
 

@@ -14,12 +14,14 @@ fields as (
                 staging_columns=get_rate_plan_charge_columns()
             )
         }}
+        {{ zuora.apply_source_relation() }}
     from base
 ),
 
 final as (
-    
-    select 
+
+    select
+        source_relation,
         id as rate_plan_charge_id,
         account_id,
         account_receivable_accounting_code_id,
@@ -91,7 +93,7 @@ final as (
         cast(updated_date as {{ dbt.type_timestamp() }}) as updated_date,
         version,
         weekly_bill_cycle_day,
-        row_number() over (partition by id order by updated_date desc) = 1 as is_most_recent_record
+        row_number() over (partition by id {{ zuora.partition_by_source_relation() }} order by updated_date desc) = 1 as is_most_recent_record
 
         {{ fivetran_utils.fill_pass_through_columns('zuora_rate_plan_charge_pass_through_columns') }}
 

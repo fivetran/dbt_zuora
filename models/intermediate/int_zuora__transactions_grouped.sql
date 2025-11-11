@@ -11,27 +11,28 @@ with invoice_joined as (
 
 transactions_grouped as (
 
-    select 
-        account_id, 
-        invoice_date as date_day,             
-        cast({{ dbt.date_trunc("week", "invoice_date") }} as date) as date_week, 
-        cast({{ dbt.date_trunc("month", "invoice_date") }} as date) as date_month, 
-        cast({{ dbt.date_trunc("year", "invoice_date") }} as date) as date_year, 
+    select
+        source_relation,
+        account_id,
+        invoice_date as date_day,
+        cast({{ dbt.date_trunc("week", "invoice_date") }} as date) as date_week,
+        cast({{ dbt.date_trunc("month", "invoice_date") }} as date) as date_month,
+        cast({{ dbt.date_trunc("year", "invoice_date") }} as date) as date_year,
         count(distinct invoice_id) as daily_invoices,
         sum(invoice_items) as daily_invoice_items,
 
         {% for col in sum_cols %}
         {% if var('zuora__using_multicurrency', false) %}
             sum({{ col }}_home_currency) as daily_{{ col }},
-        {% else %} 
+        {% else %}
             sum({{ col }}) as daily_{{ col }},
         {% endif %}
         {% endfor %}
 
-        sum(refund_amount) as daily_refunds 
+        sum(refund_amount) as daily_refunds
 
     from invoice_joined
-    {{ dbt_utils.group_by(5) }}
+    {{ dbt_utils.group_by(6) }}
 )
 
 select *

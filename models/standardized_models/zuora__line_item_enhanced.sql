@@ -62,9 +62,10 @@ with line_items as (
 
 ), enhanced as (
 select
+    line_items.source_relation,
     line_items.invoice_id as header_id,
     line_items.invoice_item_id as line_item_id,
-    row_number() over (partition by line_items.invoice_id
+    row_number() over (partition by line_items.invoice_id {{ zuora.partition_by_source_relation(alias='line_items') }}
         order by line_items.invoice_item_id) as line_item_index,
     line_items.created_date as line_item_created_at,
     invoices.created_date as invoice_created_at,
@@ -109,35 +110,45 @@ from line_items
 
 left join invoices
     on invoices.invoice_id = line_items.invoice_id
+    and invoices.source_relation = line_items.source_relation
 
 left join invoice_payments
     on invoice_payments.invoice_id = invoices.invoice_id
+    and invoice_payments.source_relation = invoices.source_relation
 
 left join payments
     on payments.payment_id = invoice_payments.payment_id
+    and payments.source_relation = invoice_payments.source_relation
 
 left join payment_methods
     on payment_methods.payment_method_id = payments.payment_method_id
+    and payment_methods.source_relation = payments.source_relation
 
 left join accounts
     on accounts.account_id = line_items.account_id
+    and accounts.source_relation = line_items.source_relation
 
 left join contacts
     on contacts.contact_id = line_items.bill_to_contact_id
+    and contacts.source_relation = line_items.source_relation
 
 left join products
     on products.product_id = line_items.product_id
+    and products.source_relation = line_items.source_relation
 
 left join subscriptions
     on subscriptions.subscription_id = line_items.subscription_id
+    and subscriptions.source_relation = line_items.source_relation
 
 left join rate_plan
     on rate_plan.subscription_id = subscriptions.subscription_id
+    and rate_plan.source_relation = subscriptions.source_relation
 
 
 ), final as (
 
-    select 
+    select
+        source_relation,
         header_id,
         line_item_id,
         line_item_index,
@@ -180,6 +191,7 @@ left join rate_plan
 
     -- Refund information is only reliable at the invoice header. Therefore the below operation creates a new line to track the refund values.
     select
+        source_relation,
         header_id,
         cast(null as {{ dbt.type_string() }}) as line_item_id,
         cast(0 as {{ dbt.type_int() }}) as line_item_index,

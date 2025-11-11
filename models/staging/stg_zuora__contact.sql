@@ -14,12 +14,14 @@ fields as (
                 staging_columns=get_contact_columns()
             )
         }}
+        {{ zuora.apply_source_relation() }}
     from base
 ),
 
 final as (
-    
-    select  
+
+    select
+        source_relation,
         id as contact_id,
         account_id,
         address_1,
@@ -37,8 +39,8 @@ final as (
         cast(updated_date as {{ dbt.type_timestamp() }}) as updated_date,
         work_email,
         work_phone,
-        row_number() over (partition by id order by updated_date desc) = 1 as is_most_recent_record,
-        row_number() over (partition by account_id order by created_date desc) = 1 as is_most_recent_account_contact
+        row_number() over (partition by id {{ zuora.partition_by_source_relation() }} order by updated_date desc) = 1 as is_most_recent_record,
+        row_number() over (partition by account_id {{ zuora.partition_by_source_relation() }} order by created_date desc) = 1 as is_most_recent_account_contact
     from fields
     where not coalesce(_fivetran_deleted, false)
 )

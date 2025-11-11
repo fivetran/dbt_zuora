@@ -67,37 +67,40 @@ amendment as (
 {% if var('zuora__using_taxation_item', true) %}
 taxation_item as (
 
-    select 
+    select
+        source_relation,
         invoice_item_id,
         sum(tax_amount_home_currency) as tax_amount_home_currency
     from {{ ref('stg_zuora__taxation_item') }}
     where is_most_recent_record
-    group by 1
-), 
+    {{ dbt_utils.group_by(2) }}
+),
 {% endif %}
 
 account_enhanced as (
 
-    select  
+    select
+        source_relation,
         account_id,
-        cast({{ dbt.date_trunc("day", "account_created_at") }} as date) as account_creation_day, 
+        cast({{ dbt.date_trunc("day", "account_created_at") }} as date) as account_creation_day,
         cast({{ dbt.date_trunc("day", "first_charge_processed_at") }} as date) as first_charge_day,
         account_status
     from {{ ref('zuora__account_daily_overview') }}
-    {{ dbt_utils.group_by(4) }}
+    {{ dbt_utils.group_by(5) }}
 ),
 
 invoice_revenue_items as (
 
     select
-        invoice_item_id, 
+        source_relation,
+        invoice_item_id,
         {% if var('zuora__using_multicurrency', false) %}
         charge_amount_home_currency as gross_revenue,
-        case when cast(processing_type as {{ dbt.type_string() }})= '1' 
+        case when cast(processing_type as {{ dbt.type_string() }})= '1'
             then charge_amount_home_currency else 0 end as discount_revenue
-        {% else %} 
+        {% else %}
         charge_amount as gross_revenue,
-        case when cast(processing_type as {{ dbt.type_string() }})= '1' 
+        case when cast(processing_type as {{ dbt.type_string() }})= '1'
             then charge_amount else 0 end as discount_revenue
         {% endif %}
     from invoice_item_enhanced
@@ -106,7 +109,8 @@ invoice_revenue_items as (
 
 line_item_history as (
 
-    select 
+    select
+        invoice_item_enhanced.source_relation,
         invoice_item_enhanced.invoice_item_id, 
         invoice_item_enhanced.account_id,  
         account_enhanced.account_creation_day, 
@@ -189,24 +193,33 @@ line_item_history as (
     from invoice_item_enhanced
         left join invoice
             on invoice_item_enhanced.invoice_id = invoice.invoice_id
+            and invoice_item_enhanced.source_relation = invoice.source_relation
         left join subscription
             on invoice_item_enhanced.subscription_id = subscription.subscription_id
-        left join rate_plan_charge 
+            and invoice_item_enhanced.source_relation = subscription.source_relation
+        left join rate_plan_charge
             on invoice_item_enhanced.rate_plan_charge_id = rate_plan_charge.rate_plan_charge_id
+            and invoice_item_enhanced.source_relation = rate_plan_charge.source_relation
         left join amendment
             on invoice_item_enhanced.amendment_id = amendment.amendment_id
+            and invoice_item_enhanced.source_relation = amendment.source_relation
         left join product
             on invoice_item_enhanced.product_id = product.product_id
+            and invoice_item_enhanced.source_relation = product.source_relation
         left join product_rate_plan
-            on invoice_item_enhanced.product_rate_plan_id = product_rate_plan.product_rate_plan_id 
+            on invoice_item_enhanced.product_rate_plan_id = product_rate_plan.product_rate_plan_id
+            and invoice_item_enhanced.source_relation = product_rate_plan.source_relation
         left join account_enhanced
             on invoice_item_enhanced.account_id = account_enhanced.account_id
+            and invoice_item_enhanced.source_relation = account_enhanced.source_relation
         left join invoice_revenue_items
             on invoice_item_enhanced.invoice_item_id = invoice_revenue_items.invoice_item_id
-        
+            and invoice_item_enhanced.source_relation = invoice_revenue_items.source_relation
+
         {% if var('zuora__using_taxation_item', true) %}
-        left join taxation_item 
+        left join taxation_item
             on invoice_item_enhanced.invoice_item_id = taxation_item.invoice_item_id
+            and invoice_item_enhanced.source_relation = taxation_item.source_relation
         {% endif %}
 )
 

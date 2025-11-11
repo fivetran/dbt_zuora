@@ -5,8 +5,9 @@ sources:
     schema: "{{ var('zuora_schema', 'zuora')}}"
   
     loader: fivetran
-    
+
     config:
+      enabled: "{{ var('zuora_sources', []) == [] }}"
       loaded_at_field: _fivetran_synced
 
     tables:

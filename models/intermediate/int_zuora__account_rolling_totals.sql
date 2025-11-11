@@ -15,19 +15,20 @@ transactions_grouped as (
 ), 
 
 account_rolling as (
-    
-    select 
+
+    select
         *,
         {% for f in fields %}
-            sum(daily_{{ f }}) over (partition by account_id order by date_day, account_id rows unbounded preceding) as rolling_{{ f }}
+            sum(daily_{{ f }}) over (partition by account_id {{ zuora.partition_by_source_relation() }} order by date_day, account_id rows unbounded preceding) as rolling_{{ f }}
         {%- if not loop.last -%},{%- endif -%}
-        {% endfor %}  
+        {% endfor %}
     from transactions_grouped
 ),
 
 account_rolling_totals as (
 
-    select 
+    select
+        coalesce(account_rolling.source_relation, transaction_date_spine.source_relation) as source_relation,
         coalesce(account_rolling.account_id, transaction_date_spine.account_id) as account_id,
         coalesce(account_rolling.date_day, transaction_date_spine.date_day) as date_day,
         coalesce(account_rolling.date_week, transaction_date_spine.date_week) as date_week,
@@ -57,9 +58,10 @@ account_rolling_totals as (
         {% endfor %}
         transaction_date_spine.date_index
 
-    from transaction_date_spine 
+    from transaction_date_spine
     left join account_rolling
-        on account_rolling.account_id = transaction_date_spine.account_id 
+        on account_rolling.account_id = transaction_date_spine.account_id
+        and account_rolling.source_relation = transaction_date_spine.source_relation
         and account_rolling.date_day = transaction_date_spine.date_day
 )
 
