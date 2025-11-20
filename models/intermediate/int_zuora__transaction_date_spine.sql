@@ -1,35 +1,39 @@
 -- depends_on: {{ ref('stg_zuora__invoice_tmp') }}
 with spine as (
 
-    {% if execute %}
-    {% if not var('zuora_daily_overview_first_date', None) or not var('zuora_daily_overview_last_date', None) %}
-        {% set date_query %}
-        select
-            min( invoice_date ) as min_date,
-            max( invoice_date ) as max_date
+    {% if execute and flags.WHICH in ('run', 'build') and (not var('zuora_daily_overview_first_date', None) or not var('zuora_daily_overview_last_date', None)) %}
+        {%- set first_date_query %}
+            select 
+                cast(min(invoice_date) as date) as min_date
         from {{ ref('stg_zuora__invoice_tmp') }}
         {% endset %}
 
-        {% set calc_first_date = run_query(date_query).columns[0][0]|string %}
-        {% set calc_last_date = run_query(date_query).columns[1][0]|string %}
-    {% endif %}
+        {%- set last_date_query %}
+            select 
+                cast(max(invoice_date) as date) as max_date
+            from {{ ref('stg_zuora__invoice_tmp') }}
+        {% endset -%}
 
     {# If only compiling, creates range going back 1 year #}
-    {% else %} 
-        {% set calc_first_date = dbt.dateadd("year", "-1", "current_date") %}
-        {% set calc_last_date = dbt.current_timestamp() %}
+    {% else %}
+        {%- set first_date_query %}
+            select cast({{ dbt.dateadd("year", -1, dbt.current_timestamp() ) }} as date) as min_date
+        {% endset -%}
+
+        {%- set last_date_query %}
+            select cast({{ dbt.current_timestamp() }} as date) as max_date
+        {% endset -%}
     {% endif %}
 
     {# Prioritizes variables over calculated dates #}
-    {% set first_date = var('zuora_daily_overview_first_date', calc_first_date)|string %}
-    {% set last_date = var('zuora_daily_overview_last_date', calc_last_date)|string %}
+    {%- set first_date = var('zuora_daily_overview_first_date', dbt_utils.get_single_value(first_date_query))|string %}
+    {%- set last_date = var('zuora_daily_overview_first_date', dbt_utils.get_single_value(last_date_query))|string %}
 
     {{ dbt_utils.date_spine(
-        datepart="day",
-        start_date = "cast('" ~ first_date[0:10] ~ "'as date)",
-        end_date = "cast('" ~ last_date[0:10] ~ "'as date)"
-        )
-    }}
+        datepart = "day",
+        start_date = "cast('" ~ first_date ~ "' as date)",
+        end_date = "cast('" ~ last_date ~ "' as date)"
+    ) }}
 ),
 
 account_first_invoice as (
