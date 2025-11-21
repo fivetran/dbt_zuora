@@ -1,3 +1,10 @@
+# dbt_zuora v1.1.1
+[PR #36](https://github.com/fivetran/dbt_zuora/pull/36) includes the following updates:
+
+## Bug Fixes
+- Updates the `union_connections` macro to correctly support sources that use reserved words as names.
+- Updates the `int_zuora__mrr_date_spine` and `int_zuora__transaction_date_spine` models to prevent erroring during compilation on a newly created schema.
+
 # dbt_zuora v1.1.0
 [PR #34](https://github.com/fivetran/dbt_zuora/pull/34) includes the following updates:
 
