@@ -27,7 +27,7 @@ with spine as (
 
     {# Prioritizes variables over calculated dates #}
     {%- set first_date = var('zuora_daily_overview_first_date', dbt_utils.get_single_value(first_date_query))|string %}
-    {%- set last_date = var('zuora_daily_overview_first_date', dbt_utils.get_single_value(last_date_query))|string %}
+    {%- set last_date = var('zuora_daily_overview_last_date', dbt_utils.get_single_value(last_date_query))|string %}
 
     {{ dbt_utils.date_spine(
         datepart = "day",
