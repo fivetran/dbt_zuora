@@ -61,7 +61,7 @@
     {% set identifier_var = single_source_name + "_" + single_table_name + "_identifier"%}
     {%- set database = source(single_source_name, single_table_name).database %}
     {%- set schema =   source(single_source_name, single_table_name).schema %}
-    {%- set identifier = source(single_source_name, single_table_name).identifier %}
+    {%- set identifier = var(identifier_var, single_table_name) %}
 
     {%- set relation=adapter.get_relation(
         database=database,
