@@ -1,3 +1,10 @@
+# dbt_zuora v1.2.0
+
+[PR #37](https://github.com/fivetran/dbt_zuora/pull/37) includes the following updates:
+
+## Features
+  - Increases the required dbt version upper limit to v3.0.0
+
 # dbt_zuora v1.1.1
 [PR #36](https://github.com/fivetran/dbt_zuora/pull/36) includes the following updates:
 
