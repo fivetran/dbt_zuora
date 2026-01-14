@@ -13,6 +13,29 @@ table_variables:
   zuora__using_taxation_item:
     - taxation_item
 
+  _fivetran_quickstart_amendment:
+    - amendment
+  _fivetran_quickstart_contact:
+    - contact
+  _fivetran_quickstart_order:
+    - order
+  _fivetran_quickstart_payment:
+    - payment
+  _fivetran_quickstart_payment_method:
+    - payment_method
+  _fivetran_quickstart_product:
+    - product
+  _fivetran_quickstart_product_rate_plan:
+    - product_rate_plan
+  _fivetran_quickstart_product_rate_plan_charge:
+    - product_rate_plan_charge
+  _fivetran_quickstart_rate_plan:
+    - rate_plan
+  _fivetran_quickstart_refund:
+    - refund
+  _fivetran_quickstart_refund_invoice_payment:
+    - refund_invoice_payment
+
 destination_configurations:
   databricks:
     dispatch:
@@ -28,3 +51,11 @@ public_models: [
   "zuora__account_overview",
   "zuora__line_item_enhanced"
 ]
+
+supported_vars:
+  zuora__using_multicurrency:
+    type: boolean
+    value: false
+    description: "Are you utilizing multicurrency within Zuora?"
+    display_name: "Enable Multicurrency"
+
