@@ -23,7 +23,7 @@ This dbt package transforms data from Fivetran's Zuora connector into analytics-
 - Number of materialized models¹: 51
 - Connector documentation
   - [Zuora connector documentation](https://fivetran.com/docs/connectors/applications/zuora)
-  - [Zuora ERD](https://fivetran.com/docs/connectors/applications/zuora#schemainformation)
+  - [Zuora ERD](https://docs.google.com/presentation/d/1p-JoEOVEAG9EYI_DgnDDUjLLs5SnyIboNUWQavYIevY/edit?slide=id.g118e455a94d_0_362#slide=id.g118e455a94d_0_362)
 - dbt package documentation
   - [GitHub repository](https://github.com/fivetran/dbt_zuora)
   - [dbt Docs](https://fivetran.github.io/dbt_zuora/#!/overview)
@@ -54,10 +54,6 @@ By default, this package materializes the following final tables:
 | [zuora__subscription_overview](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__subscription_overview) | Provides detailed subscription profiles with activation dates, term lengths, subscription status, auto-renewal settings, charge details including MRR, amendment info, and period calculations to monitor subscription lifecycle and financial contribution. <br></br>**Example Analytics Questions:**<ul><li>Which subscriptions have the longest subscription_days and highest charge_mrr values?</li><li>How do subscriptions with auto_renew = true compare to false in terms of term lengths?</li><li>What is the average current_term, initial_term, and renewal_term by status and term_type?</li></ul>|
 | [zuora__line_item_enhanced](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__line_item_enhanced) | This table is a comprehensive, denormalized analytical table that enables reporting on key revenue, subscription, customer, and product metrics from your billing platform. It's designed to align with the schema of the `*__line_item_enhanced` table found in Zuora, Recharge, Stripe, Shopify, and Recurly, offering standardized reporting across various billing platforms. To see the kinds of insights this table can generate, explore example visualizations in the [Fivetran Billing Model Streamlit App](https://fivetran-billing-model.streamlit.app/). Visit the app for more details and refer to these [docs](https://github.com/fivetran/dbt_zuora/tree/main?tab=readme-ov-file#enabling-standardized-billing-model) for how to enable the table, which is disabled by default. |
 
-An example churn report is separately available in the analysis folder:
-| **analysis model**   | **description**   |
-|---------------------|------------------|
-| [zuora__account_churn_analysis](https://fivetran.github.io/dbt_zuora/#!/analysis/analysis.zuora.zuora__account_churn_analysis) | Each record represents an account and whether it has churned in that month or not. |
 
 ¹ Each Quickstart transformation job run materializes these models if all components of this data model are enabled. This count includes all staging, intermediate, and final models materialized as `view`, `table`, or `incremental`.
 
