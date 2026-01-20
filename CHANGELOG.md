@@ -1,3 +1,15 @@
+# dbt_zuora v1.3.0
+
+[PR #38](https://github.com/fivetran/dbt_zuora/pull/38) includes the following updates:
+
+## Documentation
+- Updates README with standardized Fivetran formatting.
+
+## Under the Hood
+- In the `quickstart.yml` file:
+  - Adds `table_variables` for relevant sources to prevent missing sources from blocking downstream Quickstart models.
+  - Adds `supported_vars` for Quickstart UI customization.
+
 # dbt_zuora v1.2.0
 
 [PR #37](https://github.com/fivetran/dbt_zuora/pull/37) includes the following updates:

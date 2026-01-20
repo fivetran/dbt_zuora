@@ -1,4 +1,5 @@
-# Zuora dbt package ([Docs](https://fivetran.github.io/dbt_zuora/))
+<!--section="zuora_transformation_model"-->
+# Zuora dbt Package
 
 <p align="left">
     <a alt="License"
@@ -11,41 +12,55 @@
     <a alt="PRs">
         <img src="https://img.shields.io/badge/Contributions-welcome-blueviolet" /></a>
     <a alt="Fivetran Quickstart Compatible"
-        href="https://fivetran.com/docs/transformations/dbt/quickstart">
+        href="https://fivetran.com/docs/transformations/data-models/quickstart-management#quickstartmanagement">
         <img src="https://img.shields.io/badge/Fivetran_Quickstart_Compatible%3F-yes-green.svg" /></a>
 </p>
 
+This dbt package transforms data from Fivetran's Zuora connector into analytics-ready tables.
+
+## Resources
+
+- Number of materialized models¹: 51
+- Connector documentation
+  - [Zuora connector documentation](https://fivetran.com/docs/connectors/applications/zuora)
+  - [Zuora ERD](https://docs.google.com/presentation/d/1p-JoEOVEAG9EYI_DgnDDUjLLs5SnyIboNUWQavYIevY/edit?slide=id.g118e455a94d_0_362#slide=id.g118e455a94d_0_362)
+- dbt package documentation
+  - [GitHub repository](https://github.com/fivetran/dbt_zuora)
+  - [dbt Docs](https://fivetran.github.io/dbt_zuora/#!/overview)
+  - [DAG](https://fivetran.github.io/dbt_zuora/#!/overview?g_v=1)
+  - [Changelog](https://github.com/fivetran/dbt_zuora/blob/main/CHANGELOG.md)
+
 ## What does this dbt package do?
-- Produces modeled tables that leverage Zuora data from [Fivetran's connector](https://fivetran.com/docs/applications/zuora) in the format described by [this ERD](https://fivetran.com/docs/applications/zuora#schemainformation).
+This package enables you to enhance balance transaction entries with useful fields, create customized churn analysis, and develop monthly recurring revenue insights. It creates enriched models with metrics focused on account activity, subscription management, and billing transaction history.
 
-- Enables you to better understand your Zuora data. The package achieves this by performing the following:
-    - Enhancing the balance transaction entries with useful fields from related tables 
-    - Creating customized analysis tables to examine churn by subscriptions
-    - Developing a look at gross, net, and discount monthly recurring revenue by account 
-    - Generating metrics tables that allow you to better understand your account activity over time or at a customer level. These time-based metrics are available on a daily level.
-- Generates a comprehensive data dictionary of your source and modeled Zuora data through the [dbt docs site](https://fivetran.github.io/dbt_zuora/).
+### Output schema
+Final output tables are generated in the following target schema:
 
-<!--section="zuora_transformation_model"-->
-The following table provides a detailed list of all tables materialized within this package by default.
-> TIP: See more details about these tables in the package's [dbt docs site](https://fivetran.github.io/dbt_zuora/#!/overview?g_v=1).
+```
+<your_database>.<connector/schema_name>_zuora
+```
 
-| **Table**                         | **Description** |
-|--------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [zuora__account_daily_overview](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__account_daily_overview)    |  Each record is a day in an account and its accumulated balance totals based on all line item transactions up to that day.                            |
-| [zuora__account_overview](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__account_overview)    |  Each record represents an account, enriched with metrics about their associated transactions.                                                                                                     |
-| [zuora__billing_history](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__billing_history)    | Each record represents an invoice and its various transaction details. |
-| [zuora__line_item_history](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__line_item_history)      | Each record represents a specific invoice item and its various transaction details.                                                                     |
-| [zuora__monthly_recurring_revenue](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__monthly_recurring_revenue) | Each record represents an account and MRR generated on a monthly basis. |
-| [zuora__subscription_overview](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__subscription_overview)       | Each record represents a subscription, enriched with metrics about time, revenue, state, and period.    |
-| [zuora__line_item_enhanced](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__line_item_enhanced)       | This table is a comprehensive, denormalized analytical table that enables reporting on key revenue, subscription, customer, and product metrics from your billing platform. It’s designed to align with the schema of the `*__line_item_enhanced` table found in Zuora, Recharge, Stripe, Shopify, and Recurly, offering standardized reporting across various billing platforms. To see the kinds of insights this table can generate, explore example visualizations in the [Fivetran Billing Model Streamlit App](https://fivetran-billing-model.streamlit.app/). Visit the app for more details and refer to these [docs](https://github.com/fivetran/dbt_zuora/tree/main?tab=readme-ov-file#enabling-standardized-billing-model) for how to enable the table, which is disabled by default.  |
+### Final output tables
 
-An example churn report is separately available in the analysis folder:
-| **analysis model**   | **description**   |
-|---------------------|------------------|
-| [zuora__account_churn_analysis](https://fivetran.github.io/dbt_zuora/#!/analysis/analysis.zuora.zuora__account_churn_analysis) | Each record represents an account and whether it has churned in that month or not. |
+By default, this package materializes the following final tables:
 
-### Example Visualizations
-Curious what these tables can do? Check out example visualizations from the [zuora__line_item_enhanced](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__line_item_enhanced) table in the [Fivetran Billing Model Streamlit App](https://fivetran-billing-model.streamlit.app/), and see how you can use these tables in your own reporting. Below is a screenshot of an example report—-explore the app for more.
+| Table | Description |
+| :---- | :---- |
+| [zuora__account_daily_overview](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__account_daily_overview) | Provides daily account snapshots with invoice counts, amounts, payments, taxes, discounts, refunds, and rolling totals to track account financial health, payment activity, and balance evolution over time. For an example of how this data can be used to evaluate churn at the monthly level, see [this analysis query](https://github.com/fivetran/dbt_zuora/blob/65f1aa666a214e6111e2879536e908d36e70f57f/analysis/zuora__account_churn_analysis.sql), and [see the DECISIONLOG](https://github.com/fivetran/dbt_zuora/blob/65f1aa666a214e6111e2879536e908d36e70f57f/DECISIONLOG.md#use-zuora__account_churn_analysis-in-our-analysis-folder-to-examine-churn-at-the-monthly-level) for a more detailed explanation of churn definitions and additonal evaluation grains. <br></br>**Example Analytics Questions:**<ul><li>How does rolling_invoice_amount_unpaid evolve day-by-day for each account?</li><li>What are the daily trends in daily_invoice_amount versus daily_invoice_amount_paid?</li><li>Which accounts have the highest rolling_invoices and rolling_refunds totals?</li></ul>|
+| [zuora__account_overview](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__account_overview) | Consolidates account profiles with comprehensive transaction metrics including invoice counts, amounts, payments, subscriptions, taxes, discounts, refunds, and monthly averages to understand account financial performance and relationships. <br></br>**Example Analytics Questions:**<ul><li>Which accounts have the highest total_invoice_amount and active_subscription_count?</li><li>How do total_amount_paid versus total_amount_not_paid compare by account_status?</li><li>What is the monthly_average_invoice_amount and account_zuora_calculated_mrr by customer tenure (account_active_months)?</li></ul>|
+| [zuora__billing_history](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__billing_history) | Tracks invoice-level billing history with amounts, payment details, charges, tax, discounts, refunds, credit adjustments, and product/subscription counts to analyze billing patterns, payment status, and revenue recognition timing. <br></br>**Example Analytics Questions:**<ul><li>What is the average invoice_amount and invoice_amount_unpaid by status and due_date aging?</li><li>How many invoice_items, products, and subscriptions are typically on each invoice?</li><li>What is the time between invoice_date and first_payment_date by account?</li></ul>|
+| [zuora__line_item_history](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__line_item_history) | Chronicles individual invoice line items with product details, subscription info, charge amounts, discounts, taxes, service periods, and revenue calculations to provide granular visibility into revenue components and product-level billing. <br></br>**Example Analytics Questions:**<ul><li>Which products (product_id, sku) generate the highest gross_revenue and net_revenue?</li><li>How do charge_amount and discount_amount vary by charge_type and charge_model?</li><li>What is the charge_mrr distribution across subscriptions and rate plans?</li></ul>|
+| [zuora__monthly_recurring_revenue](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__monthly_recurring_revenue) | Tracks monthly recurring revenue (MRR) and non-MRR by account with gross, discount, and net calculations comparing current to previous month to measure subscription business health, analyze revenue trends, and calculate MRR movement by type. <br></br>**Example Analytics Questions:**<ul><li>What is the net_current_month_mrr by account and how does it compare to net_previous_month_mrr?</li><li>How does MRR break down by net_mrr_type (new, expansion, contraction, churn)?</li><li>What is the ratio of net_current_month_mrr to gross_current_month_non_mrr by account?</li></ul>|
+| [zuora__subscription_overview](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__subscription_overview) | Provides detailed subscription profiles with activation dates, term lengths, subscription status, auto-renewal settings, charge details including MRR, amendment info, and period calculations to monitor subscription lifecycle and financial contribution. <br></br>**Example Analytics Questions:**<ul><li>Which subscriptions have the longest subscription_days and highest charge_mrr values?</li><li>How do subscriptions with auto_renew = true compare to false in terms of term lengths?</li><li>What is the average current_term, initial_term, and renewal_term by status and term_type?</li></ul>|
+| [zuora__line_item_enhanced](https://fivetran.github.io/dbt_zuora/#!/model/model.zuora.zuora__line_item_enhanced) | This table is a comprehensive, denormalized analytical table that enables reporting on key revenue, subscription, customer, and product metrics from your billing platform. It's designed to align with the schema of the `*__line_item_enhanced` table found in Zuora, Recharge, Stripe, Shopify, and Recurly, offering standardized reporting across various billing platforms. To see the kinds of insights this table can generate, explore example visualizations in the [Fivetran Billing Model Streamlit App](https://fivetran-billing-model.streamlit.app/). Visit the app for more details and refer to these [docs](https://github.com/fivetran/dbt_zuora/tree/main?tab=readme-ov-file#enabling-standardized-billing-model) for how to enable the table, which is disabled by default. |
+
+
+¹ Each Quickstart transformation job run materializes these models if all components of this data model are enabled. This count includes all staging, intermediate, and final models materialized as `view`, `table`, or `incremental`.
+
+---
+
+## Visualizations
+Many of the above reports are now configurable for [visualization via Streamlit](https://github.com/fivetran/streamlit_zuora). Check out some [sample reports here](https://fivetran-zuora.streamlit.app/).
 
 <p align="center">
 <a href="https://fivetran-billing-model.streamlit.app/">
@@ -53,15 +68,29 @@ Curious what these tables can do? Check out example visualizations from the [zuo
 </a>
 </p>
 
-### Materialized Models
-Each Quickstart transformation job run materializes 51 models if all components of this data model are enabled. This count includes all staging, intermediate, and final models materialized as `view`, `table`, or `incremental`.
-<!--section-end-->
+## Prerequisites
+To use this dbt package, you must have the following:
+
+- At least one Fivetran Zuora connection syncing data into your destination.
+- A **BigQuery**, **Snowflake**, **Redshift**, **PostgreSQL**, or **Databricks** destination.
 
 ## How do I use the dbt package?
-### Step 1: Prerequisites
-To use this dbt package, you must have the following:
-- At least one Fivetran Zuora connection syncing data into your destination
-- A **BigQuery**, **Snowflake**, **Redshift**, **PostgreSQL**, **Databricks** destination
+You can either add this dbt package in the Fivetran dashboard or import it into your dbt project:
+
+- To add the package in the Fivetran dashboard, follow our [Quickstart guide](https://fivetran.com/docs/transformations/data-models/quickstart-management).
+- To add the package to your dbt project, follow the setup instructions in the dbt package's [README file](https://github.com/fivetran/dbt_zuora/blob/main/README.md#how-do-i-use-the-dbt-package) to use this package.
+
+<!--section-end-->
+
+### Install the package
+Include the following zuora package version in your `packages.yml` file.
+> TIP: Check [dbt Hub](https://hub.getdbt.com/) for the latest installation instructions or [read the dbt docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
+```yaml
+packages:
+  - package: fivetran/zuora
+    version: [">=1.3.0", "<1.4.0"]
+```
+> All required sources and staging models are now bundled into this transformation package. Do not include `fivetran/zuora_source` in your `packages.yml` since this package has been deprecated.
 
 #### Databricks Dispatch Configuration
 If you are using a Databricks destination with this package, you will need to add the below (or a variation of the below) dispatch configuration within your `dbt_project.yml`. This is required for the package to accurately search for macros within the `dbt-labs/spark_utils` then the `dbt-labs/dbt_utils` packages, respectively.
@@ -72,17 +101,7 @@ dispatch:
     search_order: ['spark_utils', 'dbt_utils']
 ```
 
-### Step 2: Install the package
-Include the following zuora package version in your `packages.yml` file.
-> TIP: Check [dbt Hub](https://hub.getdbt.com/) for the latest installation instructions or [read the dbt docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
-```yaml
-packages:
-  - package: fivetran/zuora
-    version: [">=1.2.0", "<1.3.0"]
-```
-> All required sources and staging models are now bundled into this transformation package. Do not include `fivetran/zuora_source` in your `packages.yml` since this package has been deprecated.
-
-### Step 3: Define database and schema variables
+### Define database and schema variables
 
 #### Option A: Single connection
 By default, this package runs using your [destination](https://docs.getdbt.com/docs/running-a-dbt-project/using-the-command-line-interface/configure-your-profile) and the `zuora` schema. If this is not where your Zuora data is (for example, if your Zuora schema is named `zuora_fivetran`), add the following configuration to your root `dbt_project.yml` file:
@@ -141,7 +160,7 @@ sources:
     tables: # copy and paste from zuora/models/staging/src_zuora.yml - see https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/ for how to use anchors to only do so once
 ```
 
-> **Note**: If there are source tables you do not have (see [Step 4](https://github.com/fivetran/dbt_zuora?tab=readme-ov-file#step-4-disable-models-for-non-existent-sources)), you may still include them, as long as you have set the right variables to `False`.
+> **Note**: If there are source tables you do not have (see [Disable models for non-existent sources](https://github.com/fivetran/dbt_zuora?tab=readme-ov-file#disable-models-for-non-existent-sources)), you may still include them, as long as you have set the right variables to `False`.
 
 2. Set the `has_defined_sources` variable (scoped to the `zuora` package) to `True`, like such:
 ```yml
@@ -151,7 +170,7 @@ vars:
     has_defined_sources: true
 ```
 
-### Step 4: Disable models for non-existent sources
+### Disable models for non-existent sources
 Your Zuora connection may not sync every table that this package expects. This might be because you are excluding those tables. If you are not using those tables, you can disable the corresponding functionality in the package by specifying the variable in your dbt_project.yml. By default, all packages are assumed to be true. You only have to add variables for tables you want to disable in the following way:
 
 ```yml 
@@ -162,7 +181,7 @@ vars:
   zuora__using_taxation_item: false # Disable if you do not have the taxation item table
 ```     
 
-### Step 5: Configure the multicurrency variable for customers billing in multiple currencies
+### Configure the multicurrency variable for customers billing in multiple currencies
 Zuora allows the functionality for multicurrency to bill customers in various currencies. If you are an account utilizing multicurrency, make sure to set the `zuora__using_multicurrency` variable to `true` in `dbt_project.yml` so the amounts in our data models accurately reflect the home currency values in your native account currency.
 
 ```yml
@@ -172,11 +191,11 @@ vars:
 #### Multicurrency Support Disclaimer (and how you can help)
 We were not able to develop the package using the multicurrency variable, so we had to execute our best judgement when building these models. If you encounter any issues with enabling the variable, [please file a bug report with us](https://github.com/fivetran/dbt_zuora/issues/new?assignees=&labels=type%3Abug&template=bug-report.yml&title=%5BBug%5D+%3Ctitle%3E) and we can work together to fix any issues you encounter.
 
-### (Optional) Step 6: Additional configurations
+### (Optional) Additional configurations
 <details open><summary>Expand to view configurations</summary>
 
 #### Enabling Standardized Billing Model
-This package contains the `zuora__line_item_enhanced` model which constructs a comprehensive, denormalized analytical table that enables reporting on key revenue, subscription, customer, and product metrics from your billing platform. It’s designed to align with the schema of the `*__line_item_enhanced` model found in Recurly, Recharge, Stripe, Shopify, and Zuora, offering standardized reporting across various billing platforms. To see the kinds of insights this model can generate, explore example visualizations in the [Fivetran Billing Model Streamlit App](https://fivetran-billing-model.streamlit.app/). This model is enabled by default. To disable it, set the `zuora__standardized_billing_model_enabled` variable to `false` in your `dbt_project.yml`:
+This package contains the `zuora__line_item_enhanced` model which constructs a comprehensive, denormalized analytical table that enables reporting on key revenue, subscription, customer, and product metrics from your billing platform. It's designed to align with the schema of the `*__line_item_enhanced` model found in Recurly, Recharge, Stripe, Shopify, and Zuora, offering standardized reporting across various billing platforms. To see the kinds of insights this model can generate, explore example visualizations in the [Fivetran Billing Model Streamlit App](https://fivetran-billing-model.streamlit.app/). This model is enabled by default. To disable it, set the `zuora__standardized_billing_model_enabled` variable to `false` in your `dbt_project.yml`:
 
 ```yml
 vars:
@@ -249,11 +268,11 @@ vars:
 
 </details>
 
-### (Optional) Step 7: Orchestrate your models with Fivetran Transformations for dbt Core™
+### (Optional) Orchestrate your models with Fivetran Transformations for dbt Core™
 <details><summary>Expand to view details</summary>
 <br>
 
-Fivetran offers the ability for you to orchestrate your dbt project through [Fivetran Transformations for dbt Core™](https://fivetran.com/docs/transformations/dbt). Learn how to set up your project for orchestration through Fivetran in our [Transformations for dbt Core setup guides](https://fivetran.com/docs/transformations/dbt#setupguide).
+Fivetran offers the ability for you to orchestrate your dbt project through [Fivetran Transformations for dbt Core™](https://fivetran.com/docs/transformations/dbt#transformationsfordbtcore). Learn how to set up your project for orchestration through Fivetran in our [Transformations for dbt Core setup guides](https://fivetran.com/docs/transformations/dbt/setup-guide#transformationsfordbtcoresetupguide).
 </details>
 
 ## Does this package have dependencies?
@@ -271,14 +290,16 @@ packages:
       version: [">=0.3.0", "<0.4.0"]
 ```
 
+<!--section="zuora_maintenance"-->
 ## How is this package maintained and can I contribute?
+
 ### Package Maintenance
-The Fivetran team maintaining this package _only_ maintains the latest version of the package. We highly recommend that you stay consistent with the [latest version](https://hub.getdbt.com/fivetran/zuora/latest/) of the package and refer to the [CHANGELOG](https://github.com/fivetran/dbt_zuora/blob/main/CHANGELOG.md) and release notes for more information on changes across versions.
+The Fivetran team maintaining this package only maintains the [latest version](https://hub.getdbt.com/fivetran/zuora/latest/) of the package. We highly recommend you stay consistent with the latest version of the package and refer to the [CHANGELOG](https://github.com/fivetran/dbt_zuora/blob/main/CHANGELOG.md) and release notes for more information on changes across versions.
 
 ### Contributions
 A small team of analytics engineers at Fivetran develops these dbt packages. However, the packages are made better by community contributions.
 
-We highly encourage and welcome contributions to this package. Check out [this dbt Discourse article](https://discourse.getdbt.com/t/contributing-to-a-dbt-package/657) to learn how to contribute to a dbt package.
+We highly encourage and welcome contributions to this package. Learn how to contribute to a package in dbt's [Contributing to an external dbt package article](https://discourse.getdbt.com/t/contributing-to-a-dbt-package/657).
 
 ### Opinionated Modelling Decisions
 This dbt package takes several opinionated stances in order to provide the customer several options to better understand key subscription metrics. Those include:
@@ -287,6 +308,8 @@ This dbt package takes several opinionated stances in order to provide the custo
 - Developing a custom churn analysis that you can find in the analysis folder that's built on the account monthly level, but also giving the customer the ability to look at churn from a subscription or rate plan charge level.
 
 If you would like a deeper explanation of the decisions we made to our models in this dbt package, you may reference the [DECISIONLOG](https://github.com/fivetran/dbt_zuora/blob/main/DECISIONLOG.md).
+
+<!--section-end-->
 
 ## Are there any resources available?
 - If you have questions or want to reach out for help, see the [GitHub Issue](https://github.com/fivetran/dbt_zuora/issues/new/choose) section to find the right avenue of support for you.
