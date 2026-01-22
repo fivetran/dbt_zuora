@@ -60,7 +60,7 @@ By default, this package materializes the following final tables:
 ---
 
 ## Visualizations
-Many of the above reports are now configurable for [visualization via Streamlit](https://github.com/fivetran/streamlit_zuora). Check out some [sample reports here](https://fivetran-zuora.streamlit.app/).
+Many of the above reports are now configurable for [visualization via Streamlit](https://share.streamlit.io/user/fivetran-streamlit). Check out some [sample reports here](https://fivetran-billing-model.streamlit.app//).
 
 <p align="center">
 <a href="https://fivetran-billing-model.streamlit.app/">
