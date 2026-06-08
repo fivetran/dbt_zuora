@@ -55,15 +55,15 @@ current_vs_previous_mrr as (
         discount_current_month_non_mrr,
         net_current_month_non_mrr,
         mrr_expected_current_month,
-        lag(mrr_expected_current_month) over (partition by account_id {{ zuora.partition_by_source_relation() }} order by account_month) as mrr_expected_previous_month,
+        lag(mrr_expected_current_month) over (partition by account_id {{ fivetran_utils.partition_by_source_relation(package_name='zuora') }} order by account_month) as mrr_expected_previous_month,
 
         {% set sum_cols = ['gross', 'discount', 'net'] %}
         {% for col in sum_cols %}
-            lag({{col}}_current_month_mrr) over (partition by account_id {{ zuora.partition_by_source_relation() }} order by account_month) as {{col}}_previous_month_mrr,
-            lag({{col}}_current_month_non_mrr) over (partition by account_id {{ zuora.partition_by_source_relation() }} order by account_month) as {{col}}_previous_month_non_mrr,
+            lag({{col}}_current_month_mrr) over (partition by account_id {{ fivetran_utils.partition_by_source_relation(package_name='zuora') }} order by account_month) as {{col}}_previous_month_mrr,
+            lag({{col}}_current_month_non_mrr) over (partition by account_id {{ fivetran_utils.partition_by_source_relation(package_name='zuora') }} order by account_month) as {{col}}_previous_month_non_mrr,
         {% endfor %}
 
-        row_number() over (partition by account_id {{ zuora.partition_by_source_relation() }} order by account_month) as account_month_number
+        row_number() over (partition by account_id {{ fivetran_utils.partition_by_source_relation(package_name='zuora') }} order by account_month) as account_month_number
     from mrr_by_account
     {{ dbt_utils.group_by(10) }}
 ),

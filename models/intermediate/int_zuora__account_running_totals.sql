@@ -26,7 +26,7 @@ account_running_totals as (
 
         {% for f in fields %}
             coalesce(rolling_{{ f }},
-                first_value(rolling_{{ f }}) over (partition by rolling_{{ f }}_partition {{ zuora.partition_by_source_relation() }} order by date_day rows unbounded preceding)) as rolling_{{ f }}
+                first_value(rolling_{{ f }}) over (partition by rolling_{{ f }}_partition {{ fivetran_utils.partition_by_source_relation(package_name='zuora') }} order by date_day rows unbounded preceding)) as rolling_{{ f }}
         {%- if not loop.last -%},
         {%- endif -%}
         {% endfor %}

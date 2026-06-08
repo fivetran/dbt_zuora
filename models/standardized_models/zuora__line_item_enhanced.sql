@@ -65,7 +65,7 @@ select
     line_items.source_relation,
     line_items.invoice_id as header_id,
     line_items.invoice_item_id as line_item_id,
-    row_number() over (partition by line_items.invoice_id {{ zuora.partition_by_source_relation(alias='line_items') }}
+    row_number() over (partition by line_items.invoice_id {{ fivetran_utils.partition_by_source_relation(package_name='zuora', alias='line_items') }}
         order by line_items.invoice_item_id) as line_item_index,
     line_items.created_date as line_item_created_at,
     invoices.created_date as invoice_created_at,

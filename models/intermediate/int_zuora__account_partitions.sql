@@ -17,7 +17,7 @@ account_partitions as (
         sum(case when {{ f }} is null
             then 0
             else 1
-                end) over (order by account_id, date_day {{ zuora.partition_by_source_relation() }} rows unbounded preceding) as {{ f }}_partition
+                end) over (order by account_id, date_day {{ fivetran_utils.partition_by_source_relation(package_name='zuora') }} rows unbounded preceding) as {{ f }}_partition
         {%- if not loop.last -%},{%- endif -%}
         {% endfor %}
 

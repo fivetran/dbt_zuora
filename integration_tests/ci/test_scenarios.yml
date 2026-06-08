@@ -24,3 +24,9 @@ test_scenarios:
       zuora__using_refund: false
       zuora__using_refund_invoice_payment: false
     include_incremental: false
+
+  - name: "MDLS"
+    vars:
+      fivetran_using_source_casing: true
+    include_incremental: false
+    include_dbt_seed: true

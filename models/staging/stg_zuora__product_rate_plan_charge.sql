@@ -1,4 +1,3 @@
-
 with base as (
 
     select * 
@@ -14,7 +13,7 @@ fields as (
                 staging_columns=get_product_rate_plan_charge_columns()
             )
         }}
-        {{ zuora.apply_source_relation() }}
+        {{ fivetran_utils.apply_source_relation(package_name='zuora') }}
     from base
 ),
 
@@ -60,7 +59,7 @@ final as (
         cast(updated_date as {{ dbt.type_timestamp() }}) as updated_date,
         use_discount_specific_accounting_code,
         weekly_bill_cycle_day,
-        row_number() over (partition by id {{ zuora.partition_by_source_relation() }} order by updated_date desc) = 1 as is_most_recent_record
+        row_number() over (partition by id {{ fivetran_utils.partition_by_source_relation(package_name='zuora') }} order by updated_date desc) = 1 as is_most_recent_record
     from fields
     where not coalesce(_fivetran_deleted, false)
 )

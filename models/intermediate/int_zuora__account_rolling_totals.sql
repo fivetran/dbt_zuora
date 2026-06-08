@@ -19,7 +19,7 @@ account_rolling as (
     select
         *,
         {% for f in fields %}
-            sum(daily_{{ f }}) over (partition by account_id {{ zuora.partition_by_source_relation() }} order by date_day, account_id rows unbounded preceding) as rolling_{{ f }}
+            sum(daily_{{ f }}) over (partition by account_id {{ fivetran_utils.partition_by_source_relation(package_name='zuora') }} order by date_day, account_id rows unbounded preceding) as rolling_{{ f }}
         {%- if not loop.last -%},{%- endif -%}
         {% endfor %}
     from transactions_grouped
