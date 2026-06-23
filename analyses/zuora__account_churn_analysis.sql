@@ -35,8 +35,8 @@ account_current_month as (
 account_previous_month as (
 
     select *,
-      lag(rate_plan_charges) over (partition by account_id {{ zuora.partition_by_source_relation() }} order by account_month) as rate_plan_charges_last_month,
-      lag(is_current_month_active) over (partition by account_id {{ zuora.partition_by_source_relation() }} order by account_month) as is_previous_month_active
+      lag(rate_plan_charges) over (partition by account_id {{ fivetran_utils.partition_by_source_relation(package_name='zuora') }} order by account_month) as rate_plan_charges_last_month,
+      lag(is_current_month_active) over (partition by account_id {{ fivetran_utils.partition_by_source_relation(package_name='zuora') }} order by account_month) as is_previous_month_active
     from account_current_month
 ),
 

@@ -1,17 +1,17 @@
--- depends_on: {{ ref('stg_zuora__invoice_tmp') }}
+-- depends_on: {{ ref('stg_zuora__invoice') }}
 with spine as (
 
     {% if execute and flags.WHICH in ('run', 'build') and (not var('zuora_daily_overview_first_date', None) or not var('zuora_daily_overview_last_date', None)) %}
         {%- set first_date_query %}
             select 
                 cast(min(invoice_date) as date) as min_date
-        from {{ ref('stg_zuora__invoice_tmp') }}
+        from {{ ref('stg_zuora__invoice') }}
         {% endset %}
 
         {%- set last_date_query %}
             select 
                 cast(max(invoice_date) as date) as max_date
-            from {{ ref('stg_zuora__invoice_tmp') }}
+            from {{ ref('stg_zuora__invoice') }}
         {% endset -%}
 
     {# If only compiling, creates range going back 1 year #}
