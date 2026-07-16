@@ -10,6 +10,7 @@ schema_variable_name: "zuora_schema"
 
 include_databricks_sql: false
 include_sqlserver: false
+include_duckdb: true
 
 test_scenarios:
   - name: "Default"
