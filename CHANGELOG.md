@@ -1,3 +1,11 @@
+# dbt_zuora v1.4.1
+
+[PR #44](https://github.com/fivetran/dbt_zuora/pull/44) includes the following updates:
+
+## Feature Updates
+- Adds DuckDB as a supported destination.
+
+
 # dbt_zuora v1.4.0
 
 [PR #42](https://github.com/fivetran/dbt_zuora/pull/42) includes the following updates:
