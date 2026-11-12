@@ -1,3 +1,10 @@
+# dbt_zuora v1.4.2
+
+[PR #49](https://github.com/fivetran/dbt_zuora/pull/49) includes the following updates:
+
+## Under the Hood
+- Adds the missing `source_relation` column documentation to the `stg_zuora__invoice` model, bringing it in line with the other staging models in this package.
+
 # dbt_zuora v1.4.1
 
 [PR #44](https://github.com/fivetran/dbt_zuora/pull/44) includes the following updates:
