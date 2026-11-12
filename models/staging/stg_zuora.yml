@@ -487,6 +487,12 @@ models:
 
   - name: stg_zuora__invoice_payment
     description: invoice payment details
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - invoice_payment_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
