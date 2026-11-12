@@ -1,4 +1,6 @@
 version: 1.4.2
 pr_number: 49
 under_the_hood:
-  - description: "Adds the missing `source_relation` column documentation to the `stg_zuora__invoice` model, bringing it in line with the other staging models in this package."
+- description: Adds the missing `source_relation` column documentation to the `stg_zuora__invoice`
+    model, bringing it in line with the other staging models in this package.
+date: '2026-11-12'
