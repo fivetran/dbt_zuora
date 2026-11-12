@@ -260,6 +260,8 @@ models:
   - name: stg_zuora__invoice
     description: "{{ doc('invoice_table') }}"
     columns: 
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: invoice_id 
         description: "{{ doc('id') }} invoice table."
         tests:
