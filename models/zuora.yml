@@ -3,6 +3,13 @@ version: 2
 models:
   - name: zuora__account_daily_overview
     description: Each record is a day in an account and its accumulated balance totals based on all line item transactions up to that day.   
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - account_id
+              - date_day
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -83,6 +90,12 @@ models:
 
   - name: zuora__account_overview
     description: Each record represents an account enriched with metrics about their associated transactions.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - account_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -173,6 +186,12 @@ models:
 
   - name: zuora__billing_history
     description: Each record is an invoice to evaluate the history of charges billed, enhanced with additional details from payments, refunds, adjustments, discounts, and taxes.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - invoice_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -259,6 +278,12 @@ models:
 
   - name: zuora__line_item_history
     description: Each record is an invoice item meant to provide all details on all transactions at the most granular level, with details being brought in from subscriptions, amendments, rate plan charges, products, subscriptions, amendments and more.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - invoice_item_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -407,6 +432,13 @@ models:
 
   - name: zuora__monthly_recurring_revenue
     description: Each record is an account and a month in that account, with details about its monthly recurring and non-recurring revenue in these time periods.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - account_id
+              - account_month
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -453,6 +485,14 @@ models:
 
   - name: zuora__subscription_overview
     description: Each record is a subscription, enhanced with additional details from rate plan charges and amendments.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - subscription_id
+              - rate_plan_charge_id
+              - amendment_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
