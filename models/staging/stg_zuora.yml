@@ -3,6 +3,12 @@ version: 2
 models:
   - name: stg_zuora__account
     description: "{{ doc('account_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - account_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -71,6 +77,12 @@ models:
 
   - name: stg_zuora__amendment
     description: "{{ doc('amendment_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - amendment_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -139,6 +151,12 @@ models:
 
   - name: stg_zuora__contact
     description: "{{ doc('contact_table') }}"  
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - contact_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -185,6 +203,12 @@ models:
 
   - name: stg_zuora__credit_balance_adjustment
     description: "{{ doc('credit_balance_adjustment_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - credit_balance_adjustment_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -259,6 +283,12 @@ models:
 
   - name: stg_zuora__invoice
     description: "{{ doc('invoice_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - invoice_id
     columns: 
       - name: invoice_id 
         description: "{{ doc('id') }} invoice table."
@@ -355,6 +385,12 @@ models:
 
   - name: stg_zuora__invoice_item
     description: "{{ doc('invoice_item_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - invoice_item_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -451,6 +487,12 @@ models:
 
   - name: stg_zuora__invoice_payment
     description: invoice payment details
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - invoice_payment_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -513,6 +555,12 @@ models:
 
   - name: stg_zuora__order
     description: "{{ doc('order_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - order_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -561,6 +609,12 @@ models:
 
   - name: stg_zuora__payment
     description: "{{ doc('payment_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - payment_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -633,6 +687,12 @@ models:
     
   - name: stg_zuora__payment_method
     description: "{{ doc('payment_method_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - payment_method_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -687,6 +747,12 @@ models:
 
   - name: stg_zuora__product
     description: "{{ doc('product_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - product_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -719,6 +785,12 @@ models:
 
   - name: stg_zuora__product_rate_plan
     description: "{{ doc('product_rate_plan_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - product_rate_plan_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -749,6 +821,12 @@ models:
 
   - name: stg_zuora__product_rate_plan_charge
     description: "{{ doc('product_rate_plan_charge_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - product_rate_plan_charge_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -835,6 +913,12 @@ models:
 
   - name: stg_zuora__rate_plan
     description: "{{ doc('rate_plan_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - rate_plan_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -875,6 +959,12 @@ models:
 
   - name: stg_zuora__rate_plan_charge
     description: "{{ doc('rate_plan_charge_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - rate_plan_charge_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -1027,6 +1117,12 @@ models:
   
   - name: stg_zuora__refund_invoice_payment
     description: "{{ doc('refund_invoice_payment_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - refund_invoice_payment_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -1047,6 +1143,12 @@ models:
   
   - name: stg_zuora__refund
     description: "{{ doc('refund_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - refund_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -1095,6 +1197,12 @@ models:
 
   - name: stg_zuora__subscription
     description: "{{ doc('subscription_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - subscription_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -1187,6 +1295,12 @@ models:
 
   - name: stg_zuora__taxation_item
     description: "{{ doc('taxation_item_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - taxation_item_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
