@@ -4,3 +4,5 @@ new_features:
 - description: Raises the minimum supported dbt version from v1.3.0 to v1.10.0.
 under_the_hood:
 - description: Adds `dbt_utils.unique_combination_of_columns` tests to the staging and end models. The tests use the `arguments` syntax introduced in dbt v1.10.0, the new minimum supported version.
+- description: Adds the missing `source_relation` column documentation to the `stg_zuora__invoice`
+    model, bringing it in line with the other staging models in this package.

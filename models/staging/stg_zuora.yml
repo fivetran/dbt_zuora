@@ -290,6 +290,8 @@ models:
               - source_relation
               - invoice_id
     columns: 
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: invoice_id 
         description: "{{ doc('id') }} invoice table."
         tests:
