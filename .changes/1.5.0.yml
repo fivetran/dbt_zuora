@@ -1,0 +1,24 @@
+version: 1.5.0
+pr_number: null # TODO: set once the PR is open
+is_breaking: true
+schema_data_changes:
+  entries:
+  - models:
+    - '`zuora__billing_history`'
+    change_type: Corrected values
+    old: Payments and credit balance adjustments are joined to each invoice on `invoice_id`
+      in the same query, so an invoice with more than one of either repeats the other's
+      amounts. `invoice_amount_paid_home_currency` also sums the full payment amount, even
+      when a payment covers several invoices.
+    new: Payments and credit balance adjustments are rolled up to one row per invoice
+      before the join. `invoice_amount_paid_home_currency` sums the amount applied to
+      each invoice from `invoice_payment`.
+    is_breaking: true
+    notes: Fixes overstated `invoice_amount_paid_home_currency` and `credit_balance_adjustment_amount_home_currency`,
+      and understated `invoice_amount_unpaid_home_currency`, for invoices with both
+      payments and credit balance adjustments ([#45](https://github.com/fivetran/dbt_zuora/issues/45)),
+      and for payments split across invoices. Other columns and downstream models don't change,
+      because they use amounts from the `invoice` table.
+      Thanks to [@burugupallyprem-coder](https://github.com/burugupallyprem-coder) for
+      reporting the issue.
+date: '2026-11-18'
