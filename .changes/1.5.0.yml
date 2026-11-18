@@ -2,6 +2,9 @@ version: 1.5.0
 pr_number: 50
 new_features:
 - description: Raises the minimum dbt version to 1.10.0.
-- description: Adds `dbt_utils.unique_combination_of_columns` tests to staging and end models. If a test fails, please [open an issue](https://github.com/fivetran/dbt_zuora/issues/new/choose).
+- description: Adds `dbt_utils.unique_combination_of_columns` tests to staging and
+    end models. If a test fails, please [open an issue](https://github.com/fivetran/dbt_zuora/issues/new/choose).
 under_the_hood:
-- description: Adds the missing `source_relation` column documentation to the `stg_zuora__invoice` model, bringing it in line with the other staging models in this package.
+- description: Adds the missing `source_relation` column documentation to the `stg_zuora__invoice`
+    model, bringing it in line with the other staging models in this package.
+date: '2026-11-18'
