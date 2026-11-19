@@ -7,7 +7,7 @@
 - Adds `dbt_utils.unique_combination_of_columns` tests to staging and end models. If a test fails, please [open an issue](https://github.com/fivetran/dbt_zuora/issues/new/choose).
 
 ## Under the Hood
-- Adds the missing `source_relation` column documentation to the `stg_zuora__invoice` model, bringing it in line with the other staging models in this package.
+- Updates yml column documentation to match model output.
 
 # dbt_zuora v1.4.1
 
