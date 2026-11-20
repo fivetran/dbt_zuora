@@ -3,12 +3,18 @@ version: 2
 models:
   - name: stg_zuora__account
     description: "{{ doc('account_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - account_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: account_id
         description: "{{ doc('id') }} account table."
-        tests:
+        data_tests:
           - not_null
       - name: account_number
         description: Unique account number assigned to the account. 
@@ -71,12 +77,18 @@ models:
 
   - name: stg_zuora__amendment
     description: "{{ doc('amendment_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - amendment_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: amendment_id
         description: "{{ doc('id') }} amendment table."
-        tests:
+        data_tests:
           - not_null
       - name: auto_renew
         description: Determines whether the subscription is automatically renewed, or whether it expires at the end of the term and needs to be manually renewed.
@@ -139,12 +151,18 @@ models:
 
   - name: stg_zuora__contact
     description: "{{ doc('contact_table') }}"  
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - contact_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: contact_id 
         description: "{{ doc('id') }} contact table."
-        tests:
+        data_tests:
           - not_null
       - name: account_id
         description: The Zuora account id associated with this contact.
@@ -185,12 +203,18 @@ models:
 
   - name: stg_zuora__credit_balance_adjustment
     description: "{{ doc('credit_balance_adjustment_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - credit_balance_adjustment_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: credit_balance_adjustment_id
         description: "{{ doc('id') }} credit balance adjustment table."
-        tests:
+        data_tests:
           - not_null
       - name: account_id
         description: The account id of the credit balance's account. Zuora generates this value from the source transaction.
@@ -259,10 +283,18 @@ models:
 
   - name: stg_zuora__invoice
     description: "{{ doc('invoice_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - invoice_id
     columns: 
+      - name: source_relation
+        description: "{{ doc('source_relation') }}"
       - name: invoice_id 
         description: "{{ doc('id') }} invoice table."
-        tests:
+        data_tests:
           - not_null
       - name: account_id
         description: The account identifier associated with the invoice.
@@ -355,12 +387,18 @@ models:
 
   - name: stg_zuora__invoice_item
     description: "{{ doc('invoice_item_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - invoice_item_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: invoice_item_id 
         description: "{{ doc('id') }} invoice item table."
-        tests:
+        data_tests:
           - not_null
       - name: account_id
         description: id of the account associated with this invoice item.
@@ -451,6 +489,12 @@ models:
 
   - name: stg_zuora__invoice_payment
     description: invoice payment details
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - invoice_payment_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -513,12 +557,18 @@ models:
 
   - name: stg_zuora__order
     description: "{{ doc('order_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - order_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: order_id
         description: "{{ doc('id') }} order table."
-        tests:
+        data_tests:
           - not_null
       - name: account_id
         description: The id of the account associated with this order.
@@ -561,12 +611,18 @@ models:
 
   - name: stg_zuora__payment
     description: "{{ doc('payment_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - payment_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: payment_id
         description: The unique identifier of the payment.
-        tests:
+        data_tests:
           - not_null
       - name: account_id
         description: The id of the Zuora account associated with the payment.
@@ -633,12 +689,18 @@ models:
     
   - name: stg_zuora__payment_method
     description: "{{ doc('payment_method_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - payment_method_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: payment_method_id
         description: The unique identifier of the payment method.
-        tests:
+        data_tests:
           - not_null
       - name: account_id
         description: The unique identifier of the account associated with this payment method.
@@ -687,12 +749,18 @@ models:
 
   - name: stg_zuora__product
     description: "{{ doc('product_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - product_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: product_id
         description: The unique identifier for the product.
-        tests:
+        data_tests:
           - not_null
       - name: category
         description: The category of the product.
@@ -719,12 +787,18 @@ models:
 
   - name: stg_zuora__product_rate_plan
     description: "{{ doc('product_rate_plan_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - product_rate_plan_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: product_rate_plan_id
         description: Unique identifier of the product rate plan.
-        tests: 
+        data_tests: 
           - not_null
       - name: created_by_id
         description: The id of the Zuora user who created the product rate plan.
@@ -749,12 +823,18 @@ models:
 
   - name: stg_zuora__product_rate_plan_charge
     description: "{{ doc('product_rate_plan_charge_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - product_rate_plan_charge_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: product_rate_plan_charge_id
         description: Unique identifier of the product rate plan charge.
-        tests: 
+        data_tests: 
           - not_null   
       - name: account_receivable_accounting_code_id
         description: The id of the accounting code for the accounts receivable account.
@@ -835,12 +915,18 @@ models:
 
   - name: stg_zuora__rate_plan
     description: "{{ doc('rate_plan_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - rate_plan_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: rate_plan_id
         description: The unique identifier of the rate plan.
-        tests: 
+        data_tests: 
           - not_null
       - name: account_id
         description: The unique identifier of the account that the rate plan belongs to.
@@ -875,12 +961,18 @@ models:
 
   - name: stg_zuora__rate_plan_charge
     description: "{{ doc('rate_plan_charge_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - rate_plan_charge_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: rate_plan_charge_id
         description: The unique identifier for the rate plan charge.
-        tests: 
+        data_tests: 
           - not_null
       - name: account_id
         description: The unique identifier of the account associated with the rate plan charge.
@@ -1027,6 +1119,12 @@ models:
   
   - name: stg_zuora__refund_invoice_payment
     description: "{{ doc('refund_invoice_payment_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - refund_invoice_payment_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -1047,6 +1145,12 @@ models:
   
   - name: stg_zuora__refund
     description: "{{ doc('refund_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - refund_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
@@ -1095,12 +1199,18 @@ models:
 
   - name: stg_zuora__subscription
     description: "{{ doc('subscription_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - subscription_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: subscription_id
         description: The unique identifier for the subscription.
-        tests: 
+        data_tests: 
           - not_null 
       - name: account_id
         description: The unique identifier for the account associated with the subscription.
@@ -1187,12 +1297,18 @@ models:
 
   - name: stg_zuora__taxation_item
     description: "{{ doc('taxation_item_table') }}"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - source_relation
+              - taxation_item_id
     columns:
       - name: source_relation
         description: "{{ doc('source_relation') }}"
       - name: taxation_item_id
         description: The unique identifier of the taxation item.
-        tests: 
+        data_tests: 
           - not_null
       - name: account_id
         description: The id of the account associated with the taxation item.
