@@ -14,7 +14,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: account_id
         description: "{{ doc('id') }} account table."
-        tests:
+        data_tests:
           - not_null
       - name: account_number
         description: Unique account number assigned to the account. 
@@ -88,7 +88,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: amendment_id
         description: "{{ doc('id') }} amendment table."
-        tests:
+        data_tests:
           - not_null
       - name: auto_renew
         description: Determines whether the subscription is automatically renewed, or whether it expires at the end of the term and needs to be manually renewed.
@@ -162,7 +162,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: contact_id 
         description: "{{ doc('id') }} contact table."
-        tests:
+        data_tests:
           - not_null
       - name: account_id
         description: The Zuora account id associated with this contact.
@@ -214,7 +214,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: credit_balance_adjustment_id
         description: "{{ doc('id') }} credit balance adjustment table."
-        tests:
+        data_tests:
           - not_null
       - name: account_id
         description: The account id of the credit balance's account. Zuora generates this value from the source transaction.
@@ -294,7 +294,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: invoice_id 
         description: "{{ doc('id') }} invoice table."
-        tests:
+        data_tests:
           - not_null
       - name: account_id
         description: The account identifier associated with the invoice.
@@ -398,7 +398,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: invoice_item_id 
         description: "{{ doc('id') }} invoice item table."
-        tests:
+        data_tests:
           - not_null
       - name: account_id
         description: id of the account associated with this invoice item.
@@ -568,7 +568,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: order_id
         description: "{{ doc('id') }} order table."
-        tests:
+        data_tests:
           - not_null
       - name: account_id
         description: The id of the account associated with this order.
@@ -622,7 +622,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: payment_id
         description: The unique identifier of the payment.
-        tests:
+        data_tests:
           - not_null
       - name: account_id
         description: The id of the Zuora account associated with the payment.
@@ -700,7 +700,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: payment_method_id
         description: The unique identifier of the payment method.
-        tests:
+        data_tests:
           - not_null
       - name: account_id
         description: The unique identifier of the account associated with this payment method.
@@ -760,7 +760,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: product_id
         description: The unique identifier for the product.
-        tests:
+        data_tests:
           - not_null
       - name: category
         description: The category of the product.
@@ -798,7 +798,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: product_rate_plan_id
         description: Unique identifier of the product rate plan.
-        tests: 
+        data_tests: 
           - not_null
       - name: created_by_id
         description: The id of the Zuora user who created the product rate plan.
@@ -834,7 +834,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: product_rate_plan_charge_id
         description: Unique identifier of the product rate plan charge.
-        tests: 
+        data_tests: 
           - not_null   
       - name: account_receivable_accounting_code_id
         description: The id of the accounting code for the accounts receivable account.
@@ -926,7 +926,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: rate_plan_id
         description: The unique identifier of the rate plan.
-        tests: 
+        data_tests: 
           - not_null
       - name: account_id
         description: The unique identifier of the account that the rate plan belongs to.
@@ -972,7 +972,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: rate_plan_charge_id
         description: The unique identifier for the rate plan charge.
-        tests: 
+        data_tests: 
           - not_null
       - name: account_id
         description: The unique identifier of the account associated with the rate plan charge.
@@ -1210,7 +1210,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: subscription_id
         description: The unique identifier for the subscription.
-        tests: 
+        data_tests: 
           - not_null 
       - name: account_id
         description: The unique identifier for the account associated with the subscription.
@@ -1308,7 +1308,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: taxation_item_id
         description: The unique identifier of the taxation item.
-        tests: 
+        data_tests: 
           - not_null
       - name: account_id
         description: The id of the account associated with the taxation item.

@@ -15,7 +15,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: account_daily_id
         description: Unique account key, based on account id and date of balance data.
-        tests:
+        data_tests:
           - not_null
       - name: account_id
         description:  "{{ doc('created_date') }} the account."
@@ -197,7 +197,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: invoice_id
         description: "{{ doc('id') }} invoice table."
-        tests:
+        data_tests:
           - not_null
       - name: account_id
         description: The account associated with the invoice.
@@ -289,7 +289,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: invoice_item_id
         description: "{{ doc('id') }} invoice item table."
-        tests:
+        data_tests:
           - not_null
       - name: account_id
         description: Identifier of the account associated with this invoice item.
@@ -444,7 +444,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: account_monthly_id
         description: The unique identifier for the account id and month.
-        tests:
+        data_tests:
           - not_null
       - name: account_id
         description: Unique identifier of the account.
@@ -498,7 +498,7 @@ models:
         description: "{{ doc('source_relation') }}"
       - name: subscription_key
         description: The unique subscription key, defined by subscription id, rate plan charge id, and amendment id.
-        tests:
+        data_tests:
           - not_null
       - name: subscription_id
         description: The unique identifier for the subscription.
