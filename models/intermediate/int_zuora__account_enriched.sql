@@ -146,21 +146,21 @@ account_cumulatives as (
         round(cast({{ dbt_utils.safe_divide('account_invoice_data.invoice_item_count', 'account_invoice_data.invoice_count') }} as {{ dbt.type_numeric() }}), 2) as total_units_per_invoice,
         account_subscription_data.subscription_count as total_subscription_count,
         account_subscription_data.active_subscription_count,
-        case when account_subscription_data.active_subscription_count = 0 then false else true end as is_currently_subscribed,
+        case when coalesce(account_subscription_data.active_subscription_count, 0) = 0 then false else true end as is_currently_subscribed,
         account_payment_data.account_amount_paid
     from account_details
         left join account_totals
             on account_details.account_id = account_totals.account_id
             and account_details.source_relation = account_totals.source_relation
         left join account_invoice_data
-            on account_totals.account_id = account_invoice_data.account_id
-            and account_totals.source_relation = account_invoice_data.source_relation
+            on account_details.account_id = account_invoice_data.account_id
+            and account_details.source_relation = account_invoice_data.source_relation
         left join account_subscription_data
-            on account_totals.account_id = account_subscription_data.account_id
-            and account_totals.source_relation = account_subscription_data.source_relation
+            on account_details.account_id = account_subscription_data.account_id
+            and account_details.source_relation = account_subscription_data.source_relation
         left join account_payment_data
-            on account_totals.account_id = account_payment_data.account_id
-            and account_totals.source_relation = account_payment_data.source_relation
+            on account_details.account_id = account_payment_data.account_id
+            and account_details.source_relation = account_payment_data.source_relation
 )
 
 select * 
